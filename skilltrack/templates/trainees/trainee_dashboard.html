@@ -1,0 +1,74 @@
+<section class="section" id="training">
+
+    <h2>My Training</h2>
+
+    {% if batches %}
+
+        {% for batch in batches %}
+
+        <div class="info" style="margin-bottom: 15px;">
+
+            <h3 style="color: #172554; margin-bottom: 12px;">
+                {{ batch.name }}
+            </h3>
+
+            <p>
+                <strong>Course:</strong>
+                {{ batch.course.name }}
+            </p>
+
+            <p style="margin-top: 7px;">
+                <strong>Provider:</strong>
+                {{ batch.provider.name }}
+            </p>
+
+            <p style="margin-top: 7px;">
+                <strong>Trainer:</strong>
+                {{ batch.trainer.username }}
+            </p>
+
+            <p style="margin-top: 7px;">
+                <strong>District:</strong>
+                {{ batch.district }}
+            </p>
+
+            <p style="margin-top: 7px;">
+                <strong>Training Dates:</strong>
+                {{ batch.start_date }} → {{ batch.end_date }}
+            </p>
+
+            <p style="margin-top: 7px;">
+                <strong>Status:</strong>
+
+                {% if batch.status == "Active" %}
+                    <span class="status verified">
+                        Active
+                    </span>
+                {% else %}
+                    <span class="status verified">
+                        Completed
+                    </span>
+                {% endif %}
+            </p>
+
+        </div>
+
+        {% endfor %}
+
+    {% else %}
+
+        <div class="notice">
+
+            <strong>No training assigned yet.</strong>
+
+            <p style="margin-top: 8px;">
+                Once the Authority assigns you to a training
+                batch, your course and training details will
+                automatically appear here.
+            </p>
+
+        </div>
+
+    {% endif %}
+
+</section>

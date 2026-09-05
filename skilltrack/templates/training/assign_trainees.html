@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Assign Trainees</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+            padding: 30px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+        }
+
+        h1 {
+            color: #1f2937;
+        }
+
+        .batch-info {
+            color: #6b7280;
+            line-height: 1.7;
+        }
+
+        .trainee {
+            display: flex;
+            align-items: center;
+            padding: 14px;
+            border-bottom: 1px solid #eee;
+            gap: 12px;
+        }
+
+        .trainee:last-child {
+            border-bottom: none;
+        }
+
+        .trainee input {
+            width: 18px;
+            height: 18px;
+        }
+
+        .name {
+            font-weight: bold;
+            color: #111827;
+        }
+
+        .details {
+            color: #6b7280;
+            font-size: 14px;
+            margin-top: 4px;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 11px 20px;
+            border: none;
+            border-radius: 7px;
+            background: #2563eb;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #1d4ed8;
+        }
+
+        .back {
+            display: inline-block;
+            margin-top: 18px;
+            color: #2563eb;
+            text-decoration: none;
+        }
+
+        .empty {
+            color: #6b7280;
+            text-align: center;
+            padding: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="card">
+
+        <h1>Assign Trainees</h1>
+
+        <div class="batch-info">
+            <strong>Batch:</strong> {{ batch.name }}<br>
+            <strong>Course:</strong> {{ batch.course.name }}<br>
+            <strong>Provider:</strong> {{ batch.provider.name }}<br>
+            <strong>Trainer:</strong> {{ batch.trainer.username }}<br>
+            <strong>District:</strong> {{ batch.district }}<br>
+            <strong>Capacity:</strong> {{ batch.capacity }}
+        </div>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>Select Verified Trainees</h2>
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+            {% for trainee in verified_trainees %}
+
+                <label class="trainee">
+
+                    <input
+                        type="checkbox"
+                        name="trainees"
+                        value="{{ trainee.id }}"
+                        {% if trainee in batch.trainees.all %}
+                            checked
+                        {% endif %}
+                    >
+
+                    <div>
+
+                        <div class="name">
+                            {{ trainee.name }}
+                        </div>
+
+                        <div class="details">
+                            Beneficiary ID: {{ trainee.beneficiary_id }}
+                            |
+                            District: {{ trainee.district }}
+                        </div>
+
+                    </div>
+
+                </label>
+
+            {% empty %}
+
+                <div class="empty">
+                    No verified trainees are available.
+                </div>
+
+            {% endfor %}
+
+            {% if verified_trainees %}
+
+                <button type="submit">
+                    Assign Selected Trainees
+                </button>
+
+            {% endif %}
+
+        </form>
+
+        <a
+            href="{% url 'batch_list' %}"
+            class="back"
+        >
+            ← Back to Training Batches
+        </a>
+
+    </div>
+
+</div>
+<h2>Assigned Trainees</h2>
+<a href="{% url 'trainer_batch_progress' batch.id %}">
+    Update Attendance & Progress
+</a>
+</body>
+</html>

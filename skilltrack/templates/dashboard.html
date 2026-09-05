@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>SkillTrack Maharashtra | Dashboard</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+/* ============================================
+   SkillTrack Maharashtra — Dashboard styles
+   ============================================ */
+
+:root {
+    --bg: #F6F4EF;
+    --sidebar-bg: #14213D;
+    --sidebar-bg-active: #1D2E52;
+    --sidebar-text: #AEB8D0;
+    --sidebar-text-active: #FFFFFF;
+
+    --navy: #14213D;
+    --saffron: #C1561D;
+    --saffron-soft: #F4E3D5;
+    --teal: #2F6F5E;
+    --teal-soft: #DCEBE6;
+    --teal-dark: #1F4A3E;
+    --sand: #D7A24A;
+
+    --text-primary: #1B1F27;
+    --text-muted: #6B7280;
+    --card-bg: #FFFFFF;
+    --card-border: #E7E3D8;
+
+    --radius-sm: 8px;
+    --radius-md: 14px;
+
+    --font-heading: 'Fraunces', Georgia, 'Times New Roman', serif;
+    --font-body: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+}
+
+a { text-decoration: none; color: inherit; }
+
+/* ---------- LAYOUT ---------- */
+
+.layout {
+    display: grid;
+    grid-template-columns: 248px 1fr;
+    min-height: 100vh;
+}
+
+.main {
+    padding: 32px 40px 56px;
+    max-width: 1280px;
+    width: 100%;
+}
+
+/* ---------- SIDEBAR ---------- */
+
+.sidebar {
+    background: var(--sidebar-bg);
+    color: var(--sidebar-text);
+    display: flex;
+    flex-direction: column;
+    padding: 26px 16px;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 4px 8px 28px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    margin-bottom: 20px;
+}
+
+.brand-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-sm);
+    background: var(--saffron);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-heading);
+    font-weight: 600;
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+.brand-name h2 {
+    margin: 0;
+    font-family: var(--font-heading);
+    font-weight: 600;
+    font-size: 17px;
+    color: #fff;
+    letter-spacing: 0.2px;
+}
+
+.brand-name span {
+    font-size: 12px;
+    color: var(--sidebar-text);
+}
+
+.sidebar nav {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+}
+
+.sidebar nav a,
+.sidebar-bottom a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--sidebar-text);
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.sidebar nav a svg,
+.sidebar-bottom a svg {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+}
+
+.sidebar nav a:hover {
+    background: rgba(255, 255, 255, 0.06);
+    color: #fff;
+}
+
+.sidebar nav a.active {
+    background: var(--sidebar-bg-active);
+    color: var(--sidebar-text-active);
+    box-shadow: inset 3px 0 0 var(--saffron);
+}
+
+.sidebar-bottom {
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding-top: 12px;
+}
+
+/* ---------- TOPBAR ---------- */
+
+.topbar {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: 28px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--card-border);
+}
+
+.topbar h1 {
+    font-family: var(--font-heading);
+    font-weight: 600;
+    font-size: 30px;
+    margin: 0 0 4px;
+}
+
+.topbar p {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 14px;
+}
+
+.profile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.profile strong {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.profile small {
+    color: var(--text-muted);
+    font-size: 12px;
+}
+
+.avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: var(--navy);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-heading);
+    font-weight: 600;
+}
+
+/* ---------- STAT CARDS ---------- */
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+    margin-bottom: 20px;
+}
+
+.card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-left: 3px solid transparent;
+    border-radius: var(--radius-sm);
+    padding: 20px 22px;
+}
+
+.card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+}
+
+.card-top span {
+    font-size: 13px;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.card h2 {
+    font-family: var(--font-heading);
+    font-size: 34px;
+    font-weight: 600;
+    margin: 0 0 6px;
+}
+
+.card p {
+    margin: 0;
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+.card p.positive { color: var(--teal-dark); }
+
+.stat-navy   { border-left-color: var(--navy); }
+.stat-teal   { border-left-color: var(--teal); }
+.stat-saffron{ border-left-color: var(--saffron); }
+.stat-teal-dark { border-left-color: var(--teal-dark); }
+
+/* ---------- MINI STATS ---------- */
+
+.mini-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    margin-bottom: 28px;
+}
+
+.mini-stats div {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius-sm);
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.mini-stats span {
+    font-size: 13px;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.mini-stats strong {
+    font-family: var(--font-heading);
+    font-size: 20px;
+    font-weight: 600;
+}
+
+/* ---------- CHART CARDS ---------- */
+
+.charts {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    gap: 18px;
+    margin-bottom: 18px;
+}
+
+.bottom-grid {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    gap: 18px;
+}
+
+.chart-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius-md);
+    padding: 22px;
+}
+
+.chart-header {
+    margin-bottom: 18px;
+}
+
+.chart-header h3 {
+    font-family: var(--font-heading);
+    font-size: 17px;
+    font-weight: 600;
+    margin: 0 0 3px;
+}
+
+.chart-header p {
+    margin: 0;
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+.chart-card canvas {
+    max-height: 260px;
+}
+
+/* ---------- INSIGHT CARD ---------- */
+
+.insight-card {
+    background: var(--navy);
+    color: #fff;
+    border-radius: var(--radius-md);
+    padding: 26px;
+    display: flex;
+    flex-direction: column;
+}
+
+.insight-card h3 {
+    font-family: var(--font-heading);
+    font-size: 17px;
+    font-weight: 600;
+    margin: 0 0 18px;
+}
+
+.insight-card p {
+    margin: 4px 0 16px;
+    font-size: 13px;
+    color: #B9C0D4;
+}
+
+.employment-number {
+    font-family: var(--font-heading);
+    font-size: 46px;
+    font-weight: 600;
+    color: var(--sand);
+}
+
+.progress {
+    width: 100%;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.12);
+    border-radius: 999px;
+    overflow: hidden;
+    margin-bottom: 22px;
+}
+
+.progress div {
+    height: 100%;
+    background: var(--saffron);
+    border-radius: 999px;
+}
+
+.employment-details {
+    display: flex;
+    gap: 28px;
+    margin-top: auto;
+}
+
+.employment-details strong {
+    display: block;
+    font-family: var(--font-heading);
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.employment-details span {
+    font-size: 12px;
+    color: #B9C0D4;
+}
+
+/* ---------- RESPONSIVE ---------- */
+
+@media (max-width: 1080px) {
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .charts, .bottom-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 860px) {
+    .layout { grid-template-columns: 1fr; }
+    .sidebar {
+        position: static;
+        height: auto;
+        flex-direction: row;
+        align-items: center;
+        overflow-x: auto;
+        padding: 14px 16px;
+    }
+    .brand { border-bottom: none; margin-bottom: 0; padding: 0 16px 0 0; }
+    .sidebar nav { flex-direction: row; }
+    .sidebar-bottom { border-top: none; padding-top: 0; margin-left: 8px; }
+    .sidebar nav a span, .sidebar-bottom a span { display: none; }
+    .main { padding: 24px 20px 40px; }
+}
+
+@media (max-width: 560px) {
+    .stats { grid-template-columns: 1fr; }
+    .mini-stats { grid-template-columns: 1fr; }
+    .topbar { flex-direction: column; align-items: flex-start; gap: 14px; }
+}
+
+/* ---------- ACCESSIBILITY ---------- */
+
+a:focus-visible,
+button:focus-visible {
+    outline: 2px solid var(--saffron);
+    outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; }
+}
+
+    </style>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+
+<div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+        <div class="brand">
+            <div class="brand-icon">S</div>
+            <div class="brand-name">
+                <h2>SkillTrack</h2>
+                <span>Maharashtra</span>
+            </div>
+        </div>
+
+        <nav>
+           <a href="{% url 'dashboard' %}">Dashboard</a>
+
+<a href="{% url 'trainee_list' %}">Trainees</a>
+
+<a href="{% url 'trainer_list' %}">Trainers</a>
+
+<a href="{% url 'provider_list' %}">Providers</a>
+
+<a href="{% url 'course_list' %}">Courses</a>
+
+<a href="{% url 'batch_list' %}">Training Batches</a>
+
+        <div class="sidebar-bottom">
+            <a href="#">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 13.5a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.9 2.9l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6V20a2 2 0 1 1-4 0v-.2a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.9-2.9l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.6-1H4a2 2 0 1 1 0-4h.2a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1A2 2 0 1 1 8.3 2.7l.1.1a1.7 1.7 0 0 0 1.9.3H10.5a1.7 1.7 0 0 0 1-1.6V1.4a2 2 0 1 1 4 0v.2c0 .7.4 1.3 1 1.6.6.3 1.4.2 1.9-.3l.1-.1a2 2 0 1 1 2.9 2.9l-.1.1a1.7 1.7 0 0 0-.3 1.9c.3.6.9 1 1.6 1h.2a2 2 0 1 1 0 4h-.2a1.7 1.7 0 0 0-1.6 1z"/></svg>
+                <span>Settings</span>
+            </a>
+        </div>
+
+    </aside>
+
+
+    <!-- MAIN -->
+    <main class="main">
+
+        <!-- HEADER -->
+        <header class="topbar">
+
+            <div>
+                <h1>Dashboard</h1>
+                <p>Skill development &amp; employment overview</p>
+            </div>
+
+            <div class="profile">
+                <div class="avatar">A</div>
+                <div>
+                    <strong>Administrator</strong>
+                    <small>System Admin</small>
+                </div>
+            </div>
+
+        </header>
+
+
+        <!-- STAT CARDS -->
+        <section class="stats">
+
+            <div class="card stat-navy">
+                <div class="card-top">
+                    <span>Total Trainees</span>
+                </div>
+
+                <h2>{{ total_trainees }}</h2>
+                <p class="positive">Registered beneficiaries</p>
+            </div>
+
+
+            <div class="card stat-teal">
+                <div class="card-top">
+                    <span>Total Courses</span>
+                </div>
+
+                <h2>{{ total_courses }}</h2>
+                <p>Available training programs</p>
+            </div>
+
+
+            <div class="card stat-saffron">
+                <div class="card-top">
+                    <span>Active Training</span>
+                </div>
+
+                <h2>{{ active_training }}</h2>
+                <p>Currently in training</p>
+            </div>
+
+
+            <div class="card stat-teal-dark">
+                <div class="card-top">
+                    <span>Employment Rate</span>
+                </div>
+
+                <h2>{{ employment_rate }}%</h2>
+                <p class="positive">Trainees employed</p>
+            </div>
+
+        </section>
+
+
+        <!-- SECONDARY STATS -->
+        <section class="mini-stats">
+
+            <div>
+                <span>Training Providers</span>
+                <strong>{{ total_providers }}</strong>
+            </div>
+
+            <div>
+                <span>Completed Training</span>
+                <strong>{{ completed_training }}</strong>
+            </div>
+
+            <div>
+                <span>Employed Trainees</span>
+                <strong>{{ employed }}</strong>
+            </div>
+
+        </section>
+
+
+        <!-- CHARTS -->
+        <section class="charts">
+
+            <div class="chart-card">
+
+                <div class="chart-header">
+                    <div>
+                        <h3>District-wise Trainees</h3>
+                        <p>Distribution of beneficiaries</p>
+                    </div>
+                </div>
+
+                <canvas id="districtChart"></canvas>
+
+            </div>
+
+
+            <div class="chart-card">
+
+                <div class="chart-header">
+                    <div>
+                        <h3>Courses by Sector</h3>
+                        <p>Training program distribution</p>
+                    </div>
+                </div>
+
+                <canvas id="sectorChart"></canvas>
+
+            </div>
+
+        </section>
+
+
+        <!-- TRAINING STATUS -->
+        <section class="bottom-grid">
+
+            <div class="chart-card">
+
+                <div class="chart-header">
+                    <div>
+                        <h3>Training Overview</h3>
+                        <p>Current training status</p>
+                    </div>
+                </div>
+
+                <canvas id="trainingChart"></canvas>
+
+            </div>
+
+
+            <div class="insight-card">
+
+                <h3>Employment Overview</h3>
+
+                <div class="employment-number">
+                    {{ employment_rate }}%
+                </div>
+
+                <p>Overall employment rate</p>
+
+                <div class="progress">
+                    <div style="width: {{ employment_rate }}%"></div>
+                </div>
+
+                <div class="employment-details">
+
+                    <div>
+                        <strong>{{ employed }}</strong>
+                        <span>Employed</span>
+                    </div>
+
+                    <div>
+                        {# 'others' is computed in the view: total_trainees - employed. #}
+                        {# Django templates can't subtract two variables inline, so this #}
+                        {# must be passed in via context rather than built here. #}
+                        <strong>{{ others }}</strong>
+                        <span>Others</span>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<script>
+
+    const palette = {
+        navy: "#14213D",
+        saffron: "#C1561D",
+        teal: "#2F6F5E",
+        tealLight: "#6FA895",
+        sand: "#D7A24A",
+        slate: "#6B7280"
+    };
+
+    // DISTRICT DATA
+    const districtLabels = [
+        {% for item in district_data %}
+            "{{ item.district }}",
+        {% endfor %}
+    ];
+
+    const districtValues = [
+        {% for item in district_data %}
+            {{ item.total }},
+        {% endfor %}
+    ];
+
+
+    new Chart(
+        document.getElementById("districtChart"),
+        {
+            type: "bar",
+
+            data: {
+                labels: districtLabels,
+
+                datasets: [{
+                    label: "Trainees",
+                    data: districtValues,
+                    backgroundColor: palette.teal,
+                    hoverBackgroundColor: palette.navy,
+                    borderRadius: 4,
+                    maxBarThickness: 34
+                }]
+            },
+
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: "#EAE7DE" },
+                        ticks: { color: palette.slate }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: palette.slate }
+                    }
+                }
+            }
+        }
+    );
+
+
+    // SECTOR DATA
+    const sectorLabels = [
+        {% for item in sector_data %}
+            "{{ item.sector }}",
+        {% endfor %}
+    ];
+
+    const sectorValues = [
+        {% for item in sector_data %}
+            {{ item.total }},
+        {% endfor %}
+    ];
+
+
+    new Chart(
+        document.getElementById("sectorChart"),
+        {
+            type: "doughnut",
+
+            data: {
+                labels: sectorLabels,
+
+                datasets: [{
+                    data: sectorValues,
+                    backgroundColor: [
+                        palette.navy, palette.saffron, palette.teal,
+                        palette.sand, palette.tealLight, "#8C97AE"
+                    ],
+                    borderWidth: 2,
+                    borderColor: "#FFFFFF"
+                }]
+            },
+
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: "62%",
+
+                plugins: {
+                    legend: {
+                        position: "bottom",
+                        labels: { color: "#1B1F27", boxWidth: 10, padding: 14 }
+                    }
+                }
+            }
+        }
+    );
+
+
+    // TRAINING STATUS
+    new Chart(
+        document.getElementById("trainingChart"),
+        {
+            type: "doughnut",
+
+            data: {
+                labels: [
+                    "Training",
+                    "Completed"
+                ],
+
+                datasets: [{
+                    data: [
+                        {{ active_training }},
+                        {{ completed_training }}
+                    ],
+                    backgroundColor: [palette.saffron, palette.teal],
+                    borderWidth: 2,
+                    borderColor: "#FFFFFF"
+                }]
+            },
+
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: "62%",
+
+                plugins: {
+                    legend: {
+                        position: "bottom",
+                        labels: { color: "#1B1F27", boxWidth: 10, padding: 14 }
+                    }
+                }
+            }
+        }
+    );
+
+</script>
+
+</body>
+</html>

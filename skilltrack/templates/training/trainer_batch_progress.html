@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Attendance & Progress | SkillTrack Maharashtra</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f7fb;
+            margin: 0;
+            padding: 30px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: auto;
+        }
+
+        .header,
+        .trainee-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            margin-top: 0;
+        }
+
+        .trainee-card {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 20px;
+            align-items: center;
+        }
+
+        select,
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+
+        .save-btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .back-btn {
+            display: inline-block;
+            margin-bottom: 20px;
+            text-decoration: none;
+        }
+
+        @media (max-width: 700px) {
+            .trainee-card {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <a href="{% url 'trainer_batch_detail' batch.id %}" class="back-btn">
+        ← Back to Batch
+    </a>
+
+    <div class="header">
+        <h1>Attendance & Training Progress</h1>
+
+        <p>
+            <strong>Batch:</strong>
+            {{ batch.name }}
+        </p>
+
+        <p>
+            <strong>Course:</strong>
+            {{ batch.course.name }}
+        </p>
+    </div>
+
+    <form method="POST">
+
+        {% csrf_token %}
+
+        {% for trainee in trainees %}
+
+            <div class="trainee-card">
+
+                <div>
+                    <strong>{{ trainee.name }}</strong>
+
+                    <br>
+
+                    <small>
+                        {{ trainee.beneficiary_id }}
+                    </small>
+                </div>
+
+                <div>
+                    <label>Attendance</label>
+
+                    <select name="attendance_{{ trainee.id }}">
+
+                        <option value="Present">
+                            Present
+                        </option>
+
+                        <option value="Absent">
+                            Absent
+                        </option>
+
+                    </select>
+                </div>
+
+                <div>
+                    <label>Progress (%)</label>
+
+                    <input
+                        type="number"
+                        name="progress_{{ trainee.id }}"
+                        min="0"
+                        max="100"
+                        value="0"
+                    >
+                </div>
+<div>
+    <label>Remarks</label>
+
+    <input
+        type="text"
+        name="remarks_{{ trainee.id }}"
+        placeholder="Add trainer remarks"
+    >
+</div>
+            </div>
+
+        {% empty %}
+
+            <div class="trainee-card">
+                <p>No trainees assigned to this batch.</p>
+            </div>
+
+        {% endfor %}
+
+        {% if trainees %}
+
+            <button type="submit" class="save-btn">
+                Save Attendance & Progress
+            </button>
+
+        {% endif %}
+
+    </form>
+
+</div>
+
+</body>
+</html>

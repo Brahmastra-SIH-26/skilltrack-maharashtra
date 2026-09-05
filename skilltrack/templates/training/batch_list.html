@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Training Batches</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+            padding: 30px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        h1 {
+            color: #1f2937;
+            margin: 0;
+        }
+
+        .add-btn {
+            background: #2563eb;
+            color: white;
+            text-decoration: none;
+            padding: 10px 18px;
+            border-radius: 7px;
+            font-weight: bold;
+        }
+
+        .card {
+            background: white;
+            padding: 22px;
+            margin-bottom: 15px;
+            border-radius: 12px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+        }
+
+        .batch-name {
+            font-size: 19px;
+            font-weight: bold;
+            color: #111827;
+            margin-bottom: 12px;
+        }
+
+        .info {
+            color: #6b7280;
+            margin: 7px 0;
+        }
+
+        .empty {
+            text-align: center;
+            color: #6b7280;
+        }
+
+        .view-btn {
+            display: inline-block;
+            margin-top: 12px;
+            padding: 8px 15px;
+            background: #374151;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="header">
+
+        <h1>Training Batches</h1>
+
+        <a href="{% url 'batch_create' %}" class="add-btn">
+            + Create Batch
+        </a>
+
+    </div>
+
+    {% for batch in batches %}
+
+        <div class="card">
+
+            <div class="batch-name">
+                {{ batch.name }}
+            </div>
+
+            <div class="info">
+                <strong>Course:</strong>
+                {{ batch.course.name }}
+            </div>
+
+            <div class="info">
+                <strong>Provider:</strong>
+                {{ batch.provider.name }}
+            </div>
+
+            <div class="info">
+                <strong>Trainer:</strong>
+                {{ batch.trainer.username }}
+            </div>
+
+            <div class="info">
+                <strong>District:</strong>
+                {{ batch.district }}
+            </div>
+
+            <div class="info">
+                <strong>Dates:</strong>
+                {{ batch.start_date }} → {{ batch.end_date }}
+            </div>
+
+            <div class="info">
+                <strong>Capacity:</strong>
+                {{ batch.capacity }}
+            </div>
+
+            <div class="info">
+                <strong>Assigned Trainees:</strong>
+                {{ batch.trainees.count }}
+            </div>
+            <a
+    href="{% url 'batch_assign_trainees' batch.id %}"
+    class="view-btn"
+>
+    Assign Trainees
+</a>
+
+        </div>
+
+    {% empty %}
+
+        <div class="card empty">
+            <p>No training batches have been created yet.</p>
+        </div>
+
+    {% endfor %}
+
+</div>
+
+</body>
+</html>

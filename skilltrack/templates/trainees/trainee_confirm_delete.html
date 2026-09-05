@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>Delete Trainee</title>
+
+    <style>
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f7fb;
+            padding: 50px;
+        }
+
+        .card {
+            max-width: 500px;
+            margin: auto;
+            background: white;
+            padding: 35px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.08);
+        }
+
+        h1 {
+            color: #dc2626;
+        }
+
+        p {
+            color: #6b7280;
+        }
+
+        button,
+        a {
+            padding: 11px 18px;
+            border-radius: 7px;
+            border: none;
+            text-decoration: none;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button {
+            background: #dc2626;
+            color: white;
+        }
+
+        .cancel {
+            background: #e5e7eb;
+            color: #374151;
+            margin-left: 8px;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="card">
+
+    <h1>Delete Trainee?</h1>
+
+    <p>
+        Are you sure you want to delete
+        <strong>{{ trainee.name }}</strong>?
+    </p>
+
+    <form method="POST">
+
+        {% csrf_token %}
+
+        <button type="submit">
+            Yes, Delete
+        </button>
+
+        <a
+            href="{% url 'trainee_detail' trainee.id %}"
+            class="cancel"
+        >
+            Cancel
+        </a>
+
+    </form>
+
+</div>
+
+</body>
+</html>

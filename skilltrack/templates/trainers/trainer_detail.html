@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Trainer Details</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+            padding: 30px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: auto;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+        }
+
+        h1 {
+            color: #1f2937;
+        }
+
+        .detail {
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .status {
+            font-weight: bold;
+        }
+
+        .pending {
+            color: #b45309;
+        }
+
+        .verified {
+            color: #047857;
+        }
+
+        .rejected {
+            color: #dc2626;
+        }
+
+        button {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 7px;
+            color: white;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+        .verify {
+            background: #16a34a;
+        }
+
+        .reject {
+            background: #dc2626;
+        }
+
+        .back {
+            display: inline-block;
+            margin-top: 20px;
+            text-decoration: none;
+            color: #2563eb;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="card">
+
+        <h1>Trainer Details</h1>
+
+        <div class="detail">
+            <strong>Name:</strong> {{ trainer.name }}
+        </div>
+
+        <div class="detail">
+            <strong>Phone:</strong> {{ trainer.phone }}
+        </div>
+
+        <div class="detail">
+            <strong>Email:</strong> {{ trainer.email }}
+        </div>
+
+        <div class="detail">
+            <strong>Organization:</strong> {{ trainer.organization }}
+        </div>
+
+        <div class="detail">
+            <strong>District:</strong> {{ trainer.district }}
+        </div>
+
+        <div class="detail">
+            <strong>Qualification:</strong> {{ trainer.qualification }}
+        </div>
+
+        <div class="detail">
+            <strong>Experience:</strong> {{ trainer.experience }} years
+        </div>
+
+        <div class="detail">
+            <strong>Registration Date:</strong>
+            {{ trainer.registration_date }}
+        </div>
+
+        <div class="detail">
+            <strong>Status:</strong>
+
+            <span class="status
+                {% if trainer.status == 'Pending' %}
+                    pending
+                {% elif trainer.status == 'Verified' %}
+                    verified
+                {% else %}
+                    rejected
+                {% endif %}
+            ">
+                {{ trainer.status }}
+            </span>
+        </div>
+
+        {% if trainer.status == "Pending" %}
+
+            <br>
+
+            <form method="POST"
+                  action="{% url 'verify_trainer' trainer.id %}"
+                  style="display:inline;">
+
+                {% csrf_token %}
+
+                <button type="submit" class="verify">
+                    Verify Trainer
+                </button>
+
+            </form>
+
+            <form method="POST"
+                  action="{% url 'reject_trainer' trainer.id %}"
+                  style="display:inline;">
+
+                {% csrf_token %}
+
+                <button type="submit" class="reject">
+                    Reject Trainer
+                </button>
+
+            </form>
+
+        {% endif %}
+
+        <br>
+
+        <a href="{% url 'trainer_list' %}" class="back">
+            ← Back to Trainer List
+        </a>
+
+    </div>
+
+</div>
+
+</body>
+</html>

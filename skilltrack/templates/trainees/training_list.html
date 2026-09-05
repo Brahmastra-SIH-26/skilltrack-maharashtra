@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Training Management | SkillTrack Maharashtra</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+            margin: 0;
+            padding: 30px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        h1 {
+            margin: 0;
+        }
+
+        .add-btn {
+            background: #0d6efd;
+            color: white;
+            padding: 11px 18px;
+            text-decoration: none;
+            border-radius: 8px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            overflow-x: auto;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 14px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background: #f8f9fa;
+        }
+
+        .status {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 13px;
+        }
+
+        .progress {
+            width: 120px;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: #0d6efd;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 40px;
+            color: #777;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="header">
+
+        <div>
+            <h1>Training Management</h1>
+            <p>Track trainee training and completion progress.</p>
+        </div>
+
+        <a href="{% url 'training_create' %}" class="add-btn">
+            + Assign Training
+        </a>
+
+    </div>
+
+    <div class="card">
+
+        {% if trainings %}
+
+        <table>
+
+            <thead>
+                <tr>
+                    <th>Trainee</th>
+                    <th>Course</th>
+                    <th>Provider</th>
+                    <th>Dates</th>
+                    <th>Progress</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+            {% for training in trainings %}
+
+                <tr>
+
+                    <td>
+                        <strong>{{ training.trainee.name }}</strong><br>
+                        <small>{{ training.trainee.beneficiary_id }}</small>
+                    </td>
+
+                    <td>
+                        {{ training.course.name }}
+                    </td>
+
+                    <td>
+                        {{ training.provider.name }}
+                    </td>
+
+                    <td>
+                        {{ training.start_date }}<br>
+                        to {{ training.end_date }}
+                    </td>
+
+                    <td>
+
+                        <strong>
+                            {{ training.completion_percentage }}%
+                        </strong>
+
+                        <div class="progress">
+                            <div
+                                class="progress-bar"
+                                style="width: {{ training.completion_percentage }}%;">
+                            </div>
+                        </div>
+
+                    </td>
+
+                    <td>
+                        <span class="status">
+                            {{ training.status }}
+                        </span>
+                    </td>
+
+                </tr>
+
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+
+        {% else %}
+
+            <div class="empty">
+                <h3>No Training Records Yet</h3>
+                <p>Assign a course to a trainee to start tracking training.</p>
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+</body>
+</html>

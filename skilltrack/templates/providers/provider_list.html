@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Provider Verification</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+            padding: 30px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: auto;
+        }
+
+        h1 {
+            color: #1f2937;
+        }
+
+        .subtitle {
+            color: #6b7280;
+            margin-bottom: 25px;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 12px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+        }
+
+        .row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #111827;
+            margin-bottom: 8px;
+        }
+
+        .info {
+            color: #6b7280;
+            margin: 5px 0;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: bold;
+            margin-bottom: 12px;
+        }
+
+        .pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .verified {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .rejected {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 9px 16px;
+            background: #2563eb;
+            color: white;
+            text-decoration: none;
+            border-radius: 7px;
+            font-size: 14px;
+        }
+
+        .btn:hover {
+            background: #1d4ed8;
+        }
+
+        .empty {
+            text-align: center;
+            color: #6b7280;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Provider Verification</h1>
+
+    <p class="subtitle">
+        Review and verify organizations that provide training through SkillTrack Maharashtra.
+    </p>
+
+    {% for provider in providers %}
+
+        <div class="card">
+
+            <div class="row">
+
+                <div>
+
+                    <div class="name">
+                        {{ provider.name }}
+                    </div>
+
+                    <div class="info">
+                        <strong>Type:</strong>
+                        {{ provider.provider_type }}
+                    </div>
+
+                    <div class="info">
+                        <strong>District:</strong>
+                        {{ provider.district }}
+                    </div>
+
+                    <div class="info">
+                        <strong>Rating:</strong>
+                        {{ provider.rating }}
+                    </div>
+
+                </div>
+
+                <div>
+
+                    <span class="status
+                        {% if provider.status == 'Pending' %}
+                            pending
+                        {% elif provider.status == 'Verified' %}
+                            verified
+                        {% else %}
+                            rejected
+                        {% endif %}
+                    ">
+                        {{ provider.status }}
+                    </span>
+
+                    <br>
+
+                    <a
+                        href="{% url 'provider_detail' provider.id %}"
+                        class="btn"
+                    >
+                        View Details
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    {% empty %}
+
+        <div class="card empty">
+            <p>No providers found.</p>
+        </div>
+
+    {% endfor %}
+
+</div>
+
+</body>
+</html>

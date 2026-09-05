@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<head>
+    <title>{{ batch.name }} | SkillTrack Maharashtra</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f7fb;
+            margin: 0;
+            padding: 30px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: auto;
+        }
+
+        .header {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            margin-top: 0;
+        }
+
+        .info {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .trainee-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+        }
+
+        .trainee-card h3 {
+            margin-top: 0;
+        }
+
+        .back-btn {
+            display: inline-block;
+            margin-bottom: 20px;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <a href="{% url 'trainer_dashboard' %}" class="back-btn">
+        ← Back to Dashboard
+    </a>
+
+    <div class="header">
+
+        <h1>{{ batch.name }}</h1>
+
+        <div class="info">
+
+            <div>
+                <strong>Course:</strong>
+                {{ batch.course.name }}
+            </div>
+
+            <div>
+                <strong>Provider:</strong>
+                {{ batch.provider.name }}
+            </div>
+
+            <div>
+                <strong>District:</strong>
+                {{ batch.district }}
+            </div>
+
+            <div>
+                <strong>Training Period:</strong>
+                {{ batch.start_date }} to {{ batch.end_date }}
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <h2>Assigned Trainees</h2>
+
+    {% for trainee in trainees %}
+
+        <div class="trainee-card">
+
+            <h3>{{ trainee.name }}</h3>
+
+            <p>
+                <strong>Beneficiary ID:</strong>
+                {{ trainee.beneficiary_id }}
+            </p>
+
+            <p>
+                <strong>District:</strong>
+                {{ trainee.district }}
+            </p>
+
+            <p>
+                <strong>Qualification:</strong>
+                {{ trainee.qualification }}
+            </p>
+            {% if batch.status == "Active" %}
+
+<form method="POST" action="{% url 'trainer_complete_batch' batch.id %}">
+    {% csrf_token %}
+
+    <button type="submit">
+        Mark Training Completed
+    </button>
+</form>
+
+{% else %}
+
+<p>
+    <strong>Training Status:</strong> Completed
+</p>
+
+{% endif %}
+
+        </div>
+
+    {% empty %}
+
+        <div class="trainee-card">
+            <p>No trainees have been assigned to this batch yet.</p>
+        </div>
+
+    {% endfor %}
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Trainer Verification</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+            margin: 0;
+            padding: 30px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: auto;
+        }
+
+        h1 {
+            color: #1f2937;
+        }
+
+        .subtitle {
+            color: #6b7280;
+            margin-bottom: 25px;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+        }
+
+        .row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .info h3 {
+            margin: 0 0 8px;
+            color: #111827;
+        }
+
+        .info p {
+            margin: 5px 0;
+            color: #6b7280;
+        }
+
+        .status {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .verified {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .rejected {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 9px 16px;
+            background: #2563eb;
+            color: white;
+            text-decoration: none;
+            border-radius: 7px;
+            font-size: 14px;
+        }
+
+        .btn:hover {
+            background: #1d4ed8;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Trainer / Provider Verification</h1>
+
+    <p class="subtitle">
+        Review and verify trainer registrations submitted through the portal.
+    </p>
+
+    {% for trainer in trainers %}
+
+        <div class="card">
+
+            <div class="row">
+
+                <div class="info">
+
+                    <h3>{{ trainer.name }}</h3>
+
+                    <p>
+                        <strong>Organization:</strong>
+                        {{ trainer.organization }}
+                    </p>
+
+                    <p>
+                        <strong>District:</strong>
+                        {{ trainer.district }}
+                    </p>
+
+                    <p>
+                        <strong>Experience:</strong>
+                        {{ trainer.experience }} years
+                    </p>
+
+                </div>
+
+                <div>
+
+                    <span class="status
+                        {% if trainer.status == 'Pending' %}
+                            pending
+                        {% elif trainer.status == 'Verified' %}
+                            verified
+                        {% else %}
+                            rejected
+                        {% endif %}
+                    ">
+                        {{ trainer.status }}
+                    </span>
+
+                    <br><br>
+
+                    <a
+                        href="{% url 'trainer_detail' trainer.id %}"
+                        class="btn"
+                    >
+                        View Details
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    {% empty %}
+
+        <div class="card">
+            <p>No trainer registrations found.</p>
+        </div>
+
+    {% endfor %}
+
+</div>
+
+</body>
+</html>

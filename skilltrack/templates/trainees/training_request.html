@@ -1,0 +1,86 @@
+```html
+{% extends "base.html" %}
+
+{% block content %}
+
+<div style="
+    max-width:700px;
+    margin:40px auto;
+    background:white;
+    padding:30px;
+    border-radius:16px;
+    box-shadow:0 5px 25px rgba(0,0,0,.08);
+">
+
+    <h1>Request Training</h1>
+
+    <p>
+        You are requesting to join:
+    </p>
+
+    <h2>{{ batch.name }}</h2>
+
+    <p>
+        <strong>Course:</strong>
+        {{ batch.course.name }}
+    </p>
+
+    <p>
+        <strong>Provider:</strong>
+        {{ batch.provider.name }}
+    </p>
+
+    <p>
+        <strong>District:</strong>
+        {{ batch.district }}
+    </p>
+
+    <p>
+        <strong>Training Period:</strong>
+        {{ batch.start_date }} to {{ batch.end_date }}
+    </p>
+
+    <p>
+        <strong>Available Capacity:</strong>
+        {{ batch.capacity }}
+    </p>
+
+    <hr>
+
+    <p>
+        Your request will be sent to the assigned trainer.
+        The trainer must verify your participation before you
+        are added to the batch.
+    </p>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <button
+            type="submit"
+            style="
+                background:#2563eb;
+                color:white;
+                border:0;
+                padding:12px 22px;
+                border-radius:9px;
+                cursor:pointer;
+                font-weight:600;
+            ">
+            Submit Training Request
+        </button>
+
+        <a
+            href="{% url 'trainee_dashboard' %}"
+            style="
+                margin-left:10px;
+                text-decoration:none;
+            ">
+            Cancel
+        </a>
+    </form>
+
+</div>
+
+{% endblock %}
+

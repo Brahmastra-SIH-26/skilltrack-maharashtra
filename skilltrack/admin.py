@@ -10,6 +10,7 @@ from .models import (
     Training,
     Employment,
     FollowUp,
+    Notification,
 )
 admin.site.register(TrainerRegistration)
 
@@ -21,3 +22,4 @@ admin.site.register(Provider)
 admin.site.register(Training)
 admin.site.register(Employment)
 admin.site.register(FollowUp)
+admin.site.register(Notification)

@@ -1,0 +1,556 @@
+{% extends 'base.html' %}
+
+{% block title %}Programme Analytics | SkillTrack Maharashtra{% endblock %}
+
+{% block head %}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+.analytics-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 25px;
+}
+
+.analytics-header h1 {
+    margin-bottom: 5px;
+}
+
+.analytics-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.analytics-card {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 20px;
+    box-shadow: 0 5px 18px rgba(16, 42, 67, 0.06);
+}
+
+.analytics-card span {
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.analytics-card strong {
+    display: block;
+    font-size: 28px;
+    margin-top: 8px;
+    color: var(--navy);
+}
+
+.chart-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    margin-bottom: 18px;
+}
+
+.chart-card {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 22px;
+    box-shadow: 0 5px 18px rgba(16, 42, 67, 0.06);
+}
+
+.chart-card.full {
+    grid-column: 1 / -1;
+}
+
+.chart-title {
+    margin: 0 0 4px;
+    font-size: 17px;
+    font-weight: 800;
+}
+
+.chart-subtitle {
+    margin: 0 0 18px;
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.chart-box {
+    position: relative;
+    height: 320px;
+}
+
+.chart-box.small {
+    height: 280px;
+}
+
+@media (max-width: 1000px) {
+    .analytics-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .chart-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .chart-card.full {
+        grid-column: auto;
+    }
+}
+
+@media (max-width: 600px) {
+    .analytics-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .analytics-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+</style>
+
+{% endblock %}
+
+{% block content %}
+
+<div class="analytics-header">
+    <div>
+        <h1>Programme Analytics</h1>
+        <p class="sub">
+            Monitor training performance, course completion and provider outcomes.
+        </p>
+    </div>
+</div>
+
+<!-- SUMMARY CARDS -->
+
+<div class="analytics-grid">
+
+<div class="analytics-card">
+    <span>Total Courses Tracked</span>
+    <strong>{{ course_data|length }}</strong>
+</div>
+
+<div class="analytics-card">
+    <span>Providers Tracked</span>
+    <strong>{{ provider_data|length }}</strong>
+</div>
+
+<div class="analytics-card">
+    <span>Total Course Completions</span>
+    <strong id="totalCompletions">0</strong>
+</div>
+
+<div class="analytics-card">
+    <span>Total Provider Records</span>
+    <strong id="totalProviders">0</strong>
+</div>
+
+</div>
+
+<!-- CHARTS -->
+
+<div class="chart-grid">
+
+
+<!-- COURSE BAR CHART -->
+
+<div class="chart-card">
+
+    <h2 class="chart-title">Course Completions</h2>
+
+    <p class="chart-subtitle">
+        Number of completed training records by course
+    </p>
+
+    <div class="chart-box">
+        <canvas id="courses"></canvas>
+    </div>
+
+</div>
+
+
+<!-- PROVIDER BAR CHART -->
+
+<div class="chart-card">
+
+    <h2 class="chart-title">Provider Performance</h2>
+
+    <p class="chart-subtitle">
+        Training records associated with each provider
+    </p>
+
+    <div class="chart-box">
+        <canvas id="providers"></canvas>
+    </div>
+
+</div>
+
+
+<!-- COURSE DOUGHNUT -->
+
+<div class="chart-card">
+
+    <h2 class="chart-title">Course Distribution</h2>
+
+    <p class="chart-subtitle">
+        Distribution of training records across courses
+    </p>
+
+    <div class="chart-box small">
+        <canvas id="courseDoughnut"></canvas>
+    </div>
+
+</div>
+
+
+<!-- PROVIDER DOUGHNUT -->
+
+<div class="chart-card">
+
+    <h2 class="chart-title">Provider Distribution</h2>
+
+    <p class="chart-subtitle">
+        Distribution of training records across providers
+    </p>
+
+    <div class="chart-box small">
+        <canvas id="providerDoughnut"></canvas>
+    </div>
+
+</div>
+
+
+<!-- COURSE PERFORMANCE -->
+
+<div class="chart-card full">
+
+    <h2 class="chart-title">Course Performance Overview</h2>
+
+    <p class="chart-subtitle">
+        Comparative view of course completion records
+    </p>
+
+    <div class="chart-box">
+        <canvas id="courseHorizontal"></canvas>
+    </div>
+
+</div>
+
+
+</div>
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    /* -----------------------------
+       DATA FROM DJANGO
+    ----------------------------- */
+
+    const courseLabels = [
+        {% for x in course_data %}
+            "{{ x.course__name|escapejs }}",
+        {% endfor %}
+    ];
+
+    const courseValues = [
+        {% for x in course_data %}
+            {{ x.total|default:0 }},
+        {% endfor %}
+    ];
+
+
+    const providerLabels = [
+        {% for x in provider_data %}
+            "{{ x.provider__name|escapejs }}",
+        {% endfor %}
+    ];
+
+    const providerValues = [
+        {% for x in provider_data %}
+            {{ x.total|default:0 }},
+        {% endfor %}
+    ];
+
+
+    /* -----------------------------
+       TOTALS
+    ----------------------------- */
+
+    const courseTotal = courseValues.reduce(
+        (sum, value) => sum + Number(value),
+        0
+    );
+
+    const providerTotal = providerValues.reduce(
+        (sum, value) => sum + Number(value),
+        0
+    );
+
+    document.getElementById("totalCompletions").textContent = courseTotal;
+
+    document.getElementById("totalProviders").textContent = providerTotal;
+
+
+    /* -----------------------------
+       COMMON CHART OPTIONS
+    ----------------------------- */
+
+    const commonOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+
+        plugins: {
+            legend: {
+                display: false
+            },
+
+            tooltip: {
+                backgroundColor: "#102a43",
+                padding: 12
+            }
+        },
+
+        scales: {
+            x: {
+                grid: {
+                    display: false
+                }
+            },
+
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    precision: 0
+                }
+            }
+        }
+    };
+
+
+    /* -----------------------------
+       COURSE BAR CHART
+    ----------------------------- */
+
+    new Chart(
+        document.getElementById("courses"),
+        {
+            type: "bar",
+
+            data: {
+                labels: courseLabels,
+
+                datasets: [{
+                    label: "Completions",
+                    data: courseValues,
+
+                    backgroundColor: "#1769aa",
+
+                    borderRadius: 7,
+
+                    maxBarThickness: 45
+                }]
+            },
+
+            options: commonOptions
+        }
+    );
+
+
+    /* -----------------------------
+       PROVIDER BAR CHART
+    ----------------------------- */
+
+    new Chart(
+        document.getElementById("providers"),
+        {
+            type: "bar",
+
+            data: {
+                labels: providerLabels,
+
+                datasets: [{
+                    label: "Records",
+                    data: providerValues,
+
+                    backgroundColor: "#c67519",
+
+                    borderRadius: 7,
+
+                    maxBarThickness: 45
+                }]
+            },
+
+            options: commonOptions
+        }
+    );
+
+
+    /* -----------------------------
+       COURSE DOUGHNUT
+    ----------------------------- */
+
+    new Chart(
+        document.getElementById("courseDoughnut"),
+        {
+            type: "doughnut",
+
+            data: {
+                labels: courseLabels,
+
+                datasets: [{
+                    data: courseValues,
+
+                    backgroundColor: [
+                        "#1769aa",
+                        "#177245",
+                        "#c67519",
+                        "#8b5cf6",
+                        "#d14d72",
+                        "#0891b2",
+                        "#64748b"
+                    ],
+
+                    borderWidth: 2,
+
+                    borderColor: "#ffffff"
+                }]
+            },
+
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+
+                cutout: "65%",
+
+                plugins: {
+                    legend: {
+                        position: "bottom",
+
+                        labels: {
+                            padding: 15,
+                            usePointStyle: true
+                        }
+                    }
+                }
+            }
+        }
+    );
+
+
+    /* -----------------------------
+       PROVIDER DOUGHNUT
+    ----------------------------- */
+
+    new Chart(
+        document.getElementById("providerDoughnut"),
+        {
+            type: "doughnut",
+
+            data: {
+                labels: providerLabels,
+
+                datasets: [{
+                    data: providerValues,
+
+                    backgroundColor: [
+                        "#c67519",
+                        "#1769aa",
+                        "#177245",
+                        "#8b5cf6",
+                        "#d14d72",
+                        "#0891b2",
+                        "#64748b"
+                    ],
+
+                    borderWidth: 2,
+
+                    borderColor: "#ffffff"
+                }]
+            },
+
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+
+                cutout: "65%",
+
+                plugins: {
+                    legend: {
+                        position: "bottom",
+
+                        labels: {
+                            padding: 15,
+                            usePointStyle: true
+                        }
+                    }
+                }
+            }
+        }
+    );
+
+
+    /* -----------------------------
+       HORIZONTAL COURSE CHART
+    ----------------------------- */
+
+    new Chart(
+        document.getElementById("courseHorizontal"),
+        {
+            type: "bar",
+
+            data: {
+                labels: courseLabels,
+
+                datasets: [{
+                    label: "Completed",
+
+                    data: courseValues,
+
+                    backgroundColor: "#177245",
+
+                    borderRadius: 7
+                }]
+            },
+
+            options: {
+                indexAxis: "y",
+
+                responsive: true,
+
+                maintainAspectRatio: false,
+
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+
+                scales: {
+                    x: {
+                        beginAtZero: true,
+
+                        ticks: {
+                            precision: 0
+                        }
+                    },
+
+                    y: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        }
+    );
+
+});
+
+</script>
+
+{% endblock %}

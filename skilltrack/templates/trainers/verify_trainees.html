@@ -1,0 +1,292 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+    .page-header {
+        margin-bottom: 25px;
+    }
+
+    .page-header h1 {
+        margin-bottom: 5px;
+    }
+
+    .page-header p {
+        color: #64748b;
+    }
+
+    .stats {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 25px;
+        flex-wrap: wrap;
+    }
+
+    .stat-card {
+        background: white;
+        padding: 20px;
+        border-radius: 14px;
+        box-shadow: 0 5px 20px rgba(0,0,0,.07);
+        min-width: 180px;
+    }
+
+    .stat-card strong {
+        display: block;
+        font-size: 28px;
+        margin-bottom: 5px;
+    }
+
+    .request-card {
+        background: white;
+        border-radius: 15px;
+        padding: 22px;
+        margin-bottom: 18px;
+        box-shadow: 0 5px 20px rgba(0,0,0,.07);
+    }
+
+    .request-header {
+        display: flex;
+        justify-content: space-between;
+        gap: 15px;
+        flex-wrap: wrap;
+        margin-bottom: 15px;
+    }
+
+    .trainee-name {
+        font-size: 20px;
+        font-weight: 700;
+    }
+
+    .beneficiary {
+        color: #64748b;
+        font-size: 14px;
+    }
+
+    .details {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 12px;
+        margin: 15px 0;
+    }
+
+    .detail {
+        background: #f8fafc;
+        padding: 12px;
+        border-radius: 10px;
+    }
+
+    .detail small {
+        display: block;
+        color: #64748b;
+        margin-bottom: 4px;
+    }
+
+    .badge {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .pending {
+        background: #fff7ed;
+        color: #c2410c;
+    }
+
+    .verified {
+        background: #ecfdf5;
+        color: #047857;
+    }
+
+    .rejected {
+        background: #fef2f2;
+        color: #b91c1c;
+    }
+
+    .actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 15px;
+    }
+
+    .btn {
+        border: 0;
+        padding: 10px 18px;
+        border-radius: 9px;
+        cursor: pointer;
+        font-weight: 600;
+    }
+
+    .btn-verify {
+        background: #16a34a;
+        color: white;
+    }
+
+    .btn-reject {
+        background: #dc2626;
+        color: white;
+    }
+
+    .reason {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        margin-top: 10px;
+        box-sizing: border-box;
+    }
+
+    .empty {
+        background: white;
+        padding: 40px;
+        text-align: center;
+        border-radius: 15px;
+        color: #64748b;
+    }
+</style>
+
+<div class="page-header">
+    <h1>Verify Trainees</h1>
+    <p>Review trainee requests for your assigned training batches.</p>
+</div>
+
+<div class="stats">
+    <div class="stat-card">
+        <strong>{{ pending_count }}</strong>
+        Pending Requests
+    </div>
+
+    <div class="stat-card">
+        <strong>{{ registration_requests|length }}</strong>
+        Total Requests
+    </div>
+</div>
+
+{% for item in registration_requests %}
+
+<div class="request-card">
+
+    <div class="request-header">
+
+        <div>
+            <div class="trainee-name">
+                {{ item.trainee.name }}
+            </div>
+
+            <div class="beneficiary">
+                Beneficiary ID:
+                {{ item.trainee.beneficiary_id }}
+            </div>
+        </div>
+
+        {% if item.status == "Pending" %}
+            <span class="badge pending">Pending</span>
+        {% elif item.status == "Verified" %}
+            <span class="badge verified">Verified</span>
+        {% else %}
+            <span class="badge rejected">Rejected</span>
+        {% endif %}
+
+    </div>
+
+    <div class="details">
+
+        <div class="detail">
+            <small>Course</small>
+            {{ item.batch.course.name }}
+        </div>
+
+        <div class="detail">
+            <small>Batch</small>
+            {{ item.batch.name }}
+        </div>
+
+        <div class="detail">
+            <small>District</small>
+            {{ item.trainee.district }}
+        </div>
+
+        <div class="detail">
+            <small>Qualification</small>
+            {{ item.trainee.qualification }}
+        </div>
+
+        <div class="detail">
+            <small>Phone</small>
+            {{ item.trainee.phone }}
+        </div>
+
+        <div class="detail">
+            <small>Requested</small>
+            {{ item.requested_at|date:"d M Y, h:i A" }}
+        </div>
+
+    </div>
+
+    {% if item.status == "Pending" %}
+
+    <div class="actions">
+
+        <form method="POST"
+              action="{% url 'trainer_verify_request' item.id %}">
+            {% csrf_token %}
+
+            <button
+                type="submit"
+                class="btn btn-verify"
+                onclick="return confirm('Verify this trainee?');">
+                ✓ Verify Trainee
+            </button>
+        </form>
+
+        <form method="POST"
+              action="{% url 'trainer_reject_request' item.id %}"
+              style="flex: 1; min-width: 250px;">
+
+            {% csrf_token %}
+
+            <input
+                type="text"
+                name="rejection_reason"
+                class="reason"
+                placeholder="Reason for rejection (optional)"
+            >
+
+            <button
+                type="submit"
+                class="btn btn-reject"
+                onclick="return confirm('Reject this registration request?');">
+                ✕ Reject
+            </button>
+
+        </form>
+
+    </div>
+
+    {% elif item.status == "Rejected" %}
+
+        {% if item.rejection_reason %}
+            <p>
+                <strong>Rejection reason:</strong>
+                {{ item.rejection_reason }}
+            </p>
+        {% endif %}
+
+    {% endif %}
+
+</div>
+
+{% empty %}
+
+<div class="empty">
+    <h3>No registration requests</h3>
+    <p>New trainee requests will appear here.</p>
+</div>
+
+{% endfor %}
+
+{% endblock %}
+```

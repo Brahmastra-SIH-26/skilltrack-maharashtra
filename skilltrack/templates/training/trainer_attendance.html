@@ -1,0 +1,376 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Attendance | SkillTrack Maharashtra</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f5f7fb;
+            color: #1f2937;
+        }
+
+        .header {
+            background: #111827;
+            color: white;
+            padding: 20px 30px;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .header p {
+            margin: 6px 0 0;
+            color: #cbd5e1;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .back {
+            display: inline-block;
+            margin-bottom: 20px;
+            text-decoration: none;
+            color: #2563eb;
+            font-weight: 600;
+        }
+
+        .card {
+            background: white;
+            border-radius: 14px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.06);
+        }
+
+        .card h2 {
+            margin-top: 0;
+        }
+
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 15px;
+            background: white;
+        }
+
+        .btn {
+            margin-top: 15px;
+            padding: 11px 18px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            background: #2563eb;
+            color: white;
+            font-weight: 600;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        .batch-info {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .info {
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .info strong {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 14px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        th {
+            background: #f8fafc;
+        }
+
+        .status-select {
+            width: 130px;
+            padding: 8px;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 40px;
+            color: #6b7280;
+        }
+
+        .success {
+            background: #dcfce7;
+            color: #166534;
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 700px) {
+
+            .batch-info {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            th,
+            td {
+                padding: 10px;
+            }
+        }
+
+    </style>
+</head>
+
+<body>
+
+<div class="header">
+    <h1>Attendance Management</h1>
+    <p>SkillTrack Maharashtra • Trainer Portal</p>
+</div>
+
+<div class="container">
+
+    <a href="{% url 'trainer_dashboard' %}" class="back">
+        ← Back to Trainer Dashboard
+    </a>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="success">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Batch Selection -->
+
+    <div class="card">
+
+        <h2>Select Training Batch</h2>
+
+        <form method="get">
+
+            <select name="batch" onchange="this.form.submit()">
+
+                <option value="">
+                    -- Select Batch --
+                </option>
+
+                {% for batch in batches %}
+
+                    <option
+                        value="{{ batch.id }}"
+                        {% if selected_batch and selected_batch.id == batch.id %}
+                            selected
+                        {% endif %}
+                    >
+                        {{ batch.name }} -
+                        {{ batch.course.name }}
+                    </option>
+
+                {% endfor %}
+
+            </select>
+
+        </form>
+
+    </div>
+
+
+    {% if selected_batch %}
+
+        <!-- Batch Information -->
+
+        <div class="card">
+
+            <h2>{{ selected_batch.name }}</h2>
+
+            <div class="batch-info">
+
+                <div class="info">
+                    <strong>Course</strong>
+                    {{ selected_batch.course.name }}
+                </div>
+
+                <div class="info">
+                    <strong>Provider</strong>
+                    {{ selected_batch.provider.name }}
+                </div>
+
+                <div class="info">
+                    <strong>District</strong>
+                    {{ selected_batch.district }}
+                </div>
+
+                <div class="info">
+                    <strong>Trainees</strong>
+                    {{ trainees|length }}
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Attendance -->
+
+        <div class="card">
+
+            <h2>Mark Attendance</h2>
+
+            {% if trainees %}
+
+                <form method="post">
+
+                    {% csrf_token %}
+
+                    <input
+                        type="hidden"
+                        name="batch_id"
+                        value="{{ selected_batch.id }}"
+                    >
+
+                    <div class="table-wrapper">
+
+                        <table>
+
+                            <thead>
+
+                                <tr>
+                                    <th>#</th>
+                                    <th>Trainee</th>
+                                    <th>Beneficiary ID</th>
+                                    <th>Attendance</th>
+                                </tr>
+
+                            </thead>
+
+                            <tbody>
+
+                                {% for trainee in trainees %}
+
+                                    <tr>
+
+                                        <td>
+                                            {{ forloop.counter }}
+                                        </td>
+
+                                        <td>
+                                            <strong>
+                                                {{ trainee.name }}
+                                            </strong>
+                                        </td>
+
+                                        <td>
+                                            {{ trainee.beneficiary_id }}
+                                        </td>
+
+                                        <td>
+<select
+    name="attendance_{{ trainee.id }}"
+    class="status-select"
+>
+
+    <option
+        value="Present"
+        {% if trainee.attendance_status == "Present" %}
+            selected
+        {% endif %}
+    >
+        Present
+    </option>
+
+    <option
+        value="Absent"
+        {% if trainee.attendance_status == "Absent" %}
+            selected
+        {% endif %}
+    >
+        Absent
+    </option>
+
+</select>
+
+                                        </td>
+
+                                    </tr>
+
+                                {% endfor %}
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                    <button type="submit" class="btn">
+                        Save Attendance
+                    </button>
+
+                </form>
+
+            {% else %}
+
+                <div class="empty">
+                    No trainees have been assigned to this batch yet.
+                </div>
+
+            {% endif %}
+
+        </div>
+
+    {% else %}
+
+        <div class="card">
+
+            <div class="empty">
+                Select a training batch to manage attendance.
+            </div>
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+</body>
+</html>
+

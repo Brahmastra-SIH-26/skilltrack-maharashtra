@@ -1,0 +1,1 @@
+{% extends 'base.html' %}{% block content %}<h1>Notifications</h1>{% for item in notifications %}<div class="card"><b>{{ item.notification_type }}</b><p>{{ item.message }}</p><small>{{ item.created_at }}</small></div>{% empty %}<div class="card">No notifications.</div>{% endfor %}{% endblock %}

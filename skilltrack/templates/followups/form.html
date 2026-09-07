@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="card">
+
+    <h1>Update follow-up</h1>
+
+    <p>
+        {{ followup.trainee.name }} · {{ followup.followup_type }}
+    </p>
+
+    <form method="post">
+
+        {% csrf_token %}
+
+        {% for field in form %}
+
+            <label>{{ field.label }}</label>
+
+            {{ field }}
+
+            {{ field.errors }}
+
+        {% endfor %}
+
+        <p>
+            <button>Save follow-up</button>
+        </p>
+
+    </form>
+
+</div>
+
+{% endblock %}

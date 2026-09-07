@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1>Employment follow-ups</h1>
+
+<table>
+    <tr>
+        <th>Trainee</th>
+        <th>Type</th>
+        <th>Due date</th>
+        <th>Status</th>
+        <th>Outcome</th>
+        <th></th>
+    </tr>
+
+    {% for item in followups %}
+    <tr>
+        <td>{{ item.trainee.name }}</td>
+
+        <td>{{ item.followup_type }}</td>
+
+        <td>{{ item.date }}</td>
+
+        <td>
+            {% if item.completed %}
+                Completed
+            {% elif item.date < today %}
+                Overdue
+            {% elif item.date == today %}
+                Due
+            {% else %}
+                Upcoming
+            {% endif %}
+        </td>
+
+        <td>{{ item.employment_status }}</td>
+
+        <td>
+            {% if authority %}
+                <a href="{% url 'followup_update' item.id %}">
+                    Update
+                </a>
+            {% endif %}
+        </td>
+    </tr>
+
+    {% empty %}
+    <tr>
+        <td colspan="6">
+            No follow-ups generated.
+        </td>
+    </tr>
+    {% endfor %}
+
+</table>
+
+{% endblock %}

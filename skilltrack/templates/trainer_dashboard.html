@@ -1,429 +1,742 @@
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% extends 'base.html' %}
 
-    <title>Trainer Dashboard | SkillTrack Maharashtra</title>
+{% block content %}
 
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: Arial, sans-serif;
+<style>
+
+    .trainer-container {
+        max-width: 1200px;
+        margin: 40px auto;
+        padding: 20px;
+    }
+
+    /* =========================
+       Header
+    ========================= */
+
+    .trainer-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+
+        padding: 30px;
+        margin-bottom: 30px;
+
+        border-radius: 22px;
+
+        background: linear-gradient(
+            135deg,
+            #ffffff,
+            #eff6ff
+        );
+
+        border: 1px solid #dbeafe;
+
+        box-shadow:
+            0 15px 35px rgba(15, 23, 42, 0.10);
+    }
+
+    .trainer-header h1 {
+        margin: 0 0 8px;
+
+        font-size: 32px;
+        font-weight: 800;
+
+        color: #0f172a;
+    }
+
+    .trainer-header p {
+        margin: 0;
+
+        color: #64748b;
+
+        font-size: 14px;
+    }
+
+
+    /* =========================
+       Quick Actions
+    ========================= */
+
+    .quick-actions {
+        display: grid;
+
+        grid-template-columns:
+            repeat(3, 1fr);
+
+        gap: 20px;
+
+        margin-bottom: 30px;
+    }
+
+    .action-card {
+        display: flex;
+
+        align-items: center;
+
+        gap: 16px;
+
+        padding: 22px;
+
+        border-radius: 18px;
+
+        background: white;
+
+        border: 1px solid #e2e8f0;
+
+        text-decoration: none;
+
+        box-shadow:
+            0 8px 20px rgba(15, 23, 42, 0.07);
+
+        transition:
+            transform 0.25s ease,
+            box-shadow 0.25s ease;
+    }
+
+    .action-card:hover {
+        transform: translateY(-5px);
+
+        box-shadow:
+            0 15px 30px rgba(15, 23, 42, 0.13);
+    }
+
+    .action-icon {
+        width: 52px;
+        height: 52px;
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        border-radius: 15px;
+
+        background: #dbeafe;
+
+        font-size: 25px;
+    }
+
+    .action-card h3 {
+        margin: 0 0 5px;
+
+        color: #1e293b;
+
+        font-size: 16px;
+    }
+
+    .action-card p {
+        margin: 0;
+
+        color: #64748b;
+
+        font-size: 12px;
+    }
+
+
+    /* =========================
+       Summary Cards
+    ========================= */
+
+    .summary-grid {
+        display: grid;
+
+        grid-template-columns:
+            repeat(3, 1fr);
+
+        gap: 20px;
+
+        margin-bottom: 30px;
+    }
+
+    .summary-card {
+        padding: 22px;
+
+        border-radius: 18px;
+
+        background: linear-gradient(
+            145deg,
+            #ffffff,
+            #f8fafc
+        );
+
+        border: 1px solid #e2e8f0;
+
+        box-shadow:
+            0 8px 18px rgba(15, 23, 42, 0.07);
+    }
+
+    .summary-label {
+        display: block;
+
+        margin-bottom: 8px;
+
+        color: #94a3b8;
+
+        font-size: 12px;
+
+        font-weight: 800;
+
+        text-transform: uppercase;
+    }
+
+    .summary-value {
+        font-size: 28px;
+
+        font-weight: 800;
+
+        color: #0f172a;
+    }
+
+
+    /* =========================
+       Main Card
+    ========================= */
+
+    .batches-card {
+        padding: 28px;
+
+        border-radius: 22px;
+
+        background: white;
+
+        border: 1px solid #e2e8f0;
+
+        box-shadow:
+            0 12px 28px rgba(15, 23, 42, 0.08);
+    }
+
+    .batches-card h2 {
+        margin: 0 0 20px;
+
+        color: #0f172a;
+
+        font-size: 22px;
+
+        font-weight: 800;
+    }
+
+
+    /* =========================
+       Table
+    ========================= */
+
+    .table-wrapper {
+        overflow-x: auto;
+    }
+
+    .batch-table {
+        width: 100%;
+
+        border-collapse: collapse;
+    }
+
+    .batch-table th {
+        padding: 15px;
+
+        text-align: left;
+
+        background: #f8fafc;
+
+        color: #64748b;
+
+        font-size: 11px;
+
+        font-weight: 800;
+
+        text-transform: uppercase;
+
+        letter-spacing: 0.5px;
+    }
+
+    .batch-table td {
+        padding: 17px 15px;
+
+        border-top: 1px solid #e2e8f0;
+
+        color: #475569;
+
+        font-size: 14px;
+    }
+
+    .batch-table tr:hover {
+        background: #f8fafc;
+    }
+
+
+    /* =========================
+       Batch Name
+    ========================= */
+
+    .batch-name {
+        color: #1e293b;
+
+        font-weight: 800;
+    }
+
+    .course-name {
+        display: block;
+
+        margin-top: 4px;
+
+        color: #94a3b8;
+
+        font-size: 12px;
+    }
+
+
+    /* =========================
+       Status
+    ========================= */
+
+    .status {
+        display: inline-block;
+
+        padding: 7px 12px;
+
+        border-radius: 999px;
+
+        font-size: 11px;
+
+        font-weight: 800;
+    }
+
+    .status.Active {
+        background: #dcfce7;
+
+        color: #166534;
+    }
+
+    .status.Completed {
+        background: #dbeafe;
+
+        color: #1d4ed8;
+    }
+
+
+    /* =========================
+       Buttons
+    ========================= */
+
+    .manage-btn {
+        display: inline-flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        padding: 9px 14px;
+
+        border-radius: 10px;
+
+        background: #2563eb;
+
+        color: white;
+
+        text-decoration: none;
+
+        font-size: 12px;
+
+        font-weight: 800;
+
+        transition: 0.25s ease;
+    }
+
+    .manage-btn:hover {
+        background: #1d4ed8;
+
+        transform: translateY(-2px);
+    }
+
+
+    /* =========================
+       Empty
+    ========================= */
+
+    .empty {
+        text-align: center;
+
+        padding: 55px 20px;
+
+        border-radius: 17px;
+
+        background: #f8fafc;
+
+        border: 1px dashed #cbd5e1;
+    }
+
+    .empty-icon {
+        font-size: 45px;
+
+        margin-bottom: 10px;
+    }
+
+    .empty h3 {
+        margin: 0 0 8px;
+
+        color: #334155;
+    }
+
+    .empty p {
+        margin: 0;
+
+        color: #64748b;
+
+        font-size: 14px;
+    }
+
+
+    /* =========================
+       Mobile
+    ========================= */
+
+    @media (max-width: 768px) {
+
+        .trainer-container {
+            margin: 20px auto;
+
+            padding: 12px;
         }
 
-        body {
-            background: #f4f7fb;
-            color: #1f2937;
+        .trainer-header {
+            flex-direction: column;
+
+            align-items: flex-start;
         }
 
-        .layout {
-            display: flex;
-            min-height: 100vh;
+        .quick-actions,
+        .summary-grid {
+            grid-template-columns: 1fr;
         }
 
-        /* Sidebar */
-        .sidebar {
-            width: 240px;
-            background: #172554;
-            color: white;
-            padding: 25px 15px;
-            position: fixed;
-            top: 0;
-            bottom: 0;
-            left: 0;
+        .batches-card {
+            padding: 20px;
         }
+    }
 
-        .logo {
-            font-size: 21px;
-            font-weight: bold;
-            text-align: center;
-            margin-bottom: 35px;
-        }
+</style>
 
-        .logo span {
-            color: #60a5fa;
-        }
 
-        .nav a {
-            display: block;
-            color: #dbeafe;
-            text-decoration: none;
-            padding: 13px 15px;
-            margin-bottom: 8px;
-            border-radius: 8px;
-            font-size: 15px;
-        }
+<div class="trainer-container">
 
-        .nav a:hover,
-        .nav a.active {
-            background: #2563eb;
-            color: white;
-        }
 
-        .logout {
-            position: absolute;
-            bottom: 25px;
-            left: 15px;
-            right: 15px;
-        }
+    <!-- =========================
+         Header
+    ========================= -->
 
-        .logout a {
-            display: block;
-            text-align: center;
-            background: #dc2626;
-            color: white;
-            text-decoration: none;
-            padding: 11px;
-            border-radius: 8px;
-        }
+    <div class="trainer-header">
 
-        /* Main */
-        .main {
-            margin-left: 240px;
-            width: calc(100% - 240px);
-            padding: 30px;
-        }
+        <div>
 
-        .topbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-        }
+            <h1>
+                Trainer Dashboard
+            </h1>
 
-        .topbar h1 {
-            font-size: 28px;
-            color: #172554;
-        }
+            <p>
+                Welcome,
+                <strong>
+                    {{ request.user.get_full_name|default:request.user.username }}
+                </strong>
+                — manage your training batches and trainees.
+            </p>
 
-        .welcome {
-            color: #64748b;
-            margin-top: 6px;
-        }
-
-        .user-box {
-            background: white;
-            padding: 10px 16px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-        }
-
-        /* Cards */
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .stat-card {
-            background: white;
-            padding: 22px;
-            border-radius: 12px;
-            box-shadow: 0 3px 12px rgba(0,0,0,0.07);
-        }
-
-        .stat-card h3 {
-            font-size: 14px;
-            color: #64748b;
-            margin-bottom: 10px;
-        }
-
-        .stat-card p {
-            font-size: 30px;
-            font-weight: bold;
-            color: #2563eb;
-        }
-
-        /* Section */
-        .section {
-            background: white;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 3px 12px rgba(0,0,0,0.07);
-        }
-
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .section-header h2 {
-            color: #172554;
-            font-size: 21px;
-        }
-
-        /* Table */
-        .table-container {
-            overflow-x: auto;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th,
-        td {
-            padding: 14px 12px;
-            text-align: left;
-            border-bottom: 1px solid #e5e7eb;
-        }
-
-        th {
-            background: #f8fafc;
-            color: #475569;
-            font-size: 14px;
-        }
-
-        td {
-            font-size: 14px;
-        }
-
-        .status {
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: bold;
-        }
-
-        .active {
-            background: #dcfce7;
-            color: #166534;
-        }
-
-        .completed {
-            background: #dbeafe;
-            color: #1d4ed8;
-        }
-
-        .manage-btn {
-            display: inline-block;
-            background: #2563eb;
-            color: white;
-            text-decoration: none;
-            padding: 8px 13px;
-            border-radius: 6px;
-            font-size: 13px;
-        }
-
-        .manage-btn:hover {
-            background: #1d4ed8;
-        }
-
-        .empty {
-            text-align: center;
-            padding: 35px;
-            color: #64748b;
-        }
-
-        /* Mobile */
-        @media (max-width: 800px) {
-
-            .sidebar {
-                width: 200px;
-            }
-
-            .main {
-                margin-left: 200px;
-                width: calc(100% - 200px);
-                padding: 20px;
-            }
-
-            .stats {
-                grid-template-columns: 1fr;
-            }
-
-            .topbar {
-                display: block;
-            }
-
-            .user-box {
-                margin-top: 15px;
-                display: inline-block;
-            }
-        }
-    </style>
-</head>
-
-<body>
-
-<div class="layout">
-
-    <!-- Sidebar -->
-    <aside class="sidebar">
-
-        <div class="logo">
-            SkillTrack <span>Maharashtra</span>
         </div>
 
-        <nav class="nav">
-
-            <a href="{% url 'trainer_dashboard' %}" class="active">
-                Dashboard
-            </a>
-
-            <a href="{% url 'trainer_dashboard' %}">
-                My Assigned Batches
-            </a>
-
-        </nav>
-
-        <div class="logout">
-            <a href="{% url 'logout' %}">
-                Logout
-            </a>
-        </div>
-
-    </aside>
+    </div>
 
 
-    <!-- Main Content -->
-    <main class="main">
+    <!-- =========================
+         Quick Actions
+    ========================= -->
 
-        <!-- Header -->
-        <div class="topbar">
+    <div class="quick-actions">
+
+
+        <!-- Verify Trainees -->
+
+        <a
+            href="{% url 'trainer_verify_trainees' %}"
+            class="action-card"
+        >
+
+            <div class="action-icon">
+                👥
+            </div>
 
             <div>
-                <h1>Trainer Dashboard</h1>
-                <p class="welcome">
-                    Manage your assigned training batches and trainees.
-                </p>
-            </div>
 
-            <div class="user-box">
-                <strong>{{ request.user.username }}</strong>
-            </div>
-
-        </div>
-
-
-        <!-- Statistics -->
-        <div class="stats">
-
-            <div class="stat-card">
-                <h3>Assigned Batches</h3>
-                <p>{{ batches|length }}</p>
-            </div>
-
-            <div class="stat-card">
-                <h3>Active Batches</h3>
+                <h3>
+                    Verify Trainees
+                </h3>
 
                 <p>
-                    {{ batches|dictsort:"status"|length }}
+                    Review training requests
                 </p>
+
             </div>
 
-            <div class="stat-card">
-                <h3>Role</h3>
-                <p style="font-size: 22px;">
-                    Trainer
-                </p>
+        </a>
+
+
+        <!-- Attendance -->
+
+        <a
+            href="{% url 'trainer_attendance' %}"
+            class="action-card"
+        >
+
+            <div class="action-icon">
+                📝
             </div>
+
+            <div>
+
+                <h3>
+                    Attendance
+                </h3>
+
+                <p>
+                    Mark trainee attendance
+                </p>
+
+            </div>
+
+        </a>
+
+
+        <!-- My Batches -->
+
+        <a
+            href="#my-batches"
+            class="action-card"
+        >
+
+            <div class="action-icon">
+                📚
+            </div>
+
+            <div>
+
+                <h3>
+                    My Batches
+                </h3>
+
+                <p>
+                    View assigned batches
+                </p>
+
+            </div>
+
+        </a>
+
+    </div>
+
+
+    <!-- =========================
+         Summary
+    ========================= -->
+
+    <div class="summary-grid">
+
+
+        <div class="summary-card">
+
+            <span class="summary-label">
+                Assigned Batches
+            </span>
+
+            <span class="summary-value">
+                {{ batches|length }}
+            </span>
 
         </div>
 
 
-        <!-- Assigned Batches -->
-        <section class="section">
+        <div class="summary-card">
 
-            <div class="section-header">
+            <span class="summary-label">
+                Active Batches
+            </span>
 
-                <h2>My Assigned Batches</h2>
+            <span class="summary-value">
 
-            </div>
+                {% with active_count=0 %}
 
-            {% if batches %}
+                    {% for batch in batches %}
 
-            <div class="table-container">
+                        {% if batch.status == "Active" %}
+                            {% with active_count=active_count|add:"1" %}
+                            {% endwith %}
+                        {% endif %}
 
-                <table>
+                    {% endfor %}
+
+                    {{ active_count }}
+
+                {% endwith %}
+
+            </span>
+
+        </div>
+
+
+        <div class="summary-card">
+
+            <span class="summary-label">
+                Total Trainees
+            </span>
+
+            <span class="summary-value">
+                {% for batch in batches %}
+                    {{ batch.trainees.count }}
+                    {% if not forloop.last %}+{% endif %}
+                {% empty %}
+                    0
+                {% endfor %}
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================
+         My Batches
+    ========================= -->
+
+    <div
+        class="batches-card"
+        id="my-batches"
+    >
+
+        <h2>
+            📚 My Training Batches
+        </h2>
+
+
+        {% if batches %}
+
+            <div class="table-wrapper">
+
+                <table class="batch-table">
 
                     <thead>
+
                         <tr>
-                            <th>Batch</th>
-                            <th>Course</th>
-                            <th>Provider</th>
-                            <th>District</th>
-                            <th>Dates</th>
-                            <th>Capacity</th>
-                            <th>Status</th>
-                            <th>Action</th>
+
+                            <th>
+                                Batch
+                            </th>
+
+                            <th>
+                                District
+                            </th>
+
+                            <th>
+                                Dates
+                            </th>
+
+                            <th>
+                                Trainees
+                            </th>
+
+                            <th>
+                                Status
+                            </th>
+
+                            <th>
+                                Action
+                            </th>
+
                         </tr>
+
                     </thead>
+
 
                     <tbody>
 
                         {% for batch in batches %}
 
-                        <tr>
+                            <tr>
 
-                            <td>
-                                <strong>
-                                    {{ batch.name }}
-                                </strong>
-                            </td>
 
-                            <td>
-                                {{ batch.course.name }}
-                            </td>
+                                <!-- Batch -->
 
-                            <td>
-                                {{ batch.provider.name }}
-                            </td>
+                                <td>
 
-                            <td>
-                                {{ batch.district }}
-                            </td>
+                                    <span class="batch-name">
+                                        {{ batch.name }}
+                                    </span>
 
-                            <td>
-                                {{ batch.start_date }}
-                                <br>
-                                to
-                                <br>
-                                {{ batch.end_date }}
-                            </td>
+                                    <span class="course-name">
+                                        {{ batch.course }}
+                                    </span>
 
-                            <td>
-                                {{ batch.capacity }}
-                            </td>
+                                </td>
 
-                            <td>
 
-                                {% if batch.status == "Active" %}
+                                <!-- District -->
 
-                                <span class="status active">
-                                    Active
-                                </span>
+                                <td>
+                                    {{ batch.district }}
+                                </td>
 
-                                {% else %}
 
-                                <span class="status completed">
-                                    Completed
-                                </span>
+                                <!-- Dates -->
 
-                                {% endif %}
+                                <td>
 
-                            </td>
+                                    {{ batch.start_date }}
+                                    <br>
+                                    –
+                                    <br>
+                                    {{ batch.end_date }}
 
-                            <td>
+                                </td>
 
-                                <a
-                                    href="{% url 'trainer_batch_detail' batch.id %}"
-                                    class="manage-btn"
-                                >
-                                    Manage Trainees
-                                </a>
 
-                            </td>
+                                <!-- Trainees -->
 
-                        </tr>
+                                <td>
+
+                                    <strong>
+                                        {{ batch.trainees.count }}
+                                    </strong>
+
+                                    /
+                                    {{ batch.capacity }}
+
+                                </td>
+
+
+                                <!-- Status -->
+
+                                <td>
+
+                                    <span class="status {{ batch.status }}">
+                                        {{ batch.status }}
+                                    </span>
+
+                                </td>
+
+
+                                <!-- Action -->
+
+                                <td>
+
+                                    <a
+                                        href="{% url 'trainer_batch_detail' batch.id %}"
+                                        class="manage-btn"
+                                    >
+                                        Manage
+                                    </a>
+
+                                </td>
+
+                            </tr>
 
                         {% endfor %}
 
@@ -433,29 +746,33 @@
 
             </div>
 
-            {% else %}
+
+        {% else %}
+
 
             <div class="empty">
 
-                <h3>No batches assigned yet</h3>
+                <div class="empty-icon">
+                    📚
+                </div>
+
+                <h3>
+                    No Batches Assigned
+                </h3>
 
                 <p>
-                    Your assigned training batches will appear here
-                    once the Authority assigns them.
+                    The Authority has not assigned any
+                    training batches to you yet.
                 </p>
 
             </div>
 
-            {% endif %}
 
-        </section>
+        {% endif %}
 
-    </main>
+    </div>
 
 </div>
 
-</body>
-</html>
-
-
+{% endblock %}
 

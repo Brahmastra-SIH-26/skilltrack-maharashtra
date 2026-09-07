@@ -1,830 +1,1233 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% extends 'base.html' %}
 
-    <title>SkillTrack Maharashtra | Dashboard</title>
+{% block head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+{% block content %}
 
-    <style>
-/* ============================================
-   SkillTrack Maharashtra — Dashboard styles
-   ============================================ */
+<style>
+/* =========================================================
+   AUTHORITY DASHBOARD
+========================================================= */
 
-:root {
-    --bg: #F6F4EF;
-    --sidebar-bg: #14213D;
-    --sidebar-bg-active: #1D2E52;
-    --sidebar-text: #AEB8D0;
-    --sidebar-text-active: #FFFFFF;
-
-    --navy: #14213D;
-    --saffron: #C1561D;
-    --saffron-soft: #F4E3D5;
-    --teal: #2F6F5E;
-    --teal-soft: #DCEBE6;
-    --teal-dark: #1F4A3E;
-    --sand: #D7A24A;
-
-    --text-primary: #1B1F27;
-    --text-muted: #6B7280;
-    --card-bg: #FFFFFF;
-    --card-border: #E7E3D8;
-
-    --radius-sm: 8px;
-    --radius-md: 14px;
-
-    --font-heading: 'Fraunces', Georgia, 'Times New Roman', serif;
-    --font-body: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+.authority-dashboard {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 10px 0 40px;
 }
 
-* { box-sizing: border-box; }
+/* =========================================================
+   HEADER
+========================================================= */
 
-html, body {
-    margin: 0;
-    padding: 0;
-    background: var(--bg);
-    color: var(--text-primary);
-    font-family: var(--font-body);
-    -webkit-font-smoothing: antialiased;
-}
-
-a { text-decoration: none; color: inherit; }
-
-/* ---------- LAYOUT ---------- */
-
-.layout {
-    display: grid;
-    grid-template-columns: 248px 1fr;
-    min-height: 100vh;
-}
-
-.main {
-    padding: 32px 40px 56px;
-    max-width: 1280px;
-    width: 100%;
-}
-
-/* ---------- SIDEBAR ---------- */
-
-.sidebar {
-    background: var(--sidebar-bg);
-    color: var(--sidebar-text);
-    display: flex;
-    flex-direction: column;
-    padding: 26px 16px;
-    position: sticky;
-    top: 0;
-    height: 100vh;
-}
-
-.brand {
+.dashboard-hero {
+    position: relative;
+    overflow: hidden;
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 4px 8px 28px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    margin-bottom: 20px;
+    justify-content: space-between;
+    gap: 25px;
+
+    padding: 32px;
+    margin-bottom: 25px;
+
+    border-radius: 24px;
+
+    background:
+        linear-gradient(135deg, #102a43 0%, #1769aa 65%, #2186d0 100%);
+
+    color: white;
+
+    box-shadow:
+        0 18px 40px rgba(16, 42, 67, .20);
 }
 
-.brand-icon {
-    width: 36px;
-    height: 36px;
-    border-radius: var(--radius-sm);
-    background: var(--saffron);
-    color: #fff;
+.dashboard-hero::before {
+    content: "";
+    position: absolute;
+    width: 220px;
+    height: 220px;
+    right: -70px;
+    top: -100px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.08);
+}
+
+.dashboard-hero::after {
+    content: "";
+    position: absolute;
+    width: 140px;
+    height: 140px;
+    right: 170px;
+    bottom: -100px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.06);
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+}
+
+.hero-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+
+    padding: 6px 11px;
+    margin-bottom: 12px;
+
+    border-radius: 30px;
+
+    background: rgba(255,255,255,.12);
+    border: 1px solid rgba(255,255,255,.18);
+
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .5px;
+    text-transform: uppercase;
+}
+
+.dashboard-hero h1 {
+    margin: 0 0 8px;
+
+    font-size: 32px;
+    line-height: 1.2;
+    font-weight: 800;
+}
+
+.dashboard-hero p {
+    margin: 0;
+
+    color: rgba(255,255,255,.78);
+    font-size: 15px;
+}
+
+.create-btn {
+    position: relative;
+    z-index: 3;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+
+    padding: 13px 20px;
+
+    border-radius: 12px;
+
+    background: white;
+    color: #1769aa;
+
+    text-decoration: none;
+
+    font-weight: 800;
+
+    box-shadow: 0 8px 20px rgba(0,0,0,.16);
+
+    transition: .25s ease;
+}
+
+.create-btn:hover {
+    transform: translateY(-3px);
+    color: #102a43;
+    box-shadow: 0 13px 25px rgba(0,0,0,.22);
+}
+
+/* =========================================================
+   SECTION TITLE
+========================================================= */
+
+.section-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    margin: 5px 2px 14px;
+}
+
+.section-heading h2 {
+    margin: 0;
+
+    color: #172b4d;
+    font-size: 18px;
+    font-weight: 800;
+}
+
+.section-heading span {
+    color: #667085;
+    font-size: 13px;
+}
+
+/* =========================================================
+   METRICS
+========================================================= */
+
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 18px;
+
+    margin-bottom: 27px;
+}
+
+.metric-card {
+    position: relative;
+    overflow: hidden;
+
+    padding: 22px;
+
+    min-height: 150px;
+
+    background: #fff;
+
+    border: 1px solid #e3e8ef;
+    border-radius: 18px;
+
+    box-shadow: 0 7px 22px rgba(16,42,67,.07);
+
+    transition:
+        transform .25s ease,
+        box-shadow .25s ease;
+}
+
+.metric-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 32px rgba(16,42,67,.12);
+}
+
+.metric-card::after {
+    content: "";
+
+    position: absolute;
+
+    width: 85px;
+    height: 85px;
+
+    right: -30px;
+    bottom: -30px;
+
+    border-radius: 50%;
+
+    background: rgba(23,105,170,.06);
+}
+
+.metric-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    margin-bottom: 16px;
+}
+
+.metric-icon {
+    width: 44px;
+    height: 44px;
+
     display: flex;
     align-items: center;
     justify-content: center;
-    font-family: var(--font-heading);
-    font-weight: 600;
-    font-size: 18px;
-    flex-shrink: 0;
+
+    border-radius: 13px;
+
+    font-size: 20px;
+
+    background: #eef5fb;
 }
 
-.brand-name h2 {
-    margin: 0;
-    font-family: var(--font-heading);
-    font-weight: 600;
-    font-size: 17px;
-    color: #fff;
-    letter-spacing: 0.2px;
+.metric-status {
+    padding: 5px 9px;
+
+    border-radius: 20px;
+
+    background: #f1f5f9;
+    color: #64748b;
+
+    font-size: 11px;
+    font-weight: 700;
 }
 
-.brand-name span {
+.metric-title {
+    display: block;
+
+    margin-bottom: 6px;
+
+    color: #667085;
+
     font-size: 12px;
-    color: var(--sidebar-text);
+    font-weight: 800;
+
+    text-transform: uppercase;
+    letter-spacing: .6px;
 }
 
-.sidebar nav {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    flex: 1;
+.metric-value {
+    display: block;
+
+    margin-bottom: 8px;
+
+    color: #102a43;
+
+    font-size: 30px;
+    line-height: 1;
+
+    font-weight: 800;
 }
 
-.sidebar nav a,
-.sidebar-bottom a {
+.metric-description {
+    color: #8492a6;
+    font-size: 12px;
+}
+
+/* Individual metric accents */
+
+.metric-trainees .metric-icon {
+    background: #eaf3ff;
+}
+
+.metric-partners .metric-icon {
+    background: #edf9f2;
+}
+
+.metric-batches .metric-icon {
+    background: #fff7e8;
+}
+
+.metric-employment .metric-icon {
+    background: #f1edff;
+}
+
+/* =========================================================
+   CHARTS
+========================================================= */
+
+.charts-grid {
+    display: grid;
+    grid-template-columns: 1.35fr 1fr;
+    gap: 20px;
+
+    margin-bottom: 22px;
+}
+
+.dashboard-card {
+    background: #fff;
+
+    border: 1px solid #e3e8ef;
+    border-radius: 19px;
+
+    padding: 24px;
+
+    box-shadow: 0 7px 22px rgba(16,42,67,.06);
+}
+
+.card-header {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 10px 12px;
-    border-radius: var(--radius-sm);
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--sidebar-text);
-    transition: background 0.15s ease, color 0.15s ease;
-}
-
-.sidebar nav a svg,
-.sidebar-bottom a svg {
-    width: 18px;
-    height: 18px;
-    flex-shrink: 0;
-}
-
-.sidebar nav a:hover {
-    background: rgba(255, 255, 255, 0.06);
-    color: #fff;
-}
-
-.sidebar nav a.active {
-    background: var(--sidebar-bg-active);
-    color: var(--sidebar-text-active);
-    box-shadow: inset 3px 0 0 var(--saffron);
-}
-
-.sidebar-bottom {
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
-    padding-top: 12px;
-}
-
-/* ---------- TOPBAR ---------- */
-
-.topbar {
-    display: flex;
-    align-items: flex-end;
     justify-content: space-between;
-    margin-bottom: 28px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid var(--card-border);
+
+    gap: 15px;
+
+    margin-bottom: 20px;
 }
 
-.topbar h1 {
-    font-family: var(--font-heading);
-    font-weight: 600;
-    font-size: 30px;
-    margin: 0 0 4px;
-}
-
-.topbar p {
-    margin: 0;
-    color: var(--text-muted);
-    font-size: 14px;
-}
-
-.profile {
+.card-title {
     display: flex;
     align-items: center;
     gap: 10px;
 }
 
-.profile strong {
-    display: block;
-    font-size: 14px;
-    font-weight: 600;
-}
+.card-title-icon {
+    width: 36px;
+    height: 36px;
 
-.profile small {
-    color: var(--text-muted);
-    font-size: 12px;
-}
-
-.avatar {
-    width: 38px;
-    height: 38px;
-    border-radius: 50%;
-    background: var(--navy);
-    color: #fff;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-family: var(--font-heading);
-    font-weight: 600;
-}
 
-/* ---------- STAT CARDS ---------- */
+    border-radius: 10px;
 
-.stats {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 18px;
-    margin-bottom: 20px;
-}
+    background: #eef5fb;
 
-.card {
-    background: var(--card-bg);
-    border: 1px solid var(--card-border);
-    border-left: 3px solid transparent;
-    border-radius: var(--radius-sm);
-    padding: 20px 22px;
-}
-
-.card-top {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 14px;
-}
-
-.card-top span {
-    font-size: 13px;
-    color: var(--text-muted);
-    font-weight: 500;
-}
-
-.card h2 {
-    font-family: var(--font-heading);
-    font-size: 34px;
-    font-weight: 600;
-    margin: 0 0 6px;
-}
-
-.card p {
-    margin: 0;
-    font-size: 13px;
-    color: var(--text-muted);
-}
-
-.card p.positive { color: var(--teal-dark); }
-
-.stat-navy   { border-left-color: var(--navy); }
-.stat-teal   { border-left-color: var(--teal); }
-.stat-saffron{ border-left-color: var(--saffron); }
-.stat-teal-dark { border-left-color: var(--teal-dark); }
-
-/* ---------- MINI STATS ---------- */
-
-.mini-stats {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 18px;
-    margin-bottom: 28px;
-}
-
-.mini-stats div {
-    background: var(--card-bg);
-    border: 1px solid var(--card-border);
-    border-radius: var(--radius-sm);
-    padding: 16px 20px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.mini-stats span {
-    font-size: 13px;
-    color: var(--text-muted);
-    font-weight: 500;
-}
-
-.mini-stats strong {
-    font-family: var(--font-heading);
-    font-size: 20px;
-    font-weight: 600;
-}
-
-/* ---------- CHART CARDS ---------- */
-
-.charts {
-    display: grid;
-    grid-template-columns: 1.3fr 1fr;
-    gap: 18px;
-    margin-bottom: 18px;
-}
-
-.bottom-grid {
-    display: grid;
-    grid-template-columns: 1.3fr 1fr;
-    gap: 18px;
-}
-
-.chart-card {
-    background: var(--card-bg);
-    border: 1px solid var(--card-border);
-    border-radius: var(--radius-md);
-    padding: 22px;
-}
-
-.chart-header {
-    margin-bottom: 18px;
-}
-
-.chart-header h3 {
-    font-family: var(--font-heading);
     font-size: 17px;
-    font-weight: 600;
-    margin: 0 0 3px;
 }
 
-.chart-header p {
+.card-title h2 {
     margin: 0;
-    font-size: 13px;
-    color: var(--text-muted);
+
+    color: #172b4d;
+
+    font-size: 17px;
+    font-weight: 800;
 }
 
-.chart-card canvas {
-    max-height: 260px;
+.card-subtitle {
+    margin: 3px 0 0;
+
+    color: #8a96a8;
+
+    font-size: 12px;
 }
 
-/* ---------- INSIGHT CARD ---------- */
+.chart-container {
+    position: relative;
 
-.insight-card {
-    background: var(--navy);
-    color: #fff;
-    border-radius: var(--radius-md);
-    padding: 26px;
+    height: 310px;
+    width: 100%;
+}
+
+.chart-badge {
+    padding: 6px 10px;
+
+    border-radius: 20px;
+
+    background: #f5f8fb;
+    color: #667085;
+
+    font-size: 11px;
+    font-weight: 700;
+}
+
+/* =========================================================
+   FOLLOW UPS
+========================================================= */
+
+.followup-card {
+    margin-top: 0;
+}
+
+.followup-list {
     display: flex;
     flex-direction: column;
+    gap: 10px;
 }
 
-.insight-card h3 {
-    font-family: var(--font-heading);
-    font-size: 17px;
-    font-weight: 600;
-    margin: 0 0 18px;
-}
-
-.insight-card p {
-    margin: 4px 0 16px;
-    font-size: 13px;
-    color: #B9C0D4;
-}
-
-.employment-number {
-    font-family: var(--font-heading);
-    font-size: 46px;
-    font-weight: 600;
-    color: var(--sand);
-}
-
-.progress {
-    width: 100%;
-    height: 8px;
-    background: rgba(255, 255, 255, 0.12);
-    border-radius: 999px;
-    overflow: hidden;
-    margin-bottom: 22px;
-}
-
-.progress div {
-    height: 100%;
-    background: var(--saffron);
-    border-radius: 999px;
-}
-
-.employment-details {
+.followup-item {
     display: flex;
-    gap: 28px;
-    margin-top: auto;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    padding: 15px 17px;
+
+    border: 1px solid #e7ebf0;
+    border-radius: 14px;
+
+    background: #fbfcfe;
+
+    transition: .2s ease;
 }
 
-.employment-details strong {
-    display: block;
-    font-family: var(--font-heading);
-    font-size: 20px;
-    font-weight: 600;
+.followup-item:hover {
+    background: #fff;
+    border-color: #cbd8e5;
+    transform: translateX(3px);
+    box-shadow: 0 7px 18px rgba(16,42,67,.06);
 }
 
-.employment-details span {
+.followup-left {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+}
+
+.followup-icon {
+    width: 43px;
+    height: 43px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 12px;
+
+    background: #fff4e8;
+
+    font-size: 19px;
+}
+
+.followup-name {
+    margin: 0 0 4px;
+
+    color: #172b4d;
+
+    font-size: 14px;
+    font-weight: 750;
+}
+
+.followup-info {
+    margin: 0;
+
+    color: #7b8798;
+
     font-size: 12px;
-    color: #B9C0D4;
 }
 
-/* ---------- RESPONSIVE ---------- */
+.update-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 
-@media (max-width: 1080px) {
-    .stats { grid-template-columns: repeat(2, 1fr); }
-    .charts, .bottom-grid { grid-template-columns: 1fr; }
+    padding: 8px 13px;
+
+    border-radius: 9px;
+
+    background: #eef5ff;
+    color: #1769aa;
+
+    text-decoration: none;
+
+    font-size: 12px;
+    font-weight: 800;
+
+    white-space: nowrap;
+
+    transition: .2s ease;
 }
 
-@media (max-width: 860px) {
-    .layout { grid-template-columns: 1fr; }
-    .sidebar {
-        position: static;
-        height: auto;
-        flex-direction: row;
-        align-items: center;
-        overflow-x: auto;
-        padding: 14px 16px;
+.update-link:hover {
+    background: #1769aa;
+    color: white;
+}
+
+/* =========================================================
+   EMPTY STATE
+========================================================= */
+
+.empty-state {
+    padding: 38px 20px;
+
+    text-align: center;
+
+    border: 1px dashed #ccd6e0;
+    border-radius: 14px;
+
+    background: #f9fbfd;
+}
+
+.empty-icon {
+    width: 52px;
+    height: 52px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin: 0 auto 12px;
+
+    border-radius: 50%;
+
+    background: #eaf7ef;
+
+    font-size: 23px;
+}
+
+.empty-state strong {
+    display: block;
+
+    margin-bottom: 4px;
+
+    color: #344054;
+}
+
+.empty-state p {
+    margin: 0;
+
+    color: #8a96a8;
+
+    font-size: 13px;
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1050px) {
+
+    .metrics-grid {
+        grid-template-columns: repeat(2, 1fr);
     }
-    .brand { border-bottom: none; margin-bottom: 0; padding: 0 16px 0 0; }
-    .sidebar nav { flex-direction: row; }
-    .sidebar-bottom { border-top: none; padding-top: 0; margin-left: 8px; }
-    .sidebar nav a span, .sidebar-bottom a span { display: none; }
-    .main { padding: 24px 20px 40px; }
+
+    .charts-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
-@media (max-width: 560px) {
-    .stats { grid-template-columns: 1fr; }
-    .mini-stats { grid-template-columns: 1fr; }
-    .topbar { flex-direction: column; align-items: flex-start; gap: 14px; }
+@media (max-width: 650px) {
+
+    .authority-dashboard {
+        padding: 5px 0 25px;
+    }
+
+    .dashboard-hero {
+        flex-direction: column;
+        align-items: flex-start;
+
+        padding: 24px;
+    }
+
+    .dashboard-hero h1 {
+        font-size: 26px;
+    }
+
+    .create-btn {
+        width: 100%;
+    }
+
+    .metrics-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .dashboard-card {
+        padding: 18px;
+    }
+
+    .chart-container {
+        height: 260px;
+    }
+
+    .followup-item {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .update-link {
+        width: 100%;
+    }
 }
-
-/* ---------- ACCESSIBILITY ---------- */
-
-a:focus-visible,
-button:focus-visible {
-    outline: 2px solid var(--saffron);
-    outline-offset: 2px;
-}
-
-@media (prefers-reduced-motion: reduce) {
-    * { transition: none !important; }
-}
-
-    </style>
-
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
-
-<body>
-
-<div class="layout">
-
-    <!-- SIDEBAR -->
-    <aside class="sidebar">
-
-        <div class="brand">
-            <div class="brand-icon">S</div>
-            <div class="brand-name">
-                <h2>SkillTrack</h2>
-                <span>Maharashtra</span>
-            </div>
-        </div>
-
-        <nav>
-           <a href="{% url 'dashboard' %}">Dashboard</a>
-
-<a href="{% url 'trainee_list' %}">Trainees</a>
-
-<a href="{% url 'trainer_list' %}">Trainers</a>
-
-<a href="{% url 'provider_list' %}">Providers</a>
-
-<a href="{% url 'course_list' %}">Courses</a>
-
-<a href="{% url 'batch_list' %}">Training Batches</a>
-
-        <div class="sidebar-bottom">
-            <a href="#">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 13.5a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.9 2.9l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6V20a2 2 0 1 1-4 0v-.2a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.9-2.9l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.6-1H4a2 2 0 1 1 0-4h.2a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1A2 2 0 1 1 8.3 2.7l.1.1a1.7 1.7 0 0 0 1.9.3H10.5a1.7 1.7 0 0 0 1-1.6V1.4a2 2 0 1 1 4 0v.2c0 .7.4 1.3 1 1.6.6.3 1.4.2 1.9-.3l.1-.1a2 2 0 1 1 2.9 2.9l-.1.1a1.7 1.7 0 0 0-.3 1.9c.3.6.9 1 1.6 1h.2a2 2 0 1 1 0 4h-.2a1.7 1.7 0 0 0-1.6 1z"/></svg>
-                <span>Settings</span>
-            </a>
-        </div>
-
-    </aside>
+</style>
 
 
-    <!-- MAIN -->
-    <main class="main">
+<div class="authority-dashboard">
 
-        <!-- HEADER -->
-        <header class="topbar">
+    <!-- =====================================================
+         HERO
+    ====================================================== -->
 
-            <div>
-                <h1>Dashboard</h1>
-                <p>Skill development &amp; employment overview</p>
+    <div class="dashboard-hero">
+
+        <div class="hero-content">
+
+            <div class="hero-label">
+                🏛️ Programme Authority
             </div>
 
-            <div class="profile">
-                <div class="avatar">A</div>
+            <h1>
+                Authority Dashboard
+            </h1>
+
+            <p>
+                Monitor trainees, training partners, batches and employment outcomes.
+            </p>
+
+        </div>
+
+        <a href="{% url 'batch_create' %}" class="create-btn">
+            <span>＋</span>
+            Create New Batch
+        </a>
+
+    </div>
+
+
+    <!-- =====================================================
+         OVERVIEW
+    ====================================================== -->
+
+    <div class="section-heading">
+        <h2>Programme Overview</h2>
+        <span>Current programme statistics</span>
+    </div>
+
+
+    <!-- =====================================================
+         METRICS
+    ====================================================== -->
+
+    <div class="metrics-grid">
+
+        <!-- TRAINEES -->
+
+        <div class="metric-card metric-trainees">
+
+            <div class="metric-top">
+
+                <div class="metric-icon">
+                    👥
+                </div>
+
+                <span class="metric-status">
+                    TRAINEES
+                </span>
+
+            </div>
+
+            <span class="metric-title">
+                Total Trainees
+            </span>
+
+            <span class="metric-value">
+                {{ total_trainees }}
+            </span>
+
+            <span class="metric-description">
+                {{ pending_trainees }} pending ·
+                {{ verified_trainees }} verified
+            </span>
+
+        </div>
+
+
+        <!-- PARTNERS -->
+
+        <div class="metric-card metric-partners">
+
+            <div class="metric-top">
+
+                <div class="metric-icon">
+                    🤝
+                </div>
+
+                <span class="metric-status">
+                    PARTNERS
+                </span>
+
+            </div>
+
+            <span class="metric-title">
+                Verified Partners
+            </span>
+
+            <span class="metric-value">
+                {{ verified_trainers }}
+                /
+                {{ verified_providers }}
+            </span>
+
+            <span class="metric-description">
+                Verified trainers / providers
+            </span>
+
+        </div>
+
+
+        <!-- BATCHES -->
+
+        <div class="metric-card metric-batches">
+
+            <div class="metric-top">
+
+                <div class="metric-icon">
+                    🎓
+                </div>
+
+                <span class="metric-status">
+                    TRAINING
+                </span>
+
+            </div>
+
+            <span class="metric-title">
+                Training Batches
+            </span>
+
+            <span class="metric-value">
+                {{ active_batches }}
+            </span>
+
+            <span class="metric-description">
+                {{ completed_batches }} completed batches
+            </span>
+
+        </div>
+
+
+        <!-- EMPLOYMENT -->
+
+        <div class="metric-card metric-employment">
+
+            <div class="metric-top">
+
+                <div class="metric-icon">
+                    💼
+                </div>
+
+                <span class="metric-status">
+                    OUTCOME
+                </span>
+
+            </div>
+
+            <span class="metric-title">
+                Employment Rate
+            </span>
+
+            <span class="metric-value">
+                {{ employment_rate }}%
+            </span>
+
+            <span class="metric-description">
+                {{ employed }} trainees employed
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         ANALYTICS
+    ====================================================== -->
+
+    <div class="section-heading">
+
+        <h2>Programme Analytics</h2>
+
+        <span>Data-driven monitoring</span>
+
+    </div>
+
+
+    <div class="charts-grid">
+
+        <!-- DISTRICT -->
+
+        <section class="dashboard-card">
+
+            <div class="card-header">
+
+                <div class="card-title">
+
+                    <div class="card-title-icon">
+                        📊
+                    </div>
+
+                    <div>
+
+                        <h2>
+                            Trainees by District
+                        </h2>
+
+                        <p class="card-subtitle">
+                            Distribution of registered trainees
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <span class="chart-badge">
+                    DISTRICT
+                </span>
+
+            </div>
+
+            <div class="chart-container">
+
+                <canvas id="district"></canvas>
+
+            </div>
+
+        </section>
+
+
+        <!-- EMPLOYMENT -->
+
+        <section class="dashboard-card">
+
+            <div class="card-header">
+
+                <div class="card-title">
+
+                    <div class="card-title-icon">
+                        💼
+                    </div>
+
+                    <div>
+
+                        <h2>
+                            Employment Outcomes
+                        </h2>
+
+                        <p class="card-subtitle">
+                            Current trainee outcome distribution
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <span class="chart-badge">
+                    OUTCOMES
+                </span>
+
+            </div>
+
+            <div class="chart-container">
+
+                <canvas id="employment"></canvas>
+
+            </div>
+
+        </section>
+
+    </div>
+
+
+    <!-- =====================================================
+         FOLLOW UPS
+    ====================================================== -->
+
+    <section class="dashboard-card followup-card">
+
+        <div class="card-header">
+
+            <div class="card-title">
+
+                <div class="card-title-icon">
+                    ⚠️
+                </div>
+
                 <div>
-                    <strong>Administrator</strong>
-                    <small>System Admin</small>
-                </div>
-            </div>
 
-        </header>
+                    <h2>
+                        Follow-ups Requiring Attention
+                    </h2>
 
+                    <p class="card-subtitle">
+                        Trainee outcomes that need an update
+                    </p>
 
-        <!-- STAT CARDS -->
-        <section class="stats">
-
-            <div class="card stat-navy">
-                <div class="card-top">
-                    <span>Total Trainees</span>
                 </div>
 
-                <h2>{{ total_trainees }}</h2>
-                <p class="positive">Registered beneficiaries</p>
             </div>
 
-
-            <div class="card stat-teal">
-                <div class="card-top">
-                    <span>Total Courses</span>
-                </div>
-
-                <h2>{{ total_courses }}</h2>
-                <p>Available training programs</p>
-            </div>
+        </div>
 
 
-            <div class="card stat-saffron">
-                <div class="card-top">
-                    <span>Active Training</span>
-                </div>
+        <div class="followup-list">
 
-                <h2>{{ active_training }}</h2>
-                <p>Currently in training</p>
-            </div>
+            {% for followup in due_followups %}
 
+                <div class="followup-item">
 
-            <div class="card stat-teal-dark">
-                <div class="card-top">
-                    <span>Employment Rate</span>
-                </div>
+                    <div class="followup-left">
 
-                <h2>{{ employment_rate }}%</h2>
-                <p class="positive">Trainees employed</p>
-            </div>
+                        <div class="followup-icon">
+                            📅
+                        </div>
 
-        </section>
+                        <div>
 
+                            <p class="followup-name">
+                                {{ followup.trainee.name }}
+                            </p>
 
-        <!-- SECONDARY STATS -->
-        <section class="mini-stats">
+                            <p class="followup-info">
 
-            <div>
-                <span>Training Providers</span>
-                <strong>{{ total_providers }}</strong>
-            </div>
+                                {{ followup.followup_type }}
 
-            <div>
-                <span>Completed Training</span>
-                <strong>{{ completed_training }}</strong>
-            </div>
+                                · Due
 
-            <div>
-                <span>Employed Trainees</span>
-                <strong>{{ employed }}</strong>
-            </div>
+                                {{ followup.date }}
 
-        </section>
+                            </p>
 
+                        </div>
 
-        <!-- CHARTS -->
-        <section class="charts">
-
-            <div class="chart-card">
-
-                <div class="chart-header">
-                    <div>
-                        <h3>District-wise Trainees</h3>
-                        <p>Distribution of beneficiaries</p>
-                    </div>
-                </div>
-
-                <canvas id="districtChart"></canvas>
-
-            </div>
-
-
-            <div class="chart-card">
-
-                <div class="chart-header">
-                    <div>
-                        <h3>Courses by Sector</h3>
-                        <p>Training program distribution</p>
-                    </div>
-                </div>
-
-                <canvas id="sectorChart"></canvas>
-
-            </div>
-
-        </section>
-
-
-        <!-- TRAINING STATUS -->
-        <section class="bottom-grid">
-
-            <div class="chart-card">
-
-                <div class="chart-header">
-                    <div>
-                        <h3>Training Overview</h3>
-                        <p>Current training status</p>
-                    </div>
-                </div>
-
-                <canvas id="trainingChart"></canvas>
-
-            </div>
-
-
-            <div class="insight-card">
-
-                <h3>Employment Overview</h3>
-
-                <div class="employment-number">
-                    {{ employment_rate }}%
-                </div>
-
-                <p>Overall employment rate</p>
-
-                <div class="progress">
-                    <div style="width: {{ employment_rate }}%"></div>
-                </div>
-
-                <div class="employment-details">
-
-                    <div>
-                        <strong>{{ employed }}</strong>
-                        <span>Employed</span>
                     </div>
 
-                    <div>
-                        {# 'others' is computed in the view: total_trainees - employed. #}
-                        {# Django templates can't subtract two variables inline, so this #}
-                        {# must be passed in via context rather than built here. #}
-                        <strong>{{ others }}</strong>
-                        <span>Others</span>
-                    </div>
+
+                    <a
+                        href="{% url 'followup_update' followup.id %}"
+                        class="update-link"
+                    >
+                        Update Outcome →
+                    </a>
 
                 </div>
 
-            </div>
+            {% empty %}
 
-        </section>
+                <div class="empty-state">
 
-    </main>
+                    <div class="empty-icon">
+                        ✓
+                    </div>
+
+                    <strong>
+                        All follow-ups are up to date
+                    </strong>
+
+                    <p>
+                        There are currently no pending follow-ups requiring attention.
+                    </p>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    </section>
 
 </div>
 
 
+<!-- =========================================================
+     CHART.JS
+========================================================= -->
+
 <script>
 
-    const palette = {
-        navy: "#14213D",
-        saffron: "#C1561D",
-        teal: "#2F6F5E",
-        tealLight: "#6FA895",
-        sand: "#D7A24A",
-        slate: "#6B7280"
-    };
+document.addEventListener("DOMContentLoaded", function () {
 
-    // DISTRICT DATA
-    const districtLabels = [
-        {% for item in district_data %}
-            "{{ item.district }}",
-        {% endfor %}
-    ];
+    /* =====================================================
+       DEFAULT CHART SETTINGS
+    ===================================================== */
 
-    const districtValues = [
-        {% for item in district_data %}
-            {{ item.total }},
-        {% endfor %}
-    ];
+    Chart.defaults.font.family =
+        "Manrope, Arial, sans-serif";
+
+    Chart.defaults.color =
+        "#667085";
 
 
-    new Chart(
-        document.getElementById("districtChart"),
-        {
-            type: "bar",
+    /* =====================================================
+       DISTRICT CHART
+    ===================================================== */
 
-            data: {
-                labels: districtLabels,
+    const districtCanvas =
+        document.getElementById("district");
 
-                datasets: [{
-                    label: "Trainees",
-                    data: districtValues,
-                    backgroundColor: palette.teal,
-                    hoverBackgroundColor: palette.navy,
-                    borderRadius: 4,
-                    maxBarThickness: 34
-                }]
-            },
+    if (districtCanvas) {
 
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
+        new Chart(
+            districtCanvas,
+            {
+                type: "bar",
 
-                plugins: {
-                    legend: {
-                        display: false
-                    }
+                data: {
+
+                    labels: [
+                        {% for x in district_data %}
+                            "{{ x.district|escapejs }}",
+                        {% endfor %}
+                    ],
+
+                    datasets: [
+
+                        {
+                            label: "Trainees",
+
+                            data: [
+                                {% for x in district_data %}
+                                    {{ x.total|default:0 }},
+                                {% endfor %}
+                            ],
+
+                            backgroundColor:
+                                "rgba(23, 105, 170, 0.85)",
+
+                            borderColor:
+                                "#1769aa",
+
+                            borderWidth: 1,
+
+                            borderRadius: 7,
+
+                            borderSkipped: false,
+
+                            maxBarThickness: 45
+                        }
+
+                    ]
+
                 },
 
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        grid: { color: "#EAE7DE" },
-                        ticks: { color: palette.slate }
+                options: {
+
+                    responsive: true,
+
+                    maintainAspectRatio: false,
+
+                    interaction: {
+                        intersect: false,
+                        mode: "index"
                     },
-                    x: {
-                        grid: { display: false },
-                        ticks: { color: palette.slate }
+
+                    plugins: {
+
+                        legend: {
+                            display: false
+                        },
+
+                        tooltip: {
+
+                            backgroundColor: "#102a43",
+
+                            titleFont: {
+                                weight: "700"
+                            },
+
+                            padding: 12,
+
+                            cornerRadius: 9,
+
+                            displayColors: false
+
+                        }
+
+                    },
+
+                    scales: {
+
+                        x: {
+
+                            grid: {
+                                display: false
+                            },
+
+                            ticks: {
+                                maxRotation: 0
+                            }
+
+                        },
+
+                        y: {
+
+                            beginAtZero: true,
+
+                            border: {
+                                display: false
+                            },
+
+                            grid: {
+                                color: "rgba(16,42,67,.07)"
+                            },
+
+                            ticks: {
+                                precision: 0
+                            }
+
+                        }
+
                     }
+
                 }
+
             }
-        }
-    );
+        );
+
+    }
 
 
-    // SECTOR DATA
-    const sectorLabels = [
-        {% for item in sector_data %}
-            "{{ item.sector }}",
-        {% endfor %}
-    ];
+    /* =====================================================
+       EMPLOYMENT CHART
+    ===================================================== */
 
-    const sectorValues = [
-        {% for item in sector_data %}
-            {{ item.total }},
-        {% endfor %}
-    ];
+    const employmentCanvas =
+        document.getElementById("employment");
 
+    if (employmentCanvas) {
 
-    new Chart(
-        document.getElementById("sectorChart"),
-        {
-            type: "doughnut",
+        new Chart(
+            employmentCanvas,
+            {
+                type: "doughnut",
 
-            data: {
-                labels: sectorLabels,
+                data: {
 
-                datasets: [{
-                    data: sectorValues,
-                    backgroundColor: [
-                        palette.navy, palette.saffron, palette.teal,
-                        palette.sand, palette.tealLight, "#8C97AE"
+                    labels: [
+                        {% for x in employment_data %}
+                            "{{ x.status|escapejs }}",
+                        {% endfor %}
                     ],
-                    borderWidth: 2,
-                    borderColor: "#FFFFFF"
-                }]
-            },
 
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                cutout: "62%",
+                    datasets: [
 
-                plugins: {
-                    legend: {
-                        position: "bottom",
-                        labels: { color: "#1B1F27", boxWidth: 10, padding: 14 }
+                        {
+
+                            data: [
+                                {% for x in employment_data %}
+                                    {{ x.total|default:0 }},
+                                {% endfor %}
+                            ],
+
+                            backgroundColor: [
+                                "#177245",
+                                "#c67519",
+                                "#b42318",
+                                "#1769aa",
+                                "#6b4bb3"
+                            ],
+
+                            borderWidth: 4,
+
+                            borderColor: "#ffffff",
+
+                            hoverOffset: 8
+
+                        }
+
+                    ]
+
+                },
+
+                options: {
+
+                    responsive: true,
+
+                    maintainAspectRatio: false,
+
+                    cutout: "68%",
+
+                    plugins: {
+
+                        legend: {
+
+                            position: "bottom",
+
+                            labels: {
+
+                                padding: 18,
+
+                                usePointStyle: true,
+
+                                pointStyle: "circle",
+
+                                font: {
+                                    size: 12
+                                }
+
+                            }
+
+                        },
+
+                        tooltip: {
+
+                            backgroundColor: "#102a43",
+
+                            padding: 12,
+
+                            cornerRadius: 9
+
+                        }
+
                     }
+
                 }
+
             }
-        }
-    );
+        );
 
+    }
 
-    // TRAINING STATUS
-    new Chart(
-        document.getElementById("trainingChart"),
-        {
-            type: "doughnut",
-
-            data: {
-                labels: [
-                    "Training",
-                    "Completed"
-                ],
-
-                datasets: [{
-                    data: [
-                        {{ active_training }},
-                        {{ completed_training }}
-                    ],
-                    backgroundColor: [palette.saffron, palette.teal],
-                    borderWidth: 2,
-                    borderColor: "#FFFFFF"
-                }]
-            },
-
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                cutout: "62%",
-
-                plugins: {
-                    legend: {
-                        position: "bottom",
-                        labels: { color: "#1B1F27", boxWidth: 10, padding: 14 }
-                    }
-                }
-            }
-        }
-    );
+});
 
 </script>
 
-</body>
-</html>
+{% endblock %}

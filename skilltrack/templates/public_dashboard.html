@@ -1,0 +1,1853 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    SkillTrack Maharashtra
+{% endblock %}
+
+
+{% block public_content %}
+
+<style>
+    :root {
+        --navy: #0b2943;
+        --navy-light: #163e5f;
+        --blue: #1769aa;
+        --blue-light: #eaf4fc;
+        --saffron: #c67519;
+        --green: #177245;
+        --red: #b42318;
+        --purple: #7057c8;
+        --white: #ffffff;
+        --background: #f4f7fa;
+        --ink: #172b4d;
+        --muted: #667085;
+        --line: #e1e7ee;
+        --shadow: 0 12px 35px rgba(16, 42, 67, 0.08);
+        --radius: 18px;
+    }
+
+    * {
+        box-sizing: border-box;
+    }
+
+    html {
+        scroll-behavior: smooth;
+    }
+
+    body {
+        margin: 0;
+        background: var(--background);
+        color: var(--ink);
+    }
+
+    .public-page {
+        width: 100%;
+        overflow-x: hidden;
+        background: var(--background);
+    }
+
+    /* =========================
+       NAVIGATION
+    ========================== */
+
+    .portal-nav {
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        width: 100%;
+        background: rgba(255, 255, 255, 0.96);
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--line);
+    }
+
+    .portal-nav-inner {
+        width: min(1400px, 94%);
+        min-height: 76px;
+        margin: auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 25px;
+    }
+
+    .portal-brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        text-decoration: none;
+        color: var(--navy);
+        font-weight: 800;
+        white-space: nowrap;
+    }
+
+    .portal-logo {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        background: linear-gradient(
+            135deg,
+            var(--navy),
+            var(--blue)
+        );
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 19px;
+        font-weight: 800;
+        box-shadow: 0 8px 18px rgba(23, 105, 170, 0.2);
+    }
+
+    .portal-brand-text {
+        display: flex;
+        flex-direction: column;
+        line-height: 1.1;
+    }
+
+    .portal-brand-title {
+        font-size: 17px;
+    }
+
+    .portal-brand-subtitle {
+        margin-top: 4px;
+        font-size: 10px;
+        color: var(--muted);
+        font-weight: 600;
+        letter-spacing: 0.4px;
+    }
+
+    .portal-links {
+        display: flex;
+        align-items: center;
+        gap: 24px;
+    }
+
+    .portal-links a {
+        text-decoration: none;
+        color: var(--muted);
+        font-size: 14px;
+        font-weight: 700;
+        transition: 0.2s ease;
+    }
+
+    .portal-links a:hover {
+        color: var(--blue);
+    }
+
+    .portal-login {
+        padding: 11px 19px;
+        border-radius: 10px;
+        background: var(--navy);
+        color: white !important;
+        box-shadow: 0 8px 18px rgba(11, 41, 67, 0.16);
+    }
+
+    .portal-login:hover {
+        background: var(--blue);
+        transform: translateY(-1px);
+    }
+
+
+    /* =========================
+       CONTAINER
+    ========================== */
+
+    .portal-container {
+        width: min(1400px, 94%);
+        margin: auto;
+    }
+
+
+    /* =========================
+       HERO
+    ========================== */
+
+    .portal-hero {
+        position: relative;
+        padding: 85px 0 75px;
+        background:
+            radial-gradient(
+                circle at 85% 20%,
+                rgba(23, 105, 170, 0.13),
+                transparent 28%
+            ),
+            linear-gradient(
+                135deg,
+                #ffffff 0%,
+                #f5f9fc 100%
+            );
+        border-bottom: 1px solid var(--line);
+    }
+
+    .hero-grid {
+        display: grid;
+        grid-template-columns: 1.15fr 0.85fr;
+        align-items: center;
+        gap: 70px;
+    }
+
+    .hero-content {
+        max-width: 750px;
+    }
+
+    .hero-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 14px;
+        border-radius: 999px;
+        background: var(--blue-light);
+        color: var(--blue);
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 0.3px;
+        margin-bottom: 22px;
+    }
+
+    .hero-content h1 {
+        margin: 0;
+        font-size: clamp(38px, 5vw, 68px);
+        line-height: 1.04;
+        letter-spacing: -2.5px;
+        color: var(--navy);
+    }
+
+    .hero-content h1 span {
+        color: var(--blue);
+    }
+
+    .hero-content p {
+        max-width: 680px;
+        margin: 24px 0 0;
+        font-size: 17px;
+        line-height: 1.8;
+        color: var(--muted);
+    }
+
+    .hero-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 30px;
+    }
+
+    .hero-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 13px 21px;
+        border-radius: 11px;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 800;
+        transition: 0.2s ease;
+    }
+
+    .hero-btn-primary {
+        background: var(--navy);
+        color: white;
+        box-shadow: 0 10px 25px rgba(11, 41, 67, 0.17);
+    }
+
+    .hero-btn-primary:hover {
+        background: var(--blue);
+        transform: translateY(-2px);
+    }
+
+    .hero-btn-secondary {
+        background: white;
+        color: var(--navy);
+        border: 1px solid var(--line);
+    }
+
+    .hero-btn-secondary:hover {
+        border-color: var(--blue);
+        color: var(--blue);
+        transform: translateY(-2px);
+    }
+
+    .hero-circle {
+        position: relative;
+        min-height: 420px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .hero-circle-main {
+        width: 310px;
+        height: 310px;
+        border-radius: 50%;
+        background:
+            linear-gradient(
+                145deg,
+                var(--navy),
+                var(--blue)
+            );
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        color: white;
+        box-shadow:
+            0 30px 70px rgba(11, 41, 67, 0.22);
+        position: relative;
+    }
+
+    .hero-circle-main::before {
+        content: "";
+        position: absolute;
+        inset: 18px;
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        border-radius: 50%;
+    }
+
+    .hero-circle-content {
+        position: relative;
+        z-index: 2;
+        padding: 35px;
+    }
+
+    .hero-circle-icon {
+        font-size: 42px;
+        margin-bottom: 12px;
+    }
+
+    .hero-circle-title {
+        font-size: 22px;
+        font-weight: 800;
+    }
+
+    .hero-circle-text {
+        margin-top: 8px;
+        font-size: 13px;
+        line-height: 1.6;
+        opacity: 0.82;
+    }
+
+
+    /* =========================
+       SECTION
+    ========================== */
+
+    .portal-section {
+        padding: 75px 0;
+    }
+
+    .portal-section-header {
+        max-width: 720px;
+        margin-bottom: 35px;
+    }
+
+    .portal-section-label {
+        color: var(--blue);
+        font-size: 12px;
+        font-weight: 900;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        margin-bottom: 10px;
+    }
+
+    .portal-section-title {
+        margin: 0;
+        color: var(--navy);
+        font-size: clamp(28px, 4vw, 42px);
+        letter-spacing: -1px;
+    }
+
+    .portal-section-description {
+        margin: 13px 0 0;
+        color: var(--muted);
+        line-height: 1.7;
+        font-size: 15px;
+    }
+
+
+    /* =========================
+       STATS
+    ========================== */
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 18px;
+    }
+
+    .stat-card {
+        background: white;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 25px;
+        box-shadow: var(--shadow);
+        transition: 0.25s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 18px 45px rgba(16, 42, 67, 0.12);
+    }
+
+    .stat-icon {
+        width: 43px;
+        height: 43px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 11px;
+        background: var(--blue-light);
+        color: var(--blue);
+        font-size: 19px;
+        margin-bottom: 20px;
+    }
+
+    .stat-value {
+        font-size: 32px;
+        font-weight: 900;
+        color: var(--navy);
+        letter-spacing: -1px;
+    }
+
+    .stat-label {
+        margin-top: 6px;
+        color: var(--muted);
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+
+    /* =========================
+       TRAINING CARDS
+    ========================== */
+
+    .training-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 18px;
+    }
+
+    .training-card {
+        position: relative;
+        background: white;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 26px;
+        box-shadow: var(--shadow);
+        overflow: hidden;
+    }
+
+    .training-card::after {
+        content: "";
+        position: absolute;
+        width: 85px;
+        height: 85px;
+        border-radius: 50%;
+        background: var(--blue-light);
+        right: -35px;
+        top: -35px;
+    }
+
+    .training-card-icon {
+        font-size: 25px;
+        margin-bottom: 15px;
+    }
+
+    .training-card-value {
+        font-size: 29px;
+        font-weight: 900;
+        color: var(--navy);
+    }
+
+    .training-card-label {
+        margin-top: 5px;
+        font-size: 13px;
+        color: var(--muted);
+        font-weight: 700;
+    }
+
+
+    /* =========================
+       ANALYTICS
+    ========================== */
+
+    .analytics-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 22px;
+    }
+
+    .analytics-card {
+        background: white;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 25px;
+        box-shadow: var(--shadow);
+        min-height: 410px;
+    }
+
+    .analytics-card h3 {
+        margin: 0;
+        font-size: 18px;
+        color: var(--navy);
+    }
+
+    .analytics-card p {
+        margin: 7px 0 20px;
+        font-size: 13px;
+        color: var(--muted);
+    }
+
+    .chart-container {
+        position: relative;
+        height: 310px;
+    }
+
+
+    /* =========================
+       EMPLOYMENT
+    ========================== */
+
+    .employment-panel {
+        display: grid;
+        grid-template-columns: 0.9fr 1.1fr;
+        gap: 35px;
+        align-items: center;
+        background: white;
+        border: 1px solid var(--line);
+        border-radius: 22px;
+        padding: 35px;
+        box-shadow: var(--shadow);
+    }
+
+    .employment-rate {
+        text-align: center;
+        padding: 20px;
+    }
+
+    .employment-rate-value {
+        font-size: clamp(50px, 7vw, 78px);
+        font-weight: 900;
+        color: var(--green);
+        line-height: 1;
+        letter-spacing: -3px;
+    }
+
+    .employment-rate-label {
+        margin-top: 12px;
+        font-size: 15px;
+        color: var(--muted);
+        font-weight: 800;
+    }
+
+    .employment-info h3 {
+        margin: 0;
+        font-size: 27px;
+        color: var(--navy);
+    }
+
+    .employment-info p {
+        color: var(--muted);
+        line-height: 1.75;
+        font-size: 15px;
+    }
+
+    .employment-chart {
+        height: 260px;
+        position: relative;
+    }
+
+
+    /* =========================
+       FLOW
+    ========================== */
+
+    .flow {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 15px;
+        position: relative;
+    }
+
+    .flow-card {
+        position: relative;
+        background: white;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 25px 20px;
+        text-align: center;
+        box-shadow: var(--shadow);
+        z-index: 2;
+    }
+
+    .flow-number {
+        width: 42px;
+        height: 42px;
+        margin: 0 auto 15px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--navy);
+        color: white;
+        font-weight: 900;
+    }
+
+    .flow-card h3 {
+        margin: 0;
+        font-size: 16px;
+        color: var(--navy);
+    }
+
+    .flow-card p {
+        margin: 8px 0 0;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.6;
+    }
+
+
+    /* =========================
+       ABOUT
+    ========================== */
+
+    .about-card {
+        background: var(--navy);
+        color: white;
+        border-radius: 24px;
+        padding: 45px;
+        box-shadow: 0 25px 60px rgba(11, 41, 67, 0.18);
+    }
+
+    .about-card h2 {
+        margin: 0;
+        font-size: 34px;
+        letter-spacing: -1px;
+    }
+
+    .about-card > p {
+        max-width: 850px;
+        margin: 15px 0 30px;
+        color: rgba(255, 255, 255, 0.75);
+        line-height: 1.8;
+    }
+
+    .about-points {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 15px;
+    }
+
+    .about-point {
+        padding: 20px;
+        border-radius: 15px;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .about-point-icon {
+        font-size: 23px;
+        margin-bottom: 10px;
+    }
+
+    .about-point h3 {
+        margin: 0;
+        font-size: 15px;
+    }
+
+    .about-point p {
+        margin: 7px 0 0;
+        color: rgba(255, 255, 255, 0.65);
+        font-size: 12px;
+        line-height: 1.55;
+    }
+
+
+    /* =========================
+       FOOTER
+    ========================== */
+
+    .portal-footer {
+        background: #081f33;
+        color: white;
+        padding: 38px 0;
+    }
+
+    .portal-footer-inner {
+        width: min(1400px, 94%);
+        margin: auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .footer-brand {
+        font-weight: 800;
+        font-size: 15px;
+    }
+
+    .footer-description {
+        margin-top: 6px;
+        color: rgba(255, 255, 255, 0.55);
+        font-size: 12px;
+    }
+
+    .footer-copy {
+        color: rgba(255, 255, 255, 0.55);
+        font-size: 12px;
+        text-align: right;
+    }
+
+
+    /* =========================
+       RESPONSIVE
+    ========================== */
+
+    @media (max-width: 1100px) {
+
+        .hero-grid {
+            grid-template-columns: 1fr;
+            gap: 45px;
+        }
+
+        .hero-content {
+            max-width: 850px;
+        }
+
+        .hero-circle {
+            min-height: 330px;
+        }
+
+        .stats-grid,
+        .training-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .about-points {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .flow {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+
+
+    @media (max-width: 900px) {
+
+        .portal-links a:not(.portal-login) {
+            display: none;
+        }
+
+        .analytics-grid,
+        .employment-panel {
+            grid-template-columns: 1fr;
+        }
+
+        .flow {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .portal-hero {
+            padding: 60px 0;
+        }
+    }
+
+
+    @media (max-width: 600px) {
+
+        .portal-nav-inner {
+            min-height: 68px;
+        }
+
+        .portal-brand-title {
+            font-size: 14px;
+        }
+
+        .portal-brand-subtitle {
+            font-size: 8px;
+        }
+
+        .portal-logo {
+            width: 38px;
+            height: 38px;
+            font-size: 16px;
+        }
+
+        .portal-login {
+            padding: 9px 13px;
+            font-size: 12px !important;
+        }
+
+        .portal-container {
+            width: 92%;
+        }
+
+        .portal-hero {
+            padding: 50px 0;
+        }
+
+        .hero-content h1 {
+            font-size: 39px;
+            letter-spacing: -1.5px;
+        }
+
+        .hero-content p {
+            font-size: 14px;
+        }
+
+        .hero-circle-main {
+            width: 245px;
+            height: 245px;
+        }
+
+        .hero-circle {
+            min-height: 270px;
+        }
+
+        .stats-grid,
+        .training-grid,
+        .flow,
+        .about-points {
+            grid-template-columns: 1fr;
+        }
+
+        .portal-section {
+            padding: 55px 0;
+        }
+
+        .analytics-card {
+            min-height: 370px;
+            padding: 18px;
+        }
+
+        .chart-container {
+            height: 270px;
+        }
+
+        .employment-panel {
+            padding: 22px;
+        }
+
+        .about-card {
+            padding: 28px 22px;
+        }
+
+        .about-card h2 {
+            font-size: 27px;
+        }
+
+        .portal-footer-inner {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .footer-copy {
+            text-align: left;
+        }
+    }
+</style>
+
+
+<div class="public-page">
+
+    <!-- =========================
+         NAVIGATION
+    ========================== -->
+
+    <nav class="portal-nav">
+
+        <div class="portal-nav-inner">
+
+            <a href="#" class="portal-brand">
+
+                <div class="portal-logo">
+                    ST
+                </div>
+
+                <div class="portal-brand-text">
+
+                    <div class="portal-brand-title">
+                        SkillTrack Maharashtra
+                    </div>
+
+                    <div class="portal-brand-subtitle">
+                        SKILL DEVELOPMENT & EMPLOYMENT
+                    </div>
+
+                </div>
+
+            </a>
+
+
+            <div class="portal-links">
+
+                <a href="#overview">
+                    Overview
+                </a>
+
+                <a href="#training">
+                    Training
+                </a>
+
+                <a href="#analytics">
+                    Analytics
+                </a>
+
+                <a href="#employment">
+                    Employment
+                </a>
+
+                <a href="#about">
+                    About
+                </a>
+
+                <a href="{% url 'login' %}" class="portal-login">
+                    Login
+                </a>
+
+            </div>
+
+        </div>
+
+    </nav>
+
+
+    <!-- =========================
+         HERO
+    ========================== -->
+
+    <section class="portal-hero">
+
+        <div class="portal-container">
+
+            <div class="hero-grid">
+
+                <div class="hero-content">
+
+                    <div class="hero-tag">
+                        🇮🇳 Maharashtra Skill Development Programme
+                    </div>
+
+                    <h1>
+                        Connecting Skills to
+                        <span>Better Opportunities.</span>
+                    </h1>
+
+                    <p>
+                        SkillTrack Maharashtra brings trainee registration,
+                        training programmes, verified partners and employment
+                        outcomes together on one transparent digital platform.
+                    </p>
+
+                    <div class="hero-actions">
+
+                        <a
+                            href="{% url 'login' %}"
+                            class="hero-btn hero-btn-primary"
+                        >
+                            Access Portal →
+                        </a>
+
+                        <a
+                            href="#overview"
+                            class="hero-btn hero-btn-secondary"
+                        >
+                            Explore Programme
+                        </a>
+
+                    </div>
+
+                </div>
+
+
+                <div class="hero-circle">
+
+                    <div class="hero-circle-main">
+
+                        <div class="hero-circle-content">
+
+                            <div class="hero-circle-icon">
+                                🎓
+                            </div>
+
+                            <div class="hero-circle-title">
+                                SkillTrack
+                            </div>
+
+                            <div class="hero-circle-text">
+                                One platform for training,
+                                monitoring and employment outcomes.
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================
+         OVERVIEW
+    ========================== -->
+
+    <section
+        class="portal-section"
+        id="overview"
+    >
+
+        <div class="portal-container">
+
+            <div class="portal-section-header">
+
+                <div class="portal-section-label">
+                    Programme Overview
+                </div>
+
+                <h2 class="portal-section-title">
+                    A unified view of the skill ecosystem
+                </h2>
+
+                <p class="portal-section-description">
+                    SkillTrack provides a centralised platform to monitor
+                    trainees, training providers, courses and programme
+                    participation across Maharashtra.
+                </p>
+
+            </div>
+
+
+            <div class="stats-grid">
+
+                <!-- Trainees -->
+
+                <div class="stat-card">
+
+                    <div class="stat-icon">
+                        🎓
+                    </div>
+
+                    <div class="stat-value">
+                        {{ total_trainees|default:0 }}
+                    </div>
+
+                    <div class="stat-label">
+                        Total Trainees
+                    </div>
+
+                </div>
+
+
+                <!-- Verified Trainees -->
+
+                <div class="stat-card">
+
+                    <div class="stat-icon">
+                        ✓
+                    </div>
+
+                    <div class="stat-value">
+                        {{ verified_trainees|default:0 }}
+                    </div>
+
+                    <div class="stat-label">
+                        Verified Trainees
+                    </div>
+
+                </div>
+
+
+                <!-- Providers -->
+
+                <div class="stat-card">
+
+                    <div class="stat-icon">
+                        🏢
+                    </div>
+
+                    <div class="stat-value">
+                        {{ total_providers|default:0 }}
+                    </div>
+
+                    <div class="stat-label">
+                        Training Providers
+                    </div>
+
+                </div>
+
+
+                <!-- Courses -->
+
+                <div class="stat-card">
+
+                    <div class="stat-icon">
+                        📚
+                    </div>
+
+                    <div class="stat-value">
+                        {{ total_courses|default:0 }}
+                    </div>
+
+                    <div class="stat-label">
+                        Courses Available
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================
+         TRAINING
+    ========================== -->
+
+    <section
+        class="portal-section"
+        id="training"
+    >
+
+        <div class="portal-container">
+
+            <div class="portal-section-header">
+
+                <div class="portal-section-label">
+                    Training Ecosystem
+                </div>
+
+                <h2 class="portal-section-title">
+                    From enrolment to completion
+                </h2>
+
+                <p class="portal-section-description">
+                    Track official training batches, active programmes,
+                    completed training and verified trainers through one
+                    connected system.
+                </p>
+
+            </div>
+
+
+            <div class="training-grid">
+
+                <!-- Total Batches -->
+
+                <div class="training-card">
+
+                    <div class="training-card-icon">
+                        🗂️
+                    </div>
+
+                    <div class="training-card-value">
+                        {{ total_batches|default:0 }}
+                    </div>
+
+                    <div class="training-card-label">
+                        Total Training Batches
+                    </div>
+
+                </div>
+
+
+                <!-- Active Batches -->
+
+                <div class="training-card">
+
+                    <div class="training-card-icon">
+                        ⚡
+                    </div>
+
+                    <div class="training-card-value">
+                        {{ active_batches|default:0 }}
+                    </div>
+
+                    <div class="training-card-label">
+                        Active Batches
+                    </div>
+
+                </div>
+
+
+                <!-- Completed -->
+
+                <div class="training-card">
+
+                    <div class="training-card-icon">
+                        🏆
+                    </div>
+
+                    <div class="training-card-value">
+                        {{ completed_batches|default:0 }}
+                    </div>
+
+                    <div class="training-card-label">
+                        Completed Batches
+                    </div>
+
+                </div>
+
+
+                <!-- Trainers -->
+
+                <div class="training-card">
+
+                    <div class="training-card-icon">
+                        👨‍🏫
+                    </div>
+
+                    <div class="training-card-value">
+                        {{ total_trainers|default:0 }}
+                    </div>
+
+                    <div class="training-card-label">
+                        Verified Trainers
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================
+         ANALYTICS
+    ========================== -->
+
+    <section
+        class="portal-section"
+        id="analytics"
+    >
+
+        <div class="portal-container">
+
+            <div class="portal-section-header">
+
+                <div class="portal-section-label">
+                    Data & Analytics
+                </div>
+
+                <h2 class="portal-section-title">
+                    Programme visibility through data
+                </h2>
+
+                <p class="portal-section-description">
+                    Visualise participation across districts and sectors
+                    to support better programme planning and decision-making.
+                </p>
+
+            </div>
+
+
+            <div class="analytics-grid">
+
+                <!-- District Chart -->
+
+                <div class="analytics-card">
+
+                    <h3>
+                        Trainees by District
+                    </h3>
+
+                    <p>
+                        Distribution of registered trainees across districts.
+                    </p>
+
+                    <div class="chart-container">
+                        <canvas id="districtChart"></canvas>
+                    </div>
+
+                </div>
+
+
+                <!-- Sector Chart -->
+
+                <div class="analytics-card">
+
+                    <h3>
+                        Training by Sector
+                    </h3>
+
+                    <p>
+                        Distribution of training participation by sector.
+                    </p>
+
+                    <div class="chart-container">
+                        <canvas id="sectorChart"></canvas>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================
+         EMPLOYMENT
+    ========================== -->
+
+    <section
+        class="portal-section"
+        id="employment"
+    >
+
+        <div class="portal-container">
+
+            <div class="employment-panel">
+
+                <div class="employment-rate">
+
+                    <div class="employment-rate-value">
+                        {{ employment_rate|default:0 }}%
+                    </div>
+
+                    <div class="employment-rate-label">
+                        Overall Employment Rate
+                    </div>
+
+                </div>
+
+
+                <div class="employment-info">
+
+                    <h3>
+                        Tracking outcomes beyond training
+                    </h3>
+
+                    <p>
+                        SkillTrack does not stop at course completion.
+                        Employment follow-ups help monitor whether trainees
+                        become employed, self-employed, continue further
+                        training or are still seeking opportunities.
+                    </p>
+
+                    <div class="employment-chart">
+
+                        <canvas id="employmentChart"></canvas>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================
+         PROGRAMME FLOW
+    ========================== -->
+
+    <section class="portal-section">
+
+        <div class="portal-container">
+
+            <div class="portal-section-header">
+
+                <div class="portal-section-label">
+                    How It Works
+                </div>
+
+                <h2 class="portal-section-title">
+                    A complete journey from registration to employment
+                </h2>
+
+                <p class="portal-section-description">
+                    Every stage of the trainee journey is connected through
+                    a single digital workflow.
+                </p>
+
+            </div>
+
+
+            <div class="flow">
+
+                <!-- 1 -->
+
+                <div class="flow-card">
+
+                    <div class="flow-number">
+                        1
+                    </div>
+
+                    <h3>
+                        Registration
+                    </h3>
+
+                    <p>
+                        Trainees, trainers and providers create their accounts.
+                    </p>
+
+                </div>
+
+
+                <!-- 2 -->
+
+                <div class="flow-card">
+
+                    <div class="flow-number">
+                        2
+                    </div>
+
+                    <h3>
+                        Verification
+                    </h3>
+
+                    <p>
+                        Authority verifies eligible users and records.
+                    </p>
+
+                </div>
+
+
+                <!-- 3 -->
+
+                <div class="flow-card">
+
+                    <div class="flow-number">
+                        3
+                    </div>
+
+                    <h3>
+                        Training
+                    </h3>
+
+                    <p>
+                        Verified trainees are assigned to official batches.
+                    </p>
+
+                </div>
+
+
+                <!-- 4 -->
+
+                <div class="flow-card">
+
+                    <div class="flow-number">
+                        4
+                    </div>
+
+                    <h3>
+                        Monitoring
+                    </h3>
+
+                    <p>
+                        Attendance, progress and assessments are tracked.
+                    </p>
+
+                </div>
+
+
+                <!-- 5 -->
+
+                <div class="flow-card">
+
+                    <div class="flow-number">
+                        5
+                    </div>
+
+                    <h3>
+                        Employment
+                    </h3>
+
+                    <p>
+                        Employment outcomes are followed after training.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================
+         ABOUT
+    ========================== -->
+
+    <section
+        class="portal-section"
+        id="about"
+    >
+
+        <div class="portal-container">
+
+            <div class="about-card">
+
+                <h2>
+                    Built for transparent skill development
+                </h2>
+
+                <p>
+                    SkillTrack Maharashtra connects the complete training
+                    ecosystem — from verified beneficiaries and training
+                    providers to batch management and employment outcomes.
+                    The platform creates better visibility for authorities
+                    while helping ensure that training reaches the right
+                    beneficiaries.
+                </p>
+
+
+                <div class="about-points">
+
+                    <!-- Point 1 -->
+
+                    <div class="about-point">
+
+                        <div class="about-point-icon">
+                            🔐
+                        </div>
+
+                        <h3>
+                            Verified Records
+                        </h3>
+
+                        <p>
+                            Only verified trainees, trainers and providers
+                            participate in official training.
+                        </p>
+
+                    </div>
+
+
+                    <!-- Point 2 -->
+
+                    <div class="about-point">
+
+                        <div class="about-point-icon">
+                            📊
+                        </div>
+
+                        <h3>
+                            Data Visibility
+                        </h3>
+
+                        <p>
+                            Authorities get a central view of programme
+                            participation and performance.
+                        </p>
+
+                    </div>
+
+
+                    <!-- Point 3 -->
+
+                    <div class="about-point">
+
+                        <div class="about-point-icon">
+                            📈
+                        </div>
+
+                        <h3>
+                            Training Tracking
+                        </h3>
+
+                        <p>
+                            Attendance, progress and assessments are managed
+                            throughout the training lifecycle.
+                        </p>
+
+                    </div>
+
+
+                    <!-- Point 4 -->
+
+                    <div class="about-point">
+
+                        <div class="about-point-icon">
+                            💼
+                        </div>
+
+                        <h3>
+                            Outcome Tracking
+                        </h3>
+
+                        <p>
+                            Employment follow-ups help measure the real impact
+                            of skill development programmes.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================
+         FOOTER
+    ========================== -->
+
+    <footer class="portal-footer">
+
+        <div class="portal-footer-inner">
+
+            <div>
+
+                <div class="footer-brand">
+                    SkillTrack Maharashtra
+                </div>
+
+                <div class="footer-description">
+                    Maharashtra Skill Development & Employment
+                    Monitoring Portal
+                </div>
+
+            </div>
+
+
+            <div class="footer-copy">
+                © {% now "Y" %} SkillTrack Maharashtra ·
+                Digital Programme Platform
+            </div>
+
+        </div>
+
+    </footer>
+
+</div>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    /*
+     * ============================
+     * DISTRICT CHART
+     * ============================
+     */
+
+    const districtLabels = [
+        {% for x in district_data %}
+            "{{ x.district|escapejs }}"{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    ];
+
+    const districtValues = [
+        {% for x in district_data %}
+            {{ x.total|default:0 }}{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    ];
+
+
+    const districtCanvas = document.getElementById("districtChart");
+
+    if (districtCanvas) {
+
+        new Chart(
+            districtCanvas,
+            {
+                type: "bar",
+
+                data: {
+                    labels: districtLabels,
+
+                    datasets: [
+                        {
+                            label: "Trainees",
+                            data: districtValues,
+                            borderWidth: 1,
+                            borderRadius: 7
+                        }
+                    ]
+                },
+
+                options: {
+
+                    responsive: true,
+
+                    maintainAspectRatio: false,
+
+                    plugins: {
+
+                        legend: {
+                            display: false
+                        }
+
+                    },
+
+                    scales: {
+
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                precision: 0
+                            }
+                        }
+
+                    }
+
+                }
+
+            }
+        );
+
+    }
+
+
+    /*
+     * ============================
+     * SECTOR CHART
+     * ============================
+     */
+
+    const sectorLabels = [
+        {% for x in sector_data %}
+            "{{ x.sector|escapejs }}"{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    ];
+
+    const sectorValues = [
+        {% for x in sector_data %}
+            {{ x.total|default:0 }}{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    ];
+
+
+    const sectorCanvas = document.getElementById("sectorChart");
+
+    if (sectorCanvas) {
+
+        new Chart(
+            sectorCanvas,
+            {
+                type: "doughnut",
+
+                data: {
+
+                    labels: sectorLabels,
+
+                    datasets: [
+                        {
+                            label: "Training",
+                            data: sectorValues,
+                            borderWidth: 2
+                        }
+                    ]
+
+                },
+
+                options: {
+
+                    responsive: true,
+
+                    maintainAspectRatio: false,
+
+                    plugins: {
+
+                        legend: {
+                            position: "bottom"
+                        }
+
+                    }
+
+                }
+
+            }
+        );
+
+    }
+
+
+    /*
+     * ============================
+     * EMPLOYMENT CHART
+     * ============================
+     */
+
+    const employedValue =
+        Number("{{ employed|default:0 }}");
+
+    const seekingValue =
+        Number("{{ seeking|default:0 }}");
+
+    const unemployedValue =
+        Number("{{ unemployed|default:0 }}");
+
+
+    const employmentCanvas =
+        document.getElementById("employmentChart");
+
+
+    if (employmentCanvas) {
+
+        new Chart(
+            employmentCanvas,
+            {
+                type: "doughnut",
+
+                data: {
+
+                    labels: [
+                        "Employed",
+                        "Seeking Employment",
+                        "Unemployed"
+                    ],
+
+                    datasets: [
+                        {
+                            data: [
+                                employedValue,
+                                seekingValue,
+                                unemployedValue
+                            ],
+                            borderWidth: 2
+                        }
+                    ]
+
+                },
+
+                options: {
+
+                    responsive: true,
+
+                    maintainAspectRatio: false,
+
+                    cutout: "65%",
+
+                    plugins: {
+
+                        legend: {
+                            position: "bottom"
+                        }
+
+                    }
+
+                }
+
+            }
+        );
+
+    }
+
+});
+
+</script>
+
+{% endblock %}

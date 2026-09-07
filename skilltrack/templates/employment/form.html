@@ -1,1 +1,713 @@
-{% extends 'base.html' %}{% block content %}<div class="card"><h1>My employment information</h1><form method="post">{% csrf_token %}{% for field in form %}<label>{{ field.label }}</label>{{ field }}{{ field.errors }}{% endfor %}<p><button>Save employment information</button></p></form></div>{% endblock %}
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="card">
+
+    <h1>My Employment Information</h1>
+
+    <form method="post">
+
+        {% csrf_token %}
+
+        <!-- =====================================
+             EMPLOYMENT STATUS
+        ====================================== -->
+
+        <div class="form-group">
+
+            <label for="{{ form.status.id_for_label }}">
+                Employment Status
+            </label>
+
+            {{ form.status }}
+
+            {% if form.status.errors %}
+                <div class="error">
+                    {{ form.status.errors }}
+                </div>
+            {% endif %}
+
+        </div>
+
+
+        <!-- =====================================
+             EMPLOYED SECTION
+        ====================================== -->
+
+        <div id="employed-section">
+
+            <h3>Employment Details</h3>
+
+            <!-- Employer -->
+
+            <div class="form-group">
+
+                <label for="{{ form.employer_name.id_for_label }}">
+                    Employer Name
+                </label>
+
+                {{ form.employer_name }}
+
+                {% if form.employer_name.errors %}
+                    <div class="error">
+                        {{ form.employer_name.errors }}
+                    </div>
+                {% endif %}
+
+            </div>
+
+
+            <!-- Job Role -->
+
+            <div class="form-group">
+
+                <label for="{{ form.job_role.id_for_label }}">
+                    Job Role
+                </label>
+
+                {{ form.job_role }}
+
+                {% if form.job_role.errors %}
+                    <div class="error">
+                        {{ form.job_role.errors }}
+                    </div>
+                {% endif %}
+
+            </div>
+
+
+            <!-- Employment Type -->
+
+            <div class="form-group">
+
+                <label for="{{ form.employment_type.id_for_label }}">
+                    Employment Type
+                </label>
+
+                {{ form.employment_type }}
+
+                {% if form.employment_type.errors %}
+                    <div class="error">
+                        {{ form.employment_type.errors }}
+                    </div>
+                {% endif %}
+
+            </div>
+
+
+            <!-- Salary -->
+
+            <div class="form-group">
+
+                <label for="{{ form.salary.id_for_label }}">
+                    Salary
+                </label>
+
+                {{ form.salary }}
+
+                {% if form.salary.errors %}
+                    <div class="error">
+                        {{ form.salary.errors }}
+                    </div>
+                {% endif %}
+
+            </div>
+
+
+            <!-- Employment Date -->
+
+            <div class="form-group">
+
+                <label for="{{ form.employment_date.id_for_label }}">
+                    Employment Date
+                </label>
+
+                {{ form.employment_date }}
+
+                {% if form.employment_date.errors %}
+                    <div class="error">
+                        {{ form.employment_date.errors }}
+                    </div>
+                {% endif %}
+
+            </div>
+
+
+            <!-- =====================================
+                 UAN VERIFICATION
+            ====================================== -->
+
+            <div class="form-group">
+
+                <label for="{{ form.uan_demo.id_for_label }}">
+                    UAN
+                </label>
+
+                {{ form.uan_demo }}
+
+                <button
+                    type="button"
+                    id="verifyUANBtn"
+                    onclick="verifyUAN()"
+                >
+                    Verify UAN
+                </button>
+
+                <p id="uanMessage"></p>
+
+                {% if form.uan_demo.errors %}
+                    <div class="error">
+                        {{ form.uan_demo.errors }}
+                    </div>
+                {% endif %}
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================
+             SELF EMPLOYED SECTION
+        ====================================== -->
+
+        <div id="self-employed-section">
+
+            <h3>Self-Employment Details</h3>
+
+
+            <!-- Registration Number -->
+
+            <div class="form-group">
+
+                <label for="{{ form.registration_number.id_for_label }}">
+                    Registration Number
+                </label>
+
+                {{ form.registration_number }}
+
+                <button
+                    type="button"
+                    id="verifyRegistrationBtn"
+                    onclick="verifyRegistration()"
+                >
+                    Verify Registration
+                </button>
+
+                <p id="registrationMessage"></p>
+
+                {% if form.registration_number.errors %}
+                    <div class="error">
+                        {{ form.registration_number.errors }}
+                    </div>
+                {% endif %}
+
+            </div>
+
+
+            <!-- Business Name -->
+
+            <div class="form-group">
+
+                <label for="{{ form.business_name.id_for_label }}">
+                    Business Name
+                </label>
+
+                {{ form.business_name }}
+
+                {% if form.business_name.errors %}
+                    <div class="error">
+                        {{ form.business_name.errors }}
+                    </div>
+                {% endif %}
+
+            </div>
+
+
+            <!-- Business Type -->
+
+            <div class="form-group">
+
+                <label for="{{ form.business_type.id_for_label }}">
+                    Business Type
+                </label>
+
+                {{ form.business_type }}
+
+                {% if form.business_type.errors %}
+                    <div class="error">
+                        {{ form.business_type.errors }}
+                    </div>
+                {% endif %}
+
+            </div>
+
+
+            <!-- Work Description -->
+
+            <div class="form-group">
+
+                <label for="{{ form.work_description.id_for_label }}">
+                    Work / Business Description
+                </label>
+
+                {{ form.work_description }}
+
+                {% if form.work_description.errors %}
+                    <div class="error">
+                        {{ form.work_description.errors }}
+                    </div>
+                {% endif %}
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================
+             SAVE BUTTON
+        ====================================== -->
+
+        <div class="form-group">
+
+            <button type="submit">
+                Save Employment Information
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+
+<script>
+
+/* =====================================================
+   EMPLOYMENT STATUS SHOW / HIDE
+===================================================== */
+
+function updateEmploymentFields() {
+
+    const statusElement =
+        document.getElementById("id_status");
+
+    const employedSection =
+        document.getElementById("employed-section");
+
+    const selfEmployedSection =
+        document.getElementById("self-employed-section");
+
+
+    if (!statusElement) {
+        return;
+    }
+
+
+    /*
+       Hide both sections first
+    */
+
+    employedSection.style.display = "none";
+
+    selfEmployedSection.style.display = "none";
+
+
+    /*
+       EMPLOYED
+    */
+
+    if (statusElement.value === "Employed") {
+
+        employedSection.style.display = "block";
+
+    }
+
+
+    /*
+       SELF EMPLOYED
+    */
+
+    else if (statusElement.value === "Self-Employed") {
+
+        selfEmployedSection.style.display = "block";
+
+    }
+
+}
+
+
+/* =====================================================
+   UAN VERIFICATION
+===================================================== */
+
+function verifyUAN() {
+
+    const uanInput =
+        document.getElementById("id_uan_demo");
+
+    const message =
+        document.getElementById("uanMessage");
+
+
+    if (!uanInput) {
+        return;
+    }
+
+
+    const uan =
+        uanInput.value.trim();
+
+
+    /*
+       Empty UAN
+    */
+
+    if (!uan) {
+
+        message.innerHTML =
+            "Please enter UAN first.";
+
+        return;
+    }
+
+
+    /*
+       Disable button while checking
+    */
+
+    const button =
+        document.getElementById("verifyUANBtn");
+
+    button.disabled = true;
+
+    button.innerText = "Verifying...";
+
+
+    /*
+       Send UAN to Django
+    */
+
+    const formData = new FormData();
+
+    formData.append("uan", uan);
+
+
+    fetch("{% url 'verify_uan' %}", {
+
+        method: "POST",
+
+        headers: {
+            "X-CSRFToken": "{{ csrf_token }}"
+        },
+
+        body: formData
+
+    })
+
+    .then(response => response.json())
+
+    .then(data => {
+
+        message.innerHTML = data.message;
+
+
+        /*
+           Verification successful
+        */
+
+        if (data.success) {
+
+            document.getElementById(
+                "id_employer_name"
+            ).value =
+                data.employer_name;
+
+
+            document.getElementById(
+                "id_job_role"
+            ).value =
+                data.job_role;
+
+
+            document.getElementById(
+                "id_employment_type"
+            ).value =
+                data.employment_type;
+
+
+            document.getElementById(
+                "id_salary"
+            ).value =
+                data.salary;
+
+
+            document.getElementById(
+                "id_employment_date"
+            ).value =
+                data.employment_date;
+
+        }
+
+    })
+
+    .catch(error => {
+
+        console.error(error);
+
+        message.innerHTML =
+            "Something went wrong during UAN verification.";
+
+    })
+
+    .finally(() => {
+
+        button.disabled = false;
+
+        button.innerText = "Verify UAN";
+
+    });
+
+}
+
+
+/* =====================================================
+   REGISTRATION VERIFICATION
+===================================================== */
+
+function verifyRegistration() {
+
+    const registrationInput =
+        document.getElementById(
+            "id_registration_number"
+        );
+
+    const message =
+        document.getElementById(
+            "registrationMessage"
+        );
+
+
+    if (!registrationInput) {
+        return;
+    }
+
+
+    const registrationNumber =
+        registrationInput.value.trim();
+
+
+    /*
+       Empty registration number
+    */
+
+    if (!registrationNumber) {
+
+        message.innerHTML =
+            "Please enter registration number first.";
+
+        return;
+    }
+
+
+    /*
+       Disable button
+    */
+
+    const button =
+        document.getElementById(
+            "verifyRegistrationBtn"
+        );
+
+    button.disabled = true;
+
+    button.innerText = "Verifying...";
+
+
+    /*
+       Send registration number to Django
+    */
+
+    const formData = new FormData();
+
+    formData.append(
+        "registration_number",
+        registrationNumber
+    );
+
+
+    fetch(
+        "{% url 'verify_registration' %}",
+        {
+
+            method: "POST",
+
+            headers: {
+                "X-CSRFToken": "{{ csrf_token }}"
+            },
+
+            body: formData
+
+        }
+    )
+
+    .then(response => response.json())
+
+    .then(data => {
+
+        message.innerHTML =
+            data.message;
+
+
+        /*
+           Verification successful
+        */
+
+        if (data.success) {
+
+            document.getElementById(
+                "id_business_name"
+            ).value =
+                data.business_name;
+
+
+            document.getElementById(
+                "id_business_type"
+            ).value =
+                data.business_type;
+
+
+            document.getElementById(
+                "id_work_description"
+            ).value =
+                data.work_description;
+
+        }
+
+    })
+
+    .catch(error => {
+
+        console.error(error);
+
+        message.innerHTML =
+            "Something went wrong during registration verification.";
+
+    })
+
+    .finally(() => {
+
+        button.disabled = false;
+
+        button.innerText =
+            "Verify Registration";
+
+    });
+
+}
+
+
+/* =====================================================
+   UAN CHANGE → MUST VERIFY AGAIN
+===================================================== */
+
+function setupUANChangeDetection() {
+
+    const uanInput =
+        document.getElementById("id_uan_demo");
+
+
+    if (!uanInput) {
+        return;
+    }
+
+
+    uanInput.addEventListener(
+        "input",
+        function () {
+
+            const message =
+                document.getElementById(
+                    "uanMessage"
+                );
+
+
+            message.innerHTML =
+                "UAN changed. Please verify again.";
+
+        }
+    );
+
+}
+
+
+/* =====================================================
+   REGISTRATION NUMBER CHANGE → VERIFY AGAIN
+===================================================== */
+
+function setupRegistrationChangeDetection() {
+
+    const registrationInput =
+        document.getElementById(
+            "id_registration_number"
+        );
+
+
+    if (!registrationInput) {
+        return;
+    }
+
+
+    registrationInput.addEventListener(
+        "input",
+        function () {
+
+            const message =
+                document.getElementById(
+                    "registrationMessage"
+                );
+
+
+            message.innerHTML =
+                "Registration number changed. Please verify again.";
+
+        }
+    );
+
+}
+
+
+/* =====================================================
+   PAGE LOAD
+===================================================== */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        const statusElement =
+            document.getElementById("id_status");
+
+
+        if (statusElement) {
+
+            statusElement.addEventListener(
+                "change",
+                updateEmploymentFields
+            );
+
+        }
+
+
+        updateEmploymentFields();
+
+        setupUANChangeDetection();
+
+        setupRegistrationChangeDetection();
+
+    }
+);
+
+</script>
+
+{% endblock %}

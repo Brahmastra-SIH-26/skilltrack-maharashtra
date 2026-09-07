@@ -61,4 +61,19 @@ path(
     views.trainer_attendance,
     name="trainer_attendance"
 ),
+path(
+    "employment/verify-uan/",
+    views.verify_uan,
+    name="verify_uan",
+),
+path(
+    "employment/verify-uan/",
+    views.verify_uan,
+    name="verify_uan"
+),
+path(
+    "employment/verify-registration/",
+    views.verify_registration,
+    name="verify_registration"
+),
 ]

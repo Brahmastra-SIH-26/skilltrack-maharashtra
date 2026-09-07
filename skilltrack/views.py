@@ -1,6 +1,8 @@
 import calendar
 import logging
 from datetime import date
+from django.http import JsonResponse
+from django.utils import timezone
 
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
@@ -11,8 +13,8 @@ from django.db.models import Count
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 
-from .forms import CourseForm, EmploymentForm, FollowUpForm, TraineeForm, TrainerRegistrationForm, TrainingBatchForm
-from .models import Course, Employment, FollowUp, Notification, Provider, Trainee, TrainerRegistration, TrainingBatch, UserProfile,TrainingRegistrationRequest
+from .forms import CourseForm, EmploymentForm, FollowUpForm, TraineeForm, TrainerRegistrationForm, TrainingBatch
+from .models import Course, Employment, FollowUp, Notification, Provider, Trainee, TrainerRegistration, TrainingBatch, UserProfile,TrainingRegistrationRequest, UANVerification, SelfEmploymentVerification
 
 logger = logging.getLogger(__name__)
 
@@ -887,3 +889,354 @@ def trainer_attendance(request):
             "trainees": trainees,
         }
     )
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import redirect, render
+
+from .models import Employment
+
+
+@login_required
+def verify_uan(request):
+    profile = getattr(request.user, "userprofile", None)
+
+    if not profile or profile.role != "Trainee":
+        return redirect("login")
+
+    if request.method == "POST":
+        uan = request.POST.get("uan", "").strip()
+
+        # DEMO UAN ONLY
+        demo_data = {
+            "100000000001": {
+                "employer_name": "ABC Technologies Pvt Ltd",
+                "job_role": "Software Developer",
+                "employment_type": "Full Time",
+                "salary": 25000,
+                "status": "Employed",
+            }
+        }
+
+        if uan in demo_data:
+            data = demo_data[uan]
+
+            employment, _ = Employment.objects.get_or_create(
+                trainee=profile.trainee
+            )
+
+            employment.uan_demo = uan
+            employment.employer_name = data["employer_name"]
+            employment.job_role = data["job_role"]
+            employment.employment_type = data["employment_type"]
+            employment.salary = data["salary"]
+            employment.status = data["status"]
+            employment.save()
+
+            return render(
+                request,
+                "employment/uan_result.html",
+                {
+                    "verified": True,
+                    "uan": uan,
+                    "data": data,
+                },
+            )
+
+        return render(
+            request,
+            "employment/uan_result.html",
+            {
+                "verified": False,
+                "uan": uan,
+            },
+        )
+
+    return render(request, "employment/verify_uan.html")
+@login_required
+def employment_list(request):
+    profile = getattr(request.user, "userprofile", None)
+
+    # ==============================
+    # AUTHORITY
+    # ==============================
+    if request.user.is_staff or getattr(profile, "role", None) == "Authority":
+
+        employments = Employment.objects.select_related(
+            "trainee"
+        ).all().order_by("trainee__name")
+
+        return render(
+            request,
+            "employment/list.html",
+            {
+                "employments": employments,
+                "authority": True,
+            }
+        )
+
+    # ==============================
+    # TRAINEE
+    # ==============================
+    if not profile or profile.role != "Trainee":
+        return redirect("login")
+
+    employment, _ = Employment.objects.get_or_create(
+        trainee=profile.trainee,
+        defaults={"status": "Seeking"}
+    )
+
+    if request.method == "POST":
+
+        form = EmploymentForm(
+            request.POST,
+            instance=employment
+        )
+
+        if form.is_valid():
+
+            status = form.cleaned_data.get("status")
+
+            # =====================================
+            # EMPLOYED → UAN MUST BE VERIFIED
+            # =====================================
+
+            if status == "Employed":
+
+                uan = form.cleaned_data.get("uan_demo")
+
+                verification = UANVerification.objects.filter(
+                    employment=employment,
+                    uan=uan,
+                    verified=True
+                ).first()
+
+                if not verification:
+
+                    form.add_error(
+                        "uan_demo",
+                        "Please verify this UAN before saving."
+                    )
+
+                else:
+
+                    form.save()
+
+                    messages.success(
+                        request,
+                        "Employment information saved successfully."
+                    )
+
+                    return redirect("employment_list")
+            # =====================================
+            # SELF-EMPLOYED
+            # =====================================
+
+            elif status == "Self-Employed":
+
+                registration_number = form.cleaned_data.get(
+                    "registration_number"
+                )
+
+                verification = SelfEmploymentVerification.objects.filter(
+                    employment=employment,
+                    registration_number=registration_number,
+                    status="Verified"
+                ).first()
+
+                if not verification:
+
+                    form.add_error(
+                        "registration_number",
+                        "Please verify this registration number before saving."
+                    )
+
+                else:
+
+                    form.save()
+
+                    messages.success(
+                        request,
+                        "Self-employment information saved successfully."
+                    )
+
+                    return redirect("employment_list")
+
+            # =====================================
+            # SEEKING / UNEMPLOYED
+            # =====================================
+
+            else:
+
+                form.save()
+
+                messages.success(
+                    request,
+                    "Employment status updated successfully."
+                )
+
+                return redirect("employment_list")
+
+    else:
+
+        form = EmploymentForm(
+            instance=employment
+        )
+
+    return render(
+        request,
+        "employment/form.html",
+        {
+            "form": form,
+            "employment": employment,
+        }
+    )
+@login_required
+def verify_uan(request):
+
+    if request.method != "POST":
+        return JsonResponse({
+            "success": False,
+            "message": "Invalid request."
+        }, status=400)
+
+    profile = getattr(request.user, "userprofile", None)
+
+    if not profile or profile.role != "Trainee":
+        return JsonResponse({
+            "success": False,
+            "message": "Unauthorized."
+        }, status=403)
+
+    uan = request.POST.get("uan", "").strip()
+
+    if not uan:
+        return JsonResponse({
+            "success": False,
+            "message": "Please enter UAN."
+        })
+
+    employment, _ = Employment.objects.get_or_create(
+        trainee=profile.trainee,
+        defaults={"status": "Seeking"}
+    )
+
+    # ---------------------------------
+    # DEMO VERIFICATION
+    # ---------------------------------
+
+    if uan == "100000000001":
+
+        verification, created = UANVerification.objects.update_or_create(
+            employment=employment,
+            defaults={
+                "uan": uan,
+                "verified": True,
+                "verification_message": "UAN verified successfully."
+            }
+        )
+
+        return JsonResponse({
+            "success": True,
+            "message": "✓ UAN Verified — Employment record found.",
+            "employer_name": "ABC Technologies Pvt Ltd",
+            "job_role": "Software Developer",
+            "employment_type": "Full Time",
+            "salary": 25000,
+            "employment_date": "2026-07-01"
+        })
+
+
+    UANVerification.objects.update_or_create(
+        employment=employment,
+        defaults={
+            "uan": uan,
+            "verified": False,
+            "verification_message": "UAN verification failed."
+        }
+    )
+
+    return JsonResponse({
+        "success": False,
+        "message": "✗ UAN Verification Failed."
+    })
+@login_required
+def verify_registration(request):
+
+    if request.method != "POST":
+        return JsonResponse({
+            "success": False,
+            "message": "Invalid request."
+        }, status=400)
+
+    profile = getattr(request.user, "userprofile", None)
+
+    if not profile or profile.role != "Trainee":
+        return JsonResponse({
+            "success": False,
+            "message": "Unauthorized."
+        }, status=403)
+
+    registration_number = request.POST.get(
+        "registration_number",
+        ""
+    ).strip()
+
+    if not registration_number:
+        return JsonResponse({
+            "success": False,
+            "message": "Please enter registration number."
+        })
+
+    employment, _ = Employment.objects.get_or_create(
+        trainee=profile.trainee,
+        defaults={"status": "Seeking"}
+    )
+
+    # ==========================================
+    # DEMO VERIFICATION
+    # ==========================================
+
+    if registration_number == "MH-DEMO-1001":
+
+        SelfEmploymentVerification.objects.update_or_create(
+            employment=employment,
+            defaults={
+                "registration_number": registration_number,
+                "business_name": "ABC Enterprises",
+                "business_type": "Proprietorship",
+                "work_description": "Retail Business",
+                "status": "Verified",
+                "verification_message": "Registration verified successfully.",
+                "verified_at": timezone.now(),
+            }
+        )
+
+        return JsonResponse({
+            "success": True,
+            "message": "✓ Registration Verified — Business record found.",
+            "business_name": "ABC Enterprises",
+            "business_type": "Proprietorship",
+            "work_description": "Retail Business",
+        })
+
+    # ==========================================
+    # FAILED VERIFICATION
+    # ==========================================
+
+    SelfEmploymentVerification.objects.update_or_create(
+        employment=employment,
+        defaults={
+            "registration_number": registration_number,
+            "business_name": "",
+            "business_type": "",
+            "work_description": "",
+            "status": "Rejected",
+            "verification_message": "Registration verification failed.",
+            "verified_at": timezone.now(),
+        }
+    )
+
+    return JsonResponse({
+        "success": False,
+        "message": "✗ Registration Verification Failed."
+    })

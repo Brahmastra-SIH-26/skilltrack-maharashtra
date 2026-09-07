@@ -48,14 +48,112 @@ class TrainingBatchForm(PortalForm):
         return data
 
 
-class EmploymentForm(PortalForm):
-    class Meta:
-        model = Employment
-        fields = ["status", "employer_name", "job_role", "employment_type", "salary", "employment_date", "uan_demo"]
-        widgets = {"employment_date": forms.DateInput(attrs={"type": "date"})}
+
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        status = cleaned_data.get("status")
+        uan = cleaned_data.get("uan_demo")
+
+        # UAN is required only for employed trainees
+        if status == "Employed" and not uan:
+            self.add_error(
+                "uan_demo",
+                "UAN is required for employed trainees."
+            )
+
+        # Remove UAN for other employment statuses
+        if status != "Employed":
+            cleaned_data["uan_demo"] = ""
+
+        return cleaned_data
 
 
 class FollowUpForm(PortalForm):
     class Meta:
         model = FollowUp
         fields = ["employment_status", "remarks", "completed"]
+class EmploymentForm(PortalForm):
+    class Meta:
+        model = Employment
+        fields = [
+            "status",
+            "employer_name",
+            "job_role",
+            "employment_type",
+            "salary",
+            "employment_date",
+            "uan_demo",
+            "registration_number",
+            "business_name",
+            "business_type",
+            "work_description",
+        ]
+
+        widgets = {
+            "employment_date": forms.DateInput(
+                attrs={"type": "date"}
+            ),
+        }
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        status = cleaned_data.get("status")
+
+        # -----------------------------
+        # EMPLOYED
+        # -----------------------------
+        if status == "Employed":
+
+            if not cleaned_data.get("uan_demo"):
+                self.add_error(
+                    "uan_demo",
+                    "UAN is required for employed trainees."
+                )
+
+            # Clear self-employment data
+            cleaned_data["registration_number"] = ""
+            cleaned_data["business_name"] = ""
+            cleaned_data["business_type"] = ""
+            cleaned_data["work_description"] = ""
+
+        # -----------------------------
+        # SELF EMPLOYED
+        # -----------------------------
+        elif status == "Self-Employed":
+
+            if not cleaned_data.get("registration_number"):
+                self.add_error(
+                    "registration_number",
+                    "Registration number is required for self-employed trainees."
+                )
+
+            # Clear employment/UAN data
+            cleaned_data["uan_demo"] = ""
+            cleaned_data["employer_name"] = ""
+            cleaned_data["job_role"] = ""
+            cleaned_data["employment_type"] = ""
+            cleaned_data["salary"] = 0
+            cleaned_data["employment_date"] = None
+
+        # -----------------------------
+        # SEEKING / UNEMPLOYED
+        # -----------------------------
+        else:
+
+            cleaned_data["uan_demo"] = ""
+
+            cleaned_data["employer_name"] = ""
+            cleaned_data["job_role"] = ""
+            cleaned_data["employment_type"] = ""
+            cleaned_data["salary"] = 0
+            cleaned_data["employment_date"] = None
+
+            cleaned_data["registration_number"] = ""
+            cleaned_data["business_name"] = ""
+            cleaned_data["business_type"] = ""
+            cleaned_data["work_description"] = ""
+
+        return cleaned_data

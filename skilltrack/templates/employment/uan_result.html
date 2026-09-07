@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="card">
+
+    {% if verified %}
+
+        <h1>UAN Verified ✓</h1>
+
+        <p>
+            <strong>UAN:</strong> {{ uan }}
+        </p>
+
+        <hr>
+
+        <p>
+            <strong>Employment Status:</strong>
+            {{ data.status }}
+        </p>
+
+        <p>
+            <strong>Employer:</strong>
+            {{ data.employer_name }}
+        </p>
+
+        <p>
+            <strong>Job Role:</strong>
+            {{ data.job_role }}
+        </p>
+
+        <p>
+            <strong>Employment Type:</strong>
+            {{ data.employment_type }}
+        </p>
+
+        <p>
+            <strong>Salary:</strong>
+            ₹{{ data.salary }}
+        </p>
+
+    {% else %}
+
+        <h1>UAN Verification Failed ✗</h1>
+
+        <p>
+            No matching demo UAN was found.
+        </p>
+
+    {% endif %}
+
+    <p>
+        <a href="{% url 'verify_uan' %}">
+            Verify another UAN
+        </a>
+    </p>
+
+</div>
+
+{% endblock %}

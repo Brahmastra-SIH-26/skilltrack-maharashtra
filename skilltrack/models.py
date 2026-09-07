@@ -62,7 +62,7 @@ class Training(models.Model):
 
 
 class Employment(models.Model):
-    STATUS_CHOICES = [("Employed", "Employed"), ("Seeking", "Seeking"), ("Unemployed", "Unemployed")]
+    STATUS_CHOICES = [("Employed", "Employed"), ("Seeking", "Seeking"), ("Unemployed", "Unemployed"),("Self-Employed", "Self-Employed"),]
     trainee = models.OneToOneField(Trainee, on_delete=models.CASCADE)
     uan_demo = models.CharField(max_length=30, blank=True)
     employer_name = models.CharField(max_length=150, blank=True)
@@ -72,8 +72,32 @@ class Employment(models.Model):
     employment_date = models.DateField(null=True, blank=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="Seeking")
 
+    registration_number = models.CharField(
+        max_length=50,
+        blank=True
+    )
+
+    business_name = models.CharField(
+        max_length=150,
+        blank=True
+    )
+
+    business_type = models.CharField(
+        max_length=100,
+        blank=True
+    )
+
+    work_description = models.CharField(
+        max_length=255,
+        blank=True
+    )
+
+
+
     def __str__(self):
         return f"{self.trainee.name} - {self.status}"
+
+
 
 
 class FollowUp(models.Model):
@@ -195,3 +219,52 @@ class TrainingRegistrationRequest(models.Model):
 
     def __str__(self):
         return f"{self.trainee.name} - {self.batch.name} - {self.status}"
+class UANVerification(models.Model):
+    employment = models.ForeignKey(
+        Employment,
+        on_delete=models.CASCADE,
+        related_name="uan_verifications"
+    )
+    uan = models.CharField(max_length=30)
+    verified = models.BooleanField(default=False)
+    verification_message = models.CharField(max_length=255, blank=True)
+    verified_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.uan} - {'Verified' if self.verified else 'Failed'}"
+class SelfEmploymentVerification(models.Model):
+    STATUS_CHOICES = [
+        ("Pending", "Pending"),
+        ("Verified", "Verified"),
+        ("Rejected", "Rejected"),
+    ]
+
+    employment = models.OneToOneField(
+        Employment,
+        on_delete=models.CASCADE,
+        related_name="self_employment_verification"
+    )
+
+    registration_number = models.CharField(max_length=50)
+    business_name = models.CharField(max_length=150, blank=True)
+    business_type = models.CharField(max_length=100, blank=True)
+    work_description = models.CharField(max_length=255, blank=True)
+
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default="Pending"
+    )
+
+    verification_message = models.CharField(
+        max_length=255,
+        blank=True
+    )
+
+    verified_at = models.DateTimeField(
+        null=True,
+        blank=True
+    )
+
+    def __str__(self):
+        return f"{self.registration_number} - {self.status}"

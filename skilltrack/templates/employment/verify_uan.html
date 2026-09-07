@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="card">
+
+    <h1>UAN Employment Verification</h1>
+
+    <p>
+        Enter a UAN to verify employment information.
+    </p>
+
+    <form method="post">
+
+        {% csrf_token %}
+
+        <label for="uan">
+            UAN Number
+        </label>
+
+        <input
+            type="text"
+            name="uan"
+            id="uan"
+            maxlength="30"
+            placeholder="Enter demo UAN"
+            required
+        >
+
+        <br><br>
+
+        <button type="submit">
+            Verify UAN
+        </button>
+
+    </form>
+
+    <p>
+        <strong>Demo UAN:</strong> 100000000001
+    </p>
+
+</div>
+
+{% endblock %}

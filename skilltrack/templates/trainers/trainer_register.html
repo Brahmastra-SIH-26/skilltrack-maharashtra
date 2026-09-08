@@ -1,1 +1,46 @@
-{% extends 'base.html' %}{% block content %}<div class="card" style="max-width:700px;margin:auto"><h1>Trainer registration</h1><p class="sub">Your application will be reviewed by the Authority.</p><form method="post">{% csrf_token %}{% for field in form %}<label>{{ field.label }} *</label>{{ field }}{{ field.errors }}{% endfor %}<p><button>Submit registration</button></p></form></div>{% endblock %}
+{% extends 'base.html' %}
+
+{% block title %}
+Trainer Registration | SkillTrack Maharashtra
+{% endblock %}
+
+{% block public_content %}
+
+<div class="card" style="max-width:700px; margin:40px auto;">
+
+    <h1>Trainer Registration</h1>
+
+    <p class="sub">
+        Your application will be reviewed by the Authority.
+    </p>
+
+    <form method="post" action="{% url 'trainer_register' %}">
+        {% csrf_token %}
+
+        {% for field in form %}
+
+            <label>
+                {{ field.label }} *
+            </label>
+
+            {{ field }}
+
+            {% if field.errors %}
+                <div style="color:#b42318; font-size:12px; margin-top:4px;">
+                    {{ field.errors }}
+                </div>
+            {% endif %}
+
+        {% endfor %}
+
+        <p>
+            <button type="submit">
+                Submit Registration
+            </button>
+        </p>
+
+    </form>
+
+</div>
+
+{% endblock %}

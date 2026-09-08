@@ -13,7 +13,7 @@ from django.db.models import Count
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 
-from .forms import CourseForm, EmploymentForm, FollowUpForm, TraineeForm, TrainerRegistrationForm, TrainingBatch
+from .forms import CourseForm, EmploymentForm, FollowUpForm, TraineeForm, TrainerRegistrationForm, TrainingBatch,TrainingBatchForm
 from .models import Course, Employment, FollowUp, Notification, Provider, Trainee, TrainerRegistration, TrainingBatch, UserProfile,TrainingRegistrationRequest, UANVerification, SelfEmploymentVerification
 
 logger = logging.getLogger(__name__)
@@ -914,7 +914,70 @@ def verify_uan(request):
                 "employment_type": "Full Time",
                 "salary": 25000,
                 "status": "Employed",
-            }
+            },
+            "100000000002": {
+                "employer_name": "Maharashtra IT Solutions",
+                "job_role": "Python Developer",
+                "employment_type": "Full Time",
+                "salary": 32000,
+                "status": "Employed",
+            },
+            "100000000003": {
+                "employer_name": "Pune Digital Services",
+                "job_role": "Data Entry Operator",
+                "employment_type": "Full Time",
+                "salary": 22000,
+                "status": "Employed",
+            },
+            "100000000004": {
+                "employer_name": "TechVision Solutions",
+                "job_role": "Web Developer",
+                "employment_type": "Full Time",
+                "salary": 35000,
+                "status": "Employed",
+            },
+            "100000000005": {
+                "employer_name": "Nashik Engineering Works",
+                "job_role": "Technician",
+                "employment_type": "Full Time",
+                "salary": 28000,
+                "status": "Employed",
+            },
+            "100000000006": {
+                "employer_name": "Mumbai Business Solutions",
+                "job_role": "Support Executive",
+                "employment_type": "Full Time",
+                "salary": 24000,
+                "status": "Employed",
+            },
+            "100000000007": {
+                "employer_name": "Nagpur Software Labs",
+                "job_role": "Junior Software Engineer",
+                "employment_type": "Full Time",
+                "salary": 30000,
+                "status": "Employed",
+            },
+            "100000000008": {
+                "employer_name": "Kolhapur Auto Industries",
+                "job_role": "Machine Operator",
+                "employment_type": "Full Time",
+                "salary": 27000,
+                "status": "Employed",
+            },
+            "100000000009": {
+                "employer_name": "Thane Digital Hub",
+                "job_role": "Digital Marketing Executive",
+                "employment_type": "Full Time",
+                "salary": 26000,
+                "status": "Employed",
+            },
+            "100000000010": {
+                "employer_name": "Solapur Technology Services",
+                "job_role": "Technical Support Engineer",
+                "employment_type": "Full Time",
+                "salary": 29000,
+                "status": "Employed",
+            },
         }
 
         if uan in demo_data:
@@ -1195,8 +1258,50 @@ def verify_registration(request):
     # ==========================================
     # DEMO VERIFICATION
     # ==========================================
+    demo_self_employment = {
+        "MH-DEMO-1001": {
+            "business_name": "ABC Enterprises",
+            "business_type": "Proprietorship",
+            "work_description": "Retail Business",
+        },
+        "MH-DEMO-1002": {
+            "business_name": "Pune Digital Services",
+            "business_type": "Proprietorship",
+            "work_description": "Computer and Digital Services",
+        },
+        "MH-DEMO-1003": {
+            "business_name": "Maharashtra Tailoring House",
+            "business_type": "Proprietorship",
+            "work_description": "Tailoring and Garment Services",
+        },
+        "MH-DEMO-1004": {
+            "business_name": "Shree Auto Works",
+            "business_type": "Partnership",
+            "work_description": "Automobile Repair Services",
+        },
+        "MH-DEMO-1005": {
+            "business_name": "Green Solar Solutions",
+            "business_type": "Proprietorship",
+            "work_description": "Solar Panel Installation",
+        },
+        "MH-DEMO-1006": {
+            "business_name": "Smart Graphic Studio",
+            "business_type": "Proprietorship",
+            "work_description": "Graphic Design and Printing",
+        },
+        "MH-DEMO-1007": {
+            "business_name": "Maharashtra Mobile Care",
+            "business_type": "Partnership",
+            "work_description": "Mobile Repair Services",
+        },
+        "MH-DEMO-1008": {
+            "business_name": "Fresh Food Corner",
+            "business_type": "Proprietorship",
+            "work_description": "Food and Catering Services",
+        },
+    }
 
-    if registration_number == "MH-DEMO-1001":
+    if registration_number  in demo_self_employment:
 
         SelfEmploymentVerification.objects.update_or_create(
             employment=employment,

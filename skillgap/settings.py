@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get("SECRET_KEY", "django-insecure-local-development-only")
-DEBUG = os.environ.get("DEBUG", "True").lower() == "true"
+DEBUG = os.environ.get("DEBUG", "False").lower() == "False"
 ALLOWED_HOSTS = [host.strip() for host in os.environ.get("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",") if host.strip()]
 CSRF_TRUSTED_ORIGINS = [origin.strip() for origin in os.environ.get("CSRF_TRUSTED_ORIGINS", "").split(",") if origin.strip()]
 
@@ -35,21 +35,21 @@ EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "")
 EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")
 DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", EMAIL_HOST_USER)
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-# SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
-# SECURE_SSL_REDIRECT = os.environ.get("SECURE_SSL_REDIRECT", "False").lower() == "true"
-# SECURE_HSTS_SECONDS = int(os.environ.get("SECURE_HSTS_SECONDS", "0"))
-# SECURE_HSTS_INCLUDE_SUBDOMAINS = SECURE_HSTS_SECONDS > 0
-# SECURE_HSTS_PRELOAD = SECURE_HSTS_SECONDS > 0
-# SESSION_COOKIE_SECURE = SECURE_SSL_REDIRECT
-# CSRF_COOKIE_SECURE = SECURE_SSL_REDIRECT
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+SECURE_SSL_REDIRECT = os.environ.get("SECURE_SSL_REDIRECT", "False").lower() == "true"
+SECURE_HSTS_SECONDS = int(os.environ.get("SECURE_HSTS_SECONDS", "0"))
+SECURE_HSTS_INCLUDE_SUBDOMAINS = SECURE_HSTS_SECONDS > 0
+SECURE_HSTS_PRELOAD = SECURE_HSTS_SECONDS > 0
+SESSION_COOKIE_SECURE = SECURE_SSL_REDIRECT
+CSRF_COOKIE_SECURE = SECURE_SSL_REDIRECT
 SECURE_PROXY_SSL_HEADER = None
 
-SECURE_SSL_REDIRECT = False
-
-SECURE_HSTS_SECONDS = 0
-SECURE_HSTS_INCLUDE_SUBDOMAINS = False
-SECURE_HSTS_PRELOAD = False
-
-SESSION_COOKIE_SECURE = False
-CSRF_COOKIE_SECURE = False
+# SECURE_SSL_REDIRECT = False
+#
+# SECURE_HSTS_SECONDS = 0
+# SECURE_HSTS_INCLUDE_SUBDOMAINS = False
+# SECURE_HSTS_PRELOAD = False
+#
+# SESSION_COOKIE_SECURE = False
+# CSRF_COOKIE_SECURE = False
 

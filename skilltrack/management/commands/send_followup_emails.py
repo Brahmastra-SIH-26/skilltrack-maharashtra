@@ -8,20 +8,41 @@ from skilltrack.models import FollowUp
 class Command(BaseCommand):
     help = "Send emails for due trainee follow-ups"
 
+    def add_arguments(self, parser):
+        parser.add_argument(
+            "--force",
+            action="store_true",
+            help="Send all incomplete follow-ups immediately for testing",
+        )
+
     def handle(self, *args, **options):
 
+        force = options["force"]
         today = timezone.localdate()
 
-        followups = FollowUp.objects.filter(
-            date__lte=today,
-            email_sent=False,
-            completed=False
-        ).select_related("trainee")
+        if force:
+            followups = FollowUp.objects.filter(
+                email_sent=False,
+                completed=False
+            ).select_related("trainee")
+
+            self.stdout.write(
+                self.style.WARNING(
+                    "FORCE MODE: Sending follow-ups immediately."
+                )
+            )
+
+        else:
+            followups = FollowUp.objects.filter(
+                date__lte=today,
+                email_sent=False,
+                completed=False
+            ).select_related("trainee")
 
         if not followups.exists():
             self.stdout.write(
                 self.style.WARNING(
-                    "No follow-ups are due today."
+                    "No follow-ups found."
                 )
             )
             return
@@ -66,7 +87,6 @@ SkillTrack Maharashtra
 """
 
             try:
-
                 send_mail(
                     subject,
                     message,

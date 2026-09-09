@@ -76,4 +76,9 @@ path(
     views.verify_registration,
     name="verify_registration"
 ),
+    path(
+        "run-followups/",
+        views.run_followup_emails,
+        name="run_followup_emails"
+    ),
 ]

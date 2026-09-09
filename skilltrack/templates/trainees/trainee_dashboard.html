@@ -1124,7 +1124,94 @@
         {% endif %}
 
     </section>
+<div class="performance-section">
+    <h2>My Training Performance</h2>
 
+    {% for performance in performance_records %}
+        <div class="performance-card">
+
+            <h3>{{ performance.training.course.name }}</h3>
+
+            <p>
+                Provider:
+                <strong>{{ performance.training.provider.name }}</strong>
+            </p>
+
+            <div class="performance-grid">
+
+                <div>
+                    <h4>Attendance</h4>
+                    <p>
+                        {{ performance.attended_classes }}
+                        /
+                        {{ performance.total_classes }}
+                        classes
+                    </p>
+                    <strong>
+                        {{ performance.attendance_percentage }}%
+                    </strong>
+                </div>
+
+                <div>
+                    <h4>Assignments</h4>
+                    <p>
+                        {{ performance.completed_assignments }}
+                        /
+                        {{ performance.total_assignments }}
+                    </p>
+                    <strong>
+                        {{ performance.assignment_score }}%
+                    </strong>
+                </div>
+
+                <div>
+                    <h4>Assessments</h4>
+                    <p>
+                        {{ performance.completed_assessments }}
+                        /
+                        {{ performance.total_assessments }}
+                    </p>
+                    <strong>
+                        {{ performance.assessment_score }}%
+                    </strong>
+                </div>
+
+                <div>
+                    <h4>Practical</h4>
+                    <strong>
+                        {{ performance.practical_score }}%
+                    </strong>
+                </div>
+
+                <div>
+                    <h4>Overall Progress</h4>
+                    <strong>
+                        {{ performance.progress_percentage }}%
+                    </strong>
+                </div>
+
+                <div>
+                    <h4>Final Score</h4>
+                    <strong>
+                        {{ performance.final_score }}%
+                    </strong>
+                </div>
+
+            </div>
+
+            {% if performance.trainer_remarks %}
+                <div class="trainer-remarks">
+                    <h4>Trainer Remarks</h4>
+                    <p>{{ performance.trainer_remarks }}</p>
+                </div>
+            {% endif %}
+
+        </div>
+
+    {% empty %}
+        <p>No training performance data available yet.</p>
+    {% endfor %}
+</div>
 </div>
 
 {% endblock %}

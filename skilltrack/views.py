@@ -3,7 +3,7 @@ import logging
 from datetime import date
 from django.http import JsonResponse
 from django.utils import timezone
-
+from .models import TrainingPerformance
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
@@ -347,25 +347,226 @@ def trainer_batch_detail(request, id):
     batch = get_object_or_404(TrainingBatch.objects.select_related("course", "provider"), id=id, trainer=request.user)
     return render(request, "trainers/trainer_batch_detail.html", {"batch": batch, "trainees": batch.trainees.all().order_by("name")})
 
-
+from django.contrib import messages
 @login_required
 @trainer_required
 def trainer_batch_progress(request, id):
-    batch = get_object_or_404(TrainingBatch, id=id, trainer=request.user)
-    trainees = batch.trainees.all().order_by("name")
-    if request.method == "POST":
-        attendance, progress, remarks = batch.attendance or {}, batch.progress or {}, batch.remarks or {}
-        for trainee in trainees:
-            trainee_id = str(trainee.id)
-            attendance[trainee_id] = request.POST.get(f"attendance_{trainee.id}", "Absent")
-            progress[trainee_id] = max(0, min(100, int(request.POST.get(f"progress_{trainee.id}", 0) or 0)))
-            remarks[trainee_id] = request.POST.get(f"remarks_{trainee.id}", "")
-        batch.attendance, batch.progress, batch.remarks = attendance, progress, remarks
-        batch.save(update_fields=["attendance", "progress", "remarks"])
-        messages.success(request, "Attendance and progress saved.")
-        return redirect("trainer_batch_detail", id=id)
-    return render(request, "training/trainer_batch_progress.html", {"batch": batch, "trainees": trainees})
+    batch = get_object_or_404(
+        TrainingBatch,
+        id=id,
+        trainer=request.user
+    )
 
+    trainees = batch.trainees.all().order_by("name")
+
+    if request.method == "POST":
+
+        # Existing batch-level data
+        attendance = batch.attendance or {}
+        progress = batch.progress or {}
+        remarks = batch.remarks or {}
+
+        for trainee in trainees:
+
+            trainee_id = str(trainee.id)
+
+            # -------------------------
+            # Existing Attendance
+            # -------------------------
+
+            attendance[trainee_id] = request.POST.get(
+                f"attendance_{trainee.id}",
+                "Absent"
+            )
+
+            # -------------------------
+            # Existing Progress
+            # -------------------------
+
+            progress[trainee_id] = max(
+                0,
+                min(
+                    100,
+                    int(
+                        request.POST.get(
+                            f"progress_{trainee.id}",
+                            0
+                        ) or 0
+                    )
+                )
+            )
+
+            # -------------------------
+            # Existing Remarks
+            # -------------------------
+
+            remarks[trainee_id] = request.POST.get(
+                f"remarks_{trainee.id}",
+                ""
+            )
+
+            # ==================================================
+            # Training record
+            # ==================================================
+
+            training, created = Training.objects.get_or_create(
+                trainee=trainee,
+                course=batch.course,
+                provider=batch.provider,
+                defaults={
+                    "start_date": batch.start_date,
+                    "end_date": batch.end_date,
+                    "completion_percentage": progress[trainee_id],
+                    "status": "Training",
+                }
+            )
+
+            # Update existing training progress
+            training.completion_percentage = progress[trainee_id]
+            training.save(
+                update_fields=["completion_percentage"]
+            )
+
+            # ==================================================
+            # Training Performance
+            # ==================================================
+
+            performance, created = TrainingPerformance.objects.get_or_create(
+                trainee=trainee,
+                training=training
+            )
+
+            # Attendance
+            performance.total_classes = int(
+                request.POST.get(
+                    f"total_classes_{trainee.id}",
+                    performance.total_classes
+                ) or 0
+            )
+
+            performance.attended_classes = int(
+                request.POST.get(
+                    f"attended_classes_{trainee.id}",
+                    performance.attended_classes
+                ) or 0
+            )
+
+            # Calculate attendance automatically
+            if performance.total_classes > 0:
+                performance.attendance_percentage = round(
+                    (
+                        performance.attended_classes
+                        / performance.total_classes
+                    ) * 100,
+                    2
+                )
+            else:
+                performance.attendance_percentage = 0
+
+            # Assignments
+            performance.total_assignments = int(
+                request.POST.get(
+                    f"total_assignments_{trainee.id}",
+                    performance.total_assignments
+                ) or 0
+            )
+
+            performance.completed_assignments = int(
+                request.POST.get(
+                    f"completed_assignments_{trainee.id}",
+                    performance.completed_assignments
+                ) or 0
+            )
+
+            performance.assignment_score = float(
+                request.POST.get(
+                    f"assignment_score_{trainee.id}",
+                    performance.assignment_score
+                ) or 0
+            )
+
+            # Assessments
+            performance.total_assessments = int(
+                request.POST.get(
+                    f"total_assessments_{trainee.id}",
+                    performance.total_assessments
+                ) or 0
+            )
+
+            performance.completed_assessments = int(
+                request.POST.get(
+                    f"completed_assessments_{trainee.id}",
+                    performance.completed_assessments
+                ) or 0
+            )
+
+            performance.assessment_score = float(
+                request.POST.get(
+                    f"assessment_score_{trainee.id}",
+                    performance.assessment_score
+                ) or 0
+            )
+
+            # Practical
+            performance.practical_score = float(
+                request.POST.get(
+                    f"practical_score_{trainee.id}",
+                    performance.practical_score
+                ) or 0
+            )
+
+            # Overall progress
+            performance.progress_percentage = float(
+                progress[trainee_id]
+            )
+
+            # Final score
+            performance.final_score = float(
+                request.POST.get(
+                    f"final_score_{trainee.id}",
+                    performance.final_score
+                ) or 0
+            )
+
+            # Trainer remarks
+            performance.trainer_remarks = request.POST.get(
+                f"performance_remarks_{trainee.id}",
+                remarks[trainee_id]
+            )
+
+            performance.save()
+
+        # Save existing batch data
+        batch.attendance = attendance
+        batch.progress = progress
+        batch.remarks = remarks
+
+        batch.save(
+            update_fields=[
+                "attendance",
+                "progress",
+                "remarks"
+            ]
+        )
+
+        messages.success(
+            request,
+            "Attendance, progress and training performance saved successfully."
+        )
+
+        return redirect(
+            "trainer_batch_detail",
+            id=id
+        )
+
+    return render(
+        request,
+        "training/trainer_batch_progress.html",
+        {
+            "batch": batch,
+            "trainees": trainees,
+        }
+    )
 
 @login_required
 @trainer_required
@@ -388,9 +589,35 @@ def trainer_complete_batch(request, id):
 @trainee_required
 def trainee_dashboard(request):
     trainee = request.user.userprofile.trainee
-    batches = TrainingBatch.objects.filter(trainees=trainee).select_related("course", "provider", "trainer").order_by("-start_date")
-    return render(request, "trainees/trainee_dashboard.html", {"trainee": trainee, "batches": batches, "employment": Employment.objects.filter(trainee=trainee).first(), "followups": FollowUp.objects.filter(trainee=trainee, completed=False)[:4]})
 
+    batches = (
+        TrainingBatch.objects
+        .filter(trainees=trainee)
+        .select_related("course", "provider", "trainer")
+        .order_by("-start_date")
+    )
+
+    performance_records = (
+        TrainingPerformance.objects
+        .filter(trainee=trainee)
+        .select_related("training", "training__course", "training__provider")
+        .order_by("-training__start_date")
+    )
+
+    return render(
+        request,
+        "trainees/trainee_dashboard.html",
+        {
+            "trainee": trainee,
+            "batches": batches,
+            "performance_records": performance_records,
+            "employment": Employment.objects.filter(trainee=trainee).first(),
+            "followups": FollowUp.objects.filter(
+                trainee=trainee,
+                completed=False
+            )[:4],
+        }
+    )
 
 @login_required
 def employment_list(request):
@@ -978,6 +1205,13 @@ def verify_uan(request):
                 "salary": 29000,
                 "status": "Employed",
             },
+            "100000000011": {
+                "employer_name": "Solapur Technology Services",
+                "job_role": "Technical Support Engineer",
+                "employment_type": "Full Time",
+                "salary": 29000,
+                "status": "Employed",
+            },
         }
 
         if uan in demo_data:
@@ -1153,75 +1387,7 @@ def employment_list(request):
             "employment": employment,
         }
     )
-@login_required
-def verify_uan(request):
 
-    if request.method != "POST":
-        return JsonResponse({
-            "success": False,
-            "message": "Invalid request."
-        }, status=400)
-
-    profile = getattr(request.user, "userprofile", None)
-
-    if not profile or profile.role != "Trainee":
-        return JsonResponse({
-            "success": False,
-            "message": "Unauthorized."
-        }, status=403)
-
-    uan = request.POST.get("uan", "").strip()
-
-    if not uan:
-        return JsonResponse({
-            "success": False,
-            "message": "Please enter UAN."
-        })
-
-    employment, _ = Employment.objects.get_or_create(
-        trainee=profile.trainee,
-        defaults={"status": "Seeking"}
-    )
-
-    # ---------------------------------
-    # DEMO VERIFICATION
-    # ---------------------------------
-
-    if uan == "100000000001":
-
-        verification, created = UANVerification.objects.update_or_create(
-            employment=employment,
-            defaults={
-                "uan": uan,
-                "verified": True,
-                "verification_message": "UAN verified successfully."
-            }
-        )
-
-        return JsonResponse({
-            "success": True,
-            "message": "✓ UAN Verified — Employment record found.",
-            "employer_name": "ABC Technologies Pvt Ltd",
-            "job_role": "Software Developer",
-            "employment_type": "Full Time",
-            "salary": 25000,
-            "employment_date": "2026-07-01"
-        })
-
-
-    UANVerification.objects.update_or_create(
-        employment=employment,
-        defaults={
-            "uan": uan,
-            "verified": False,
-            "verification_message": "UAN verification failed."
-        }
-    )
-
-    return JsonResponse({
-        "success": False,
-        "message": "✗ UAN Verification Failed."
-    })
 @login_required
 def verify_registration(request):
 
@@ -1345,3 +1511,350 @@ def verify_registration(request):
         "success": False,
         "message": "✗ Registration Verification Failed."
     })
+@login_required
+def verify_uan(request):
+
+    if request.method != "POST":
+        return JsonResponse({
+            "success": False,
+            "message": "Invalid request."
+        }, status=400)
+
+    profile = getattr(request.user, "userprofile", None)
+
+    if not profile or profile.role != "Trainee":
+        return JsonResponse({
+            "success": False,
+            "message": "Unauthorized."
+        }, status=403)
+
+    uan = request.POST.get("uan", "").strip()
+
+    if not uan:
+        return JsonResponse({
+            "success": False,
+            "message": "Please enter UAN."
+        })
+
+    employment, _ = Employment.objects.get_or_create(
+        trainee=profile.trainee,
+        defaults={"status": "Seeking"}
+    )
+
+    # ==========================================
+    # DEMO UAN DATA
+    # ==========================================
+
+    demo_data = {
+        "100000000001": {
+            "employer_name": "ABC Technologies Pvt Ltd",
+            "job_role": "Software Developer",
+            "employment_type": "Full Time",
+            "salary": 25000,
+            "employment_date": "2026-07-01",
+        },
+
+        "100000000002": {
+            "employer_name": "Maharashtra IT Solutions",
+            "job_role": "Python Developer",
+            "employment_type": "Full Time",
+            "salary": 32000,
+            "employment_date": "2026-06-15",
+        },
+
+        "100000000003": {
+            "employer_name": "Pune Digital Services",
+            "job_role": "Data Entry Operator",
+            "employment_type": "Full Time",
+            "salary": 22000,
+            "employment_date": "2026-05-20",
+        },
+
+        "100000000004": {
+            "employer_name": "TechVision Solutions",
+            "job_role": "Web Developer",
+            "employment_type": "Full Time",
+            "salary": 35000,
+            "employment_date": "2026-04-10",
+        },
+
+        "100000000005": {
+            "employer_name": "Nashik Engineering Works",
+            "job_role": "Technician",
+            "employment_type": "Full Time",
+            "salary": 28000,
+            "employment_date": "2026-03-12",
+        },
+
+        "100000000006": {
+            "employer_name": "Mumbai Business Solutions",
+            "job_role": "Support Executive",
+            "employment_type": "Full Time",
+            "salary": 24000,
+            "employment_date": "2026-02-18",
+        },
+
+        "100000000007": {
+            "employer_name": "Nagpur Software Labs",
+            "job_role": "Junior Software Engineer",
+            "employment_type": "Full Time",
+            "salary": 30000,
+            "employment_date": "2026-01-25",
+        },
+
+        "100000000008": {
+            "employer_name": "Kolhapur Auto Industries",
+            "job_role": "Machine Operator",
+            "employment_type": "Full Time",
+            "salary": 27000,
+            "employment_date": "2025-12-15",
+        },
+
+        "100000000009": {
+            "employer_name": "Thane Digital Hub",
+            "job_role": "Digital Marketing Executive",
+            "employment_type": "Full Time",
+            "salary": 26000,
+            "employment_date": "2025-11-20",
+        },
+
+        "100000000010": {
+            "employer_name": "Solapur Technology Services",
+            "job_role": "Technical Support Engineer",
+            "employment_type": "Full Time",
+            "salary": 29000,
+            "employment_date": "2025-10-10",
+        },
+
+        "100000000011": {
+            "employer_name": "Aurangabad Tech Solutions",
+            "job_role": "Software Tester",
+            "employment_type": "Full Time",
+            "salary": 31000,
+            "employment_date": "2025-09-15",
+        },
+    }
+
+    # ==========================================
+    # SUCCESSFUL VERIFICATION
+    # ==========================================
+
+    if uan in demo_data:
+
+        data = demo_data[uan]
+
+        UANVerification.objects.update_or_create(
+            employment=employment,
+            defaults={
+                "uan": uan,
+                "verified": True,
+                "verification_message": "UAN verified successfully.",
+                "verified_at": timezone.now(),
+            }
+        )
+
+        return JsonResponse({
+            "success": True,
+            "message": "✓ UAN Verified — Employment record found.",
+            "uan": uan,
+            "employer_name": data["employer_name"],
+            "job_role": data["job_role"],
+            "employment_type": data["employment_type"],
+            "salary": data["salary"],
+            "employment_date": data["employment_date"],
+        })
+
+    # ==========================================
+    # FAILED VERIFICATION
+    # ==========================================
+
+    UANVerification.objects.update_or_create(
+        employment=employment,
+        defaults={
+            "uan": uan,
+            "verified": False,
+            "verification_message": "UAN verification failed.",
+            "verified_at": timezone.now(),
+        }
+    )
+
+    return JsonResponse({
+        "success": False,
+        "message": "✗ UAN Verification Failed."
+    })
+
+
+@login_required
+def verify_registration(request):
+
+    if request.method != "POST":
+        return JsonResponse({
+            "success": False,
+            "message": "Invalid request."
+        }, status=400)
+
+    profile = getattr(request.user, "userprofile", None)
+
+    if not profile or profile.role != "Trainee":
+        return JsonResponse({
+            "success": False,
+            "message": "Unauthorized."
+        }, status=403)
+
+    registration_number = request.POST.get(
+        "registration_number",
+        ""
+    ).strip()
+
+    if not registration_number:
+        return JsonResponse({
+            "success": False,
+            "message": "Please enter registration number."
+        })
+
+    employment, _ = Employment.objects.get_or_create(
+        trainee=profile.trainee,
+        defaults={"status": "Seeking"}
+    )
+
+    # ==========================================
+    # DEMO SELF-EMPLOYMENT DATA
+    # ==========================================
+
+    demo_self_employment = {
+
+        "MH-DEMO-1001": {
+            "business_name": "ABC Enterprises",
+            "business_type": "Proprietorship",
+            "work_description": "Retail Business",
+        },
+
+        "MH-DEMO-1002": {
+            "business_name": "Pune Digital Services",
+            "business_type": "Proprietorship",
+            "work_description": "Computer and Digital Services",
+        },
+
+        "MH-DEMO-1003": {
+            "business_name": "Maharashtra Tailoring House",
+            "business_type": "Proprietorship",
+            "work_description": "Tailoring and Garment Services",
+        },
+
+        "MH-DEMO-1004": {
+            "business_name": "Shree Auto Works",
+            "business_type": "Partnership",
+            "work_description": "Automobile Repair Services",
+        },
+
+        "MH-DEMO-1005": {
+            "business_name": "Green Solar Solutions",
+            "business_type": "Proprietorship",
+            "work_description": "Solar Panel Installation",
+        },
+
+        "MH-DEMO-1006": {
+            "business_name": "Smart Graphic Studio",
+            "business_type": "Proprietorship",
+            "work_description": "Graphic Design and Printing",
+        },
+
+        "MH-DEMO-1007": {
+            "business_name": "Maharashtra Mobile Care",
+            "business_type": "Partnership",
+            "work_description": "Mobile Repair Services",
+        },
+
+        "MH-DEMO-1008": {
+            "business_name": "Fresh Food Corner",
+            "business_type": "Proprietorship",
+            "work_description": "Food and Catering Services",
+        },
+    }
+
+    # ==========================================
+    # SUCCESSFUL VERIFICATION
+    # ==========================================
+
+    if registration_number in demo_self_employment:
+
+        data = demo_self_employment[registration_number]
+
+        SelfEmploymentVerification.objects.update_or_create(
+            employment=employment,
+            defaults={
+                "registration_number": registration_number,
+                "business_name": data["business_name"],
+                "business_type": data["business_type"],
+                "work_description": data["work_description"],
+                "status": "Verified",
+                "verification_message": (
+                    "Registration verified successfully."
+                ),
+                "verified_at": timezone.now(),
+            }
+        )
+
+        return JsonResponse({
+            "success": True,
+            "message": (
+                "✓ Registration Verified — "
+                "Business record found."
+            ),
+            "registration_number": registration_number,
+            "business_name": data["business_name"],
+            "business_type": data["business_type"],
+            "work_description": data["work_description"],
+        })
+
+    # ==========================================
+    # FAILED VERIFICATION
+    # ==========================================
+
+    SelfEmploymentVerification.objects.update_or_create(
+        employment=employment,
+        defaults={
+            "registration_number": registration_number,
+            "business_name": "",
+            "business_type": "",
+            "work_description": "",
+            "status": "Rejected",
+            "verification_message": (
+                "Registration verification failed."
+            ),
+            "verified_at": timezone.now(),
+        }
+    )
+
+    return JsonResponse({
+        "success": False,
+        "message": "✗ Registration Verification Failed."
+    })
+from django.http import JsonResponse
+from django.core.management import call_command
+from django.views.decorators.csrf import csrf_exempt
+import os
+
+
+@csrf_exempt
+def run_followup_emails(request):
+
+    # Secret key to prevent random people from triggering it
+    secret = request.headers.get("X-FOLLOWUP-SECRET")
+
+    if secret != os.environ.get("FOLLOWUP_SECRET"):
+        return JsonResponse({"error": "Unauthorized"}, status=401)
+
+    try:
+        call_command("send_followup_emails")
+
+        return JsonResponse({
+            "success": True,
+            "message": "Follow-up check completed"
+        })
+
+    except Exception as e:
+        return JsonResponse({
+            "success": False,
+            "error": str(e)
+        }, status=500)

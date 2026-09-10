@@ -5,8 +5,25 @@ from django.contrib.auth.models import User
 from django.db import models
 
 
+from django.db import models
+from django.contrib.auth.models import User
+
+
 class Trainee(models.Model):
-    STATUS_CHOICES = [("Pending", "Pending"), ("Verified", "Verified"), ("Rejected", "Rejected")]
+    STATUS_CHOICES = [
+        ("Pending", "Pending"),
+        ("Verified", "Verified"),
+        ("Rejected", "Rejected"),
+    ]
+
+    user = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE,
+        related_name="trainee_profile",
+        null=True,
+        blank=True
+    )
+
     beneficiary_id = models.CharField(max_length=20, unique=True)
     name = models.CharField(max_length=100)
     phone = models.CharField(max_length=15)
@@ -15,7 +32,13 @@ class Trainee(models.Model):
     qualification = models.CharField(max_length=100)
     gender = models.CharField(max_length=20)
     registration_date = models.DateField()
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="Pending")
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default="Pending"
+    )
+
+    consent_given = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.beneficiary_id} - {self.name}"

@@ -98,27 +98,111 @@ def logout_view(request):
     return redirect("login")
 
 
+from django.contrib.auth.models import User
+from django.db import transaction
+
+
+from django.contrib.auth.models import User
+from django.db import transaction
+
+
 def trainee_register(request):
     form = TraineeForm(request.POST or None)
+
     if request.method == "POST" and form.is_valid():
-        trainee = form.save(commit=False)
-        trainee.beneficiary_id = f"MH-2026-{(Trainee.objects.order_by('-id').first().id + 1 if Trainee.objects.exists() else 1):06d}"
-        trainee.status = "Pending"
-        trainee.save()
-        return render(request, "trainees/registration_success.html", {"trainee": trainee})
-    return render(request, "trainees/trainee_register.html", {"form": form})
+        with transaction.atomic():
+
+            name = form.cleaned_data["name"]
+            email = form.cleaned_data["email"]
+            password = form.cleaned_data["password"]
+
+            # Generate beneficiary ID
+            next_id = (
+                Trainee.objects.order_by("-id").first().id + 1
+                if Trainee.objects.exists()
+                else 1
+            )
+
+            beneficiary_id = f"MH-2026-{next_id:06d}"
+
+            # Create Django User
+            user = User.objects.create_user(
+                username=beneficiary_id,
+                email=email,
+                password=password,
+                first_name=name
+            )
+
+            # Create trainee
+            trainee = form.save(commit=False)
+            trainee.user = user
+            trainee.beneficiary_id = beneficiary_id
+            trainee.status = "Pending"
+            trainee.save()
+
+            # Create role profile
+            UserProfile.objects.create(
+                user=user,
+                role="Trainee",
+                trainee=trainee
+            )
+
+        return render(
+            request,
+            "trainees/registration_success.html",
+            {"trainee": trainee}
+        )
+
+    return render(
+        request,
+        "trainees/trainee_register.html",
+        {"form": form}
+    )
+
+
+from django.contrib.auth.models import User
+from django.contrib import messages
+from django.shortcuts import render, redirect
 
 
 def trainer_register(request):
-    form = TrainerRegistrationForm(request.POST or None)
-    if request.method == "POST" and form.is_valid():
-        trainer = form.save(commit=False)
-        trainer.status = "Pending"
-        trainer.save()
-        messages.success(request, "Registration submitted. The Authority will review it shortly.")
-        return redirect("login")
-    return render(request, "trainers/trainer_register.html", {"form": form})
 
+    form = TrainerRegistrationForm(request.POST or None)
+
+    if request.method == "POST" and form.is_valid():
+
+        email = form.cleaned_data["email"]
+        password = form.cleaned_data["password"]
+
+        # Create Django login account
+        user = User.objects.create_user(
+            username=email,
+            email=email,
+            password=password
+        )
+
+        # Create trainer registration
+        trainer = form.save(commit=False)
+
+        trainer.status = "Pending"
+        trainer.user = user
+
+        trainer.save()
+
+        messages.success(
+            request,
+            "Registration submitted successfully. "
+            "Your application is now Pending Authority verification. "
+            "You can log in after your registration is approved."
+        )
+
+        return redirect("login")
+
+    return render(
+        request,
+        "trainers/trainer_register.html",
+        {"form": form}
+    )
 
 @login_required
 @authority_required

@@ -11,19 +11,126 @@ class PortalForm(forms.ModelForm):
 
 
 class TraineeForm(PortalForm):
+    password = forms.CharField(
+        label="Password",
+        widget=forms.PasswordInput(attrs={
+            "class": "form-control",
+            "placeholder": "Create a password"
+        }),
+        min_length=8
+    )
+
+    confirm_password = forms.CharField(
+        label="Confirm Password",
+        widget=forms.PasswordInput(attrs={
+            "class": "form-control",
+            "placeholder": "Confirm your password"
+        })
+    )
+
+    consent_given = forms.BooleanField(
+        label="I consent to the collection and use of my information for registration, training, employment tracking, and verification purposes. I confirm that the information provided by me is accurate.",
+        required=True
+    )
+
     class Meta:
         model = Trainee
-        fields = ["name", "phone", "email", "district", "qualification", "gender", "registration_date"]
-        widgets = {"registration_date": forms.DateInput(attrs={"type": "date"})}
+        fields = [
+            "name",
+            "phone",
+            "email",
+            "district",
+            "qualification",
+            "gender",
+            "registration_date",
+        ]
+        widgets = {
+            "registration_date": forms.DateInput(
+                attrs={"type": "date"}
+            )
+        }
 
+    def clean(self):
+        cleaned_data = super().clean()
+
+        password = cleaned_data.get("password")
+        confirm_password = cleaned_data.get("confirm_password")
+
+        if password and confirm_password and password != confirm_password:
+            raise forms.ValidationError(
+                "Passwords do not match."
+            )
+
+        return cleaned_data
+
+
+from django import forms
+from django.contrib.auth.password_validation import validate_password
 
 class TrainerRegistrationForm(PortalForm):
+
+    password = forms.CharField(
+        label="Password",
+        widget=forms.PasswordInput(
+            attrs={
+                "placeholder": "Create your password"
+            }
+        ),
+        validators=[validate_password]
+    )
+
+    confirm_password = forms.CharField(
+        label="Confirm Password",
+        widget=forms.PasswordInput(
+            attrs={
+                "placeholder": "Confirm your password"
+            }
+        )
+    )
+
     class Meta:
         model = TrainerRegistration
-        fields = ["name", "phone", "email", "organization", "district", "qualification", "experience", "registration_date"]
-        widgets = {"registration_date": forms.DateInput(attrs={"type": "date"})}
+        fields = [
+            "name",
+            "phone",
+            "email",
+            "organization",
+            "district",
+            "qualification",
+            "experience",
+            "registration_date",
+        ]
 
+        widgets = {
+            "registration_date": forms.DateInput(
+                attrs={"type": "date"}
+            )
+        }
 
+    def clean_email(self):
+        email = self.cleaned_data["email"].strip().lower()
+
+        if User.objects.filter(username=email).exists():
+            raise forms.ValidationError(
+                "An account with this email already exists."
+            )
+
+        return email
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        password = cleaned_data.get("password")
+        confirm_password = cleaned_data.get("confirm_password")
+
+        if password and confirm_password:
+            if password != confirm_password:
+                self.add_error(
+                    "confirm_password",
+                    "Passwords do not match."
+                )
+
+        return cleaned_data
 class CourseForm(PortalForm):
     class Meta:
         model = Course

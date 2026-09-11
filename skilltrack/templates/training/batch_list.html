@@ -1,150 +1,738 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Training Batches</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Training Batches | SkillTrack Maharashtra</title>
 
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
         body {
+            margin: 0;
             font-family: Arial, sans-serif;
-            background: #f4f7fb;
-            padding: 30px;
+            background: #f1f5f9;
+            color: #1e293b;
         }
 
-        .container {
-            max-width: 1100px;
+        /* ===== TOP BAR ===== */
+
+        .topbar {
+            background: linear-gradient(135deg, #0f172a, #1e3a8a);
+            color: white;
+            padding: 18px 35px;
+            box-shadow: 0 4px 15px rgba(15, 23, 42, 0.18);
+        }
+
+        .topbar-inner {
+            max-width: 1200px;
             margin: auto;
-        }
-
-        .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 25px;
         }
 
-        h1 {
-            color: #1f2937;
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 11px;
+            background: rgba(255,255,255,0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .brand-text h2 {
             margin: 0;
+            font-size: 17px;
+            letter-spacing: 0.3px;
+        }
+
+        .brand-text span {
+            font-size: 11px;
+            color: #cbd5e1;
+        }
+
+        .portal-label {
+            font-size: 13px;
+            color: #dbeafe;
+        }
+
+
+        /* ===== MAIN ===== */
+
+        .container {
+            max-width: 1200px;
+            margin: 35px auto;
+            padding: 0 20px;
+        }
+
+
+        /* ===== PAGE HEADER ===== */
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 28px;
+            gap: 20px;
+        }
+
+        .page-title h1 {
+            margin: 0;
+            font-size: 30px;
+            color: #0f172a;
+        }
+
+        .page-title p {
+            margin: 7px 0 0;
+            color: #64748b;
+            font-size: 14px;
         }
 
         .add-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
             background: #2563eb;
             color: white;
             text-decoration: none;
-            padding: 10px 18px;
-            border-radius: 7px;
+            padding: 12px 18px;
+            border-radius: 9px;
+            font-size: 14px;
             font-weight: bold;
+            box-shadow: 0 5px 12px rgba(37, 99, 235, 0.25);
+            transition: 0.2s ease;
         }
+
+        .add-btn:hover {
+            background: #1d4ed8;
+            transform: translateY(-1px);
+        }
+
+
+        /* ===== SUMMARY ===== */
+
+        .summary-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 18px 22px;
+            margin-bottom: 22px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .summary-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 10px;
+            background: #eff6ff;
+            color: #2563eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .summary-text strong {
+            display: block;
+            font-size: 18px;
+            color: #0f172a;
+        }
+
+        .summary-text span {
+            color: #64748b;
+            font-size: 13px;
+        }
+
+
+        /* ===== BATCH GRID ===== */
+
+        .batch-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 20px;
+        }
+
+
+        /* ===== BATCH CARD ===== */
 
         .card {
             background: white;
-            padding: 22px;
-            margin-bottom: 15px;
-            border-radius: 12px;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            overflow: hidden;
+            transition: 0.25s ease;
+            box-shadow: 0 4px 15px rgba(15, 23, 42, 0.05);
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(15, 23, 42, 0.10);
+            border-color: #cbd5e1;
+        }
+
+
+        /* ===== CARD HEADER ===== */
+
+        .card-header {
+            padding: 20px 22px;
+            background: linear-gradient(135deg, #f8fafc, #eff6ff);
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .batch-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 15px;
         }
 
         .batch-name {
-            font-size: 19px;
+            font-size: 20px;
+            font-weight: 700;
+            color: #0f172a;
+            margin: 0;
+        }
+
+        .batch-id {
+            margin-top: 5px;
+            font-size: 11px;
+            color: #64748b;
+        }
+
+        .status {
+            background: #dcfce7;
+            color: #166534;
+            padding: 5px 9px;
+            border-radius: 20px;
+            font-size: 11px;
             font-weight: bold;
-            color: #111827;
-            margin-bottom: 12px;
+            white-space: nowrap;
         }
 
-        .info {
-            color: #6b7280;
-            margin: 7px 0;
+
+        /* ===== CARD BODY ===== */
+
+        .card-body {
+            padding: 20px 22px;
         }
 
-        .empty {
-            text-align: center;
-            color: #6b7280;
+        .info-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 11px 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            background: #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 14px;
+        }
+
+        .info-content {
+            flex: 1;
+        }
+
+        .info-label {
+            display: block;
+            color: #94a3b8;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 3px;
+        }
+
+        .info-value {
+            color: #334155;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+
+        /* ===== TRAINEE COUNT ===== */
+
+        .trainee-box {
+            margin-top: 18px;
+            padding: 14px;
+            background: #f8fafc;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .trainee-label {
+            color: #64748b;
+            font-size: 13px;
+        }
+
+        .trainee-count {
+            color: #2563eb;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+
+        /* ===== CARD FOOTER ===== */
+
+        .card-footer {
+            padding: 15px 22px;
+            border-top: 1px solid #e2e8f0;
+            background: #fafafa;
         }
 
         .view-btn {
-            display: inline-block;
-            margin-top: 12px;
-            padding: 8px 15px;
-            background: #374151;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 11px 15px;
+            background: #0f172a;
             color: white;
             text-decoration: none;
-            border-radius: 6px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: bold;
+            transition: 0.2s ease;
+        }
+
+        .view-btn:hover {
+            background: #1e293b;
+        }
+
+
+        /* ===== EMPTY ===== */
+
+        .empty {
+            grid-column: 1 / -1;
+            background: white;
+            border: 1px dashed #cbd5e1;
+            border-radius: 16px;
+            padding: 60px 20px;
+            text-align: center;
+        }
+
+        .empty-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 15px;
+            border-radius: 50%;
+            background: #eff6ff;
+            color: #2563eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 25px;
+        }
+
+        .empty h3 {
+            margin: 0;
+            color: #334155;
+        }
+
+        .empty p {
+            color: #64748b;
+            font-size: 14px;
+        }
+
+
+        /* ===== RESPONSIVE ===== */
+
+        @media (max-width: 850px) {
+
+            .batch-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .add-btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .portal-label {
+                display: none;
+            }
+        }
+
+        @media (max-width: 500px) {
+
+            .topbar {
+                padding: 15px 18px;
+            }
+
+            .container {
+                margin-top: 25px;
+                padding: 0 15px;
+            }
+
+            .page-title h1 {
+                font-size: 25px;
+            }
+
+            .card-header,
+            .card-body,
+            .card-footer {
+                padding-left: 17px;
+                padding-right: 17px;
+            }
         }
     </style>
 </head>
 
 <body>
 
+
+<!-- ================= TOP BAR ================= -->
+
+<div class="topbar">
+
+    <div class="topbar-inner">
+
+        <div class="brand">
+
+            <div class="brand-icon">
+                ST
+            </div>
+
+            <div class="brand-text">
+
+                <h2>SkillTrack Maharashtra</h2>
+
+                <span>Training & Employment Tracking Portal</span>
+
+            </div>
+
+        </div>
+
+        <div class="portal-label">
+            Authority Portal
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ================= MAIN ================= -->
+
 <div class="container">
 
-    <div class="header">
 
-        <h1>Training Batches</h1>
+    <!-- PAGE HEADER -->
+
+    <div class="page-header">
+
+        <div class="page-title">
+
+            <h1>Training Batches</h1>
+
+            <p>
+                Manage training batches, trainers, providers and assigned trainees.
+            </p>
+
+        </div>
 
         <a href="{% url 'batch_create' %}" class="add-btn">
-            + Create Batch
+            <span>＋</span>
+            Create Batch
         </a>
 
     </div>
 
-    {% for batch in batches %}
 
-        <div class="card">
+    <!-- SUMMARY -->
 
-            <div class="batch-name">
-                {{ batch.name }}
-            </div>
+    <div class="summary-card">
 
-            <div class="info">
-                <strong>Course:</strong>
-                {{ batch.course.name }}
-            </div>
+        <div class="summary-icon">
+            ▣
+        </div>
 
-            <div class="info">
-                <strong>Provider:</strong>
-                {{ batch.provider.name }}
-            </div>
+        <div class="summary-text">
 
-            <div class="info">
-                <strong>Trainer:</strong>
-                {{ batch.trainer.username }}
-            </div>
+            <strong>{{ batches|length }}</strong>
 
-            <div class="info">
-                <strong>District:</strong>
-                {{ batch.district }}
-            </div>
-
-            <div class="info">
-                <strong>Dates:</strong>
-                {{ batch.start_date }} → {{ batch.end_date }}
-            </div>
-
-            <div class="info">
-                <strong>Capacity:</strong>
-                {{ batch.capacity }}
-            </div>
-
-            <div class="info">
-                <strong>Assigned Trainees:</strong>
-                {{ batch.trainees.count }}
-            </div>
-            <a
-    href="{% url 'batch_assign_trainees' batch.id %}"
-    class="view-btn"
->
-    Assign Trainees
-</a>
+            <span>
+                Training batch{{ batches|length|pluralize }} currently available
+            </span>
 
         </div>
 
-    {% empty %}
+    </div>
 
-        <div class="card empty">
-            <p>No training batches have been created yet.</p>
-        </div>
 
-    {% endfor %}
+    <!-- ================= BATCHES ================= -->
+
+    <div class="batch-grid">
+
+        {% for batch in batches %}
+
+            <div class="card">
+
+
+                <!-- CARD HEADER -->
+
+                <div class="card-header">
+
+                    <div class="batch-top">
+
+                        <div>
+
+                            <div class="batch-name">
+                                {{ batch.name }}
+                            </div>
+
+                            <div class="batch-id">
+                                Training Batch #{{ batch.id }}
+                            </div>
+
+                        </div>
+
+                        <div class="status">
+                            Active
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- CARD BODY -->
+
+                <div class="card-body">
+
+
+                    <!-- COURSE -->
+
+                    <div class="info-row">
+
+                        <div class="info-icon">
+                            📚
+                        </div>
+
+                        <div class="info-content">
+
+                            <span class="info-label">
+                                Course
+                            </span>
+
+                            <span class="info-value">
+                                {{ batch.course.name }}
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- PROVIDER -->
+
+                    <div class="info-row">
+
+                        <div class="info-icon">
+                            🏢
+                        </div>
+
+                        <div class="info-content">
+
+                            <span class="info-label">
+                                Training Provider
+                            </span>
+
+                            <span class="info-value">
+                                {{ batch.provider.name }}
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- TRAINER -->
+
+                    <div class="info-row">
+
+                        <div class="info-icon">
+                            👤
+                        </div>
+
+                        <div class="info-content">
+
+                            <span class="info-label">
+                                Assigned Trainer
+                            </span>
+
+                            <span class="info-value">
+                                {{ batch.trainer.username }}
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- DISTRICT -->
+
+                    <div class="info-row">
+
+                        <div class="info-icon">
+                            📍
+                        </div>
+
+                        <div class="info-content">
+
+                            <span class="info-label">
+                                District
+                            </span>
+
+                            <span class="info-value">
+                                {{ batch.district }}
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- DATES -->
+
+                    <div class="info-row">
+
+                        <div class="info-icon">
+                            📅
+                        </div>
+
+                        <div class="info-content">
+
+                            <span class="info-label">
+                                Training Period
+                            </span>
+
+                            <span class="info-value">
+                                {{ batch.start_date }} → {{ batch.end_date }}
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- CAPACITY -->
+
+                    <div class="info-row">
+
+                        <div class="info-icon">
+                            👥
+                        </div>
+
+                        <div class="info-content">
+
+                            <span class="info-label">
+                                Batch Capacity
+                            </span>
+
+                            <span class="info-value">
+                                {{ batch.capacity }} trainees
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- TRAINEE COUNT -->
+
+                    <div class="trainee-box">
+
+                        <span class="trainee-label">
+                            Assigned Trainees
+                        </span>
+
+                        <span class="trainee-count">
+                            {{ batch.trainees.count }}
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <!-- CARD FOOTER -->
+
+                <div class="card-footer">
+
+                    <a
+                        href="{% url 'batch_assign_trainees' batch.id %}"
+                        class="view-btn"
+                    >
+                        Manage Assigned Trainees
+                        <span>→</span>
+                    </a>
+
+                </div>
+
+
+            </div>
+
+        {% empty %}
+
+
+            <!-- EMPTY STATE -->
+
+            <div class="empty">
+
+                <div class="empty-icon">
+                    +
+                </div>
+
+                <h3>No Training Batches Yet</h3>
+
+                <p>
+                    Create your first training batch to start assigning
+                    verified trainees and managing training activities.
+                </p>
+
+                <a href="{% url 'batch_create' %}" class="add-btn">
+                    + Create First Batch
+                </a>
+
+            </div>
+
+        {% endfor %}
+
+    </div>
 
 </div>
 

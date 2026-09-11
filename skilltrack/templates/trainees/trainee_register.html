@@ -1,4 +1,3 @@
-
 {% extends 'base.html' %}
 
 {% block title %}
@@ -7,40 +6,752 @@ Trainee Registration | SkillTrack Maharashtra
 
 {% block public_content %}
 
-<div class="card" style="max-width:700px; margin:40px auto;">
+<style>
+    .trainee-page {
+        min-height: calc(100vh - 80px);
+        background-color: #f7f5f0;
+        background-image: radial-gradient(
+            rgba(20, 33, 61, 0.08) 1px,
+            transparent 1px
+        );
+        background-size: 22px 22px;
+        padding: 32px 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
 
-    <h1>Trainee Registration</h1>
+    .trainee-container {
+        width: 100%;
+        max-width: 1200px;
+        min-height: 700px;
+        display: grid;
+        grid-template-columns: 31% 69%;
+        overflow: hidden;
+        border-radius: 28px;
+        background: #ffffff;
+        border: 1px solid rgba(20, 33, 61, 0.10);
+        box-shadow: 0 24px 70px rgba(20, 33, 61, 0.12);
+    }
 
-    <p class="sub">
-        Submit your details for Authority verification.
-    </p>
+    /* =========================
+       LEFT SIDEBAR
+    ========================= */
 
-    <form method="post" action="{% url 'trainee_register' %}">
-        {% csrf_token %}
+    .trainee-sidebar {
+        position: relative;
+        overflow: hidden;
+        background: #14213d;
+        color: white;
+        padding: 40px;
+    }
 
-        {% for field in form %}
+    .trainee-logo {
+        width: 56px;
+        height: 56px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 16px;
+        background: #e06c3b;
+        color: white;
+        font-weight: 800;
+        letter-spacing: 1px;
+        box-shadow: 0 12px 24px rgba(224, 108, 59, 0.25);
+    }
 
-            <label>{{ field.label }} *</label>
+    .sidebar-label {
+        margin-top: 36px;
+        color: #f7b49a;
+        font-size: 12px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+    }
 
-            {{ field }}
+    .sidebar-title {
+        max-width: 330px;
+        margin-top: 12px;
+        color: white;
+        font-size: 43px;
+        line-height: 1.1;
+        font-weight: 800;
+    }
 
-            {% if field.errors %}
-                <div style="color:#b42318; font-size:12px; margin-top:4px;">
-                    {{ field.errors }}
+    .sidebar-description {
+        max-width: 330px;
+        margin-top: 20px;
+        color: #b6c0d1;
+        line-height: 1.8;
+        font-size: 15px;
+    }
+
+    .steps {
+        margin-top: 55px;
+        display: grid;
+        gap: 18px;
+    }
+
+    .step {
+        display: flex;
+        align-items: center;
+        color: #d6ddeb;
+        font-size: 14px;
+    }
+
+    .step-number {
+        width: 30px;
+        height: 30px;
+        margin-right: 11px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        color: #f7b49a;
+        font-size: 11px;
+        font-weight: 800;
+        flex-shrink: 0;
+    }
+
+
+    /* =========================
+       RIGHT CONTENT
+    ========================= */
+
+    .trainee-content {
+        min-width: 0;
+        padding: 55px 65px;
+        background: white;
+    }
+
+    .back-link {
+        display: inline-flex;
+        margin-bottom: 30px;
+        color: #667085;
+        text-decoration: none;
+        font-size: 14px;
+        transition: 0.2s ease;
+    }
+
+    .back-link:hover {
+        color: #bd4e27;
+    }
+
+    .form-header {
+        max-width: 650px;
+        margin-bottom: 30px;
+    }
+
+    .form-header h1 {
+        margin: 0;
+        color: #14213d;
+        font-size: 44px;
+        line-height: 1.1;
+        font-weight: 800;
+    }
+
+    .form-header p {
+        margin-top: 12px;
+        color: #667085;
+        font-size: 15px;
+    }
+
+
+    /* =========================
+       VERIFICATION BOX
+    ========================= */
+
+    .verification-box {
+        margin-bottom: 28px;
+        padding: 18px 20px;
+        border: 1px solid #bfdbfe;
+        border-radius: 14px;
+        background: #eff6ff;
+    }
+
+    .verification-content {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .verification-icon {
+        font-size: 20px;
+        line-height: 1;
+        flex-shrink: 0;
+    }
+
+    .verification-box h2 {
+        margin: 0;
+        color: #1e40af;
+        font-size: 15px;
+        font-weight: 700;
+    }
+
+    .verification-box p {
+        margin: 5px 0 0;
+        color: #1d4ed8;
+        font-size: 13px;
+        line-height: 1.7;
+    }
+
+
+    /* =========================
+       DJANGO FORM
+    ========================= */
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 20px;
+    }
+
+    .form-group {
+        min-width: 0;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 8px;
+        color: #334155;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .required {
+        color: #dc2626;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 12px 14px;
+        border: 1px solid #cbd5e1;
+        border-radius: 9px;
+        outline: none;
+        background: white;
+        color: #14213d;
+        font-size: 14px;
+        font-family: inherit;
+        transition: 0.2s ease;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    }
+
+    .form-group textarea {
+        min-height: 110px;
+        resize: vertical;
+    }
+
+    .form-group input::placeholder,
+    .form-group textarea::placeholder {
+        color: #94a3b8;
+    }
+
+
+    /* =========================
+       FORM ERRORS
+    ========================= */
+
+    .field-error {
+        margin-top: 6px;
+        padding: 7px 9px;
+        border-radius: 7px;
+        background: #fff4f2;
+        color: #b42318;
+        font-size: 12px;
+    }
+
+    .field-error ul {
+        margin: 0;
+        padding-left: 16px;
+    }
+
+    .field-error li {
+        margin: 2px 0;
+    }
+
+    .non-field-error {
+        margin-bottom: 20px;
+        padding: 12px 14px;
+        border-radius: 9px;
+        background: #fff4f2;
+        border: 1px solid #fecaca;
+        color: #b42318;
+        font-size: 13px;
+    }
+
+
+    /* =========================
+       TRAINEE CONSENT
+    ========================= */
+
+    .consent-box {
+        margin-top: 28px;
+        padding: 16px 18px;
+        border: 1px solid #dbe3ef;
+        border-radius: 12px;
+        background: #f8fafc;
+    }
+
+    .consent-content {
+        display: flex;
+        align-items: flex-start;
+        gap: 11px;
+    }
+
+    .consent-content input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        margin-top: 2px;
+        flex-shrink: 0;
+        cursor: pointer;
+        accent-color: #2563eb;
+    }
+
+    .consent-content label {
+        margin: 0;
+        color: #475569;
+        font-size: 13px;
+        line-height: 1.6;
+        cursor: pointer;
+    }
+
+
+    /* =========================
+       SUBMIT BUTTON
+    ========================= */
+
+    .submit-btn {
+        width: 100%;
+        margin-top: 22px;
+        padding: 13px 18px;
+        border: none;
+        border-radius: 9px;
+        background: #2563eb;
+        color: white;
+        font-size: 14px;
+        font-weight: 700;
+        cursor: pointer;
+        box-shadow: 0 8px 18px rgba(37, 99, 235, 0.22);
+        transition: 0.2s ease;
+    }
+
+    .submit-btn:hover {
+        background: #1d4ed8;
+        transform: translateY(-1px);
+        box-shadow: 0 12px 22px rgba(37, 99, 235, 0.28);
+    }
+
+    .submit-btn:active {
+        transform: translateY(0);
+    }
+
+
+    /* =========================
+       SECURITY NOTE
+    ========================= */
+
+    .security-note {
+        margin-top: 22px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        color: #64748b;
+        font-size: 12px;
+        text-align: center;
+    }
+
+
+    /* =========================
+       RESPONSIVE
+    ========================= */
+
+    @media (max-width: 1000px) {
+
+        .trainee-container {
+            grid-template-columns: 1fr;
+        }
+
+        .trainee-sidebar {
+            padding: 32px;
+        }
+
+        .sidebar-title {
+            font-size: 36px;
+        }
+
+        .steps {
+            display: none;
+        }
+
+        .trainee-content {
+            padding: 45px 35px;
+        }
+    }
+
+
+    @media (max-width: 650px) {
+
+        .trainee-page {
+            padding: 15px 10px;
+        }
+
+        .trainee-container {
+            border-radius: 20px;
+            min-height: auto;
+        }
+
+        .trainee-sidebar {
+            padding: 25px;
+        }
+
+        .trainee-logo {
+            width: 50px;
+            height: 50px;
+        }
+
+        .sidebar-label {
+            margin-top: 25px;
+        }
+
+        .sidebar-title {
+            font-size: 30px;
+        }
+
+        .sidebar-description {
+            font-size: 14px;
+        }
+
+        .trainee-content {
+            padding: 30px 20px;
+        }
+
+        .form-header {
+            margin-bottom: 25px;
+        }
+
+        .form-header h1 {
+            font-size: 34px;
+        }
+
+        .form-header p {
+            line-height: 1.6;
+        }
+
+        .form-grid {
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+
+        .verification-box {
+            padding: 15px;
+        }
+
+        .security-note {
+            align-items: flex-start;
+            line-height: 1.5;
+        }
+    }
+</style>
+
+
+<div class="trainee-page">
+
+    <div class="trainee-container">
+
+
+        <!-- =====================================
+             LEFT SIDEBAR
+        ====================================== -->
+
+        <aside class="trainee-sidebar">
+
+            <div class="trainee-logo">
+                ST
+            </div>
+
+            <div class="sidebar-label">
+                Start your journey
+            </div>
+
+            <h2 class="sidebar-title">
+                Build skills. Create opportunities.
+            </h2>
+
+            <p class="sidebar-description">
+                Register with SkillTrack Maharashtra and connect
+                with verified training opportunities designed
+                to help you build a better career.
+            </p>
+
+
+            <div class="steps">
+
+                <div class="step">
+
+                    <span class="step-number">
+                        01
+                    </span>
+
+                    Register your details
+
                 </div>
-            {% endif %}
 
-        {% endfor %}
 
-        <p>
-            <button type="submit">
-                Submit Registration
-            </button>
-        </p>
+                <div class="step">
 
-    </form>
+                    <span class="step-number">
+                        02
+                    </span>
+
+                    Complete Authority verification
+
+                </div>
+
+
+                <div class="step">
+
+                    <span class="step-number">
+                        03
+                    </span>
+
+                    Get assigned to training
+
+                </div>
+
+            </div>
+
+        </aside>
+
+
+        <!-- =====================================
+             RIGHT CONTENT
+        ====================================== -->
+
+        <main class="trainee-content">
+
+
+            <!-- BACK TO HOME -->
+
+            <a
+                href="{% url 'public_dashboard' %}"
+                class="back-link"
+            >
+                &larr; Back to SkillTrack
+            </a>
+
+
+            <!-- HEADER -->
+
+            <div class="form-header">
+
+                <h1>
+                    Trainee registration
+                </h1>
+
+                <p>
+                    Submit your details to join SkillTrack
+                    Maharashtra's verified training ecosystem.
+                </p>
+
+            </div>
+
+
+            <!-- =====================================
+                 AUTHORITY VERIFICATION NOTICE
+            ====================================== -->
+
+            <div class="verification-box">
+
+                <div class="verification-content">
+
+                    <div class="verification-icon">
+                        ℹ️
+                    </div>
+
+                    <div>
+
+                        <h2>
+                            Authority Verification Required
+                        </h2>
+
+                        <p>
+                            Your registration will remain
+                            <strong>Pending</strong>
+                            until it is reviewed and approved by the
+                            Authority. After verification, you can be
+                            considered for official training batches.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =====================================
+                 DJANGO REGISTRATION FORM
+            ====================================== -->
+
+            <form
+                method="post"
+                action="{% url 'trainee_register' %}"
+            >
+
+                {% csrf_token %}
+
+
+                <!-- NON FIELD ERRORS -->
+
+                {% if form.non_field_errors %}
+
+                    <div class="non-field-error">
+
+                        {{ form.non_field_errors }}
+
+                    </div>
+
+                {% endif %}
+
+
+                <!-- FORM FIELDS -->
+
+                <div class="form-grid">
+
+                    {% for field in form %}
+
+                        {% if field.name != "trainee_consent" %}
+
+                            <div class="form-group">
+
+                                <label
+                                    for="{{ field.id_for_label }}"
+                                    class="form-label"
+                                >
+
+                                    {{ field.label }}
+
+                                    {% if field.field.required %}
+
+                                        <span class="required">
+                                            *
+                                        </span>
+
+                                    {% endif %}
+
+                                </label>
+
+
+                                {{ field }}
+
+
+                                {% if field.help_text %}
+
+                                    <small class="help-text">
+                                        {{ field.help_text }}
+                                    </small>
+
+                                {% endif %}
+
+
+                                {% if field.errors %}
+
+                                    <div class="field-error">
+
+                                        {{ field.errors }}
+
+                                    </div>
+
+                                {% endif %}
+
+                            </div>
+
+                        {% endif %}
+
+                    {% endfor %}
+
+                </div>
+
+
+                <!-- =====================================
+                     TRAINEE CONSENT
+                ====================================== -->
+
+                <div class="consent-box">
+
+                    <div class="consent-content">
+
+                        {{ form.trainee_consent }}
+
+                        <label
+                            for="{{ form.trainee_consent.id_for_label }}"
+                        >
+                            I confirm that the information provided by me
+                            is correct and I consent to the use of my
+                            information for SkillTrack Maharashtra.
+                        </label>
+
+                    </div>
+
+
+                    {% if form.trainee_consent.errors %}
+
+                        <div class="field-error">
+
+                            {{ form.trainee_consent.errors }}
+
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+
+                <!-- =====================================
+                     SUBMIT
+                ====================================== -->
+
+                <button
+                    type="submit"
+                    class="submit-btn"
+                >
+                    Submit Trainee Registration
+                </button>
+
+            </form>
+
+
+            <!-- SECURITY NOTE -->
+
+            <div class="security-note">
+
+                <span>
+                    🔒
+                </span>
+
+                <span>
+                    Your registration information will be reviewed
+                    by the authorized department.
+                </span>
+
+            </div>
+
+
+        </main>
+
+    </div>
 
 </div>
 
 {% endblock %}
-

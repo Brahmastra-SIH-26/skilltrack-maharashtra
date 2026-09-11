@@ -189,14 +189,12 @@ class EmploymentForm(PortalForm):
         fields = [
             "status",
 
-
             "employer_name",
             "job_role",
             "employment_type",
             "salary",
             "employment_date",
 
-            # Employment verification
             "verification_method",
             "uan_demo",
             "employment_proof_type",
@@ -242,6 +240,14 @@ class EmploymentForm(PortalForm):
             ),
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # When editing an existing Employment record,
+        # uploading a new proof should NOT be mandatory.
+        if self.instance and self.instance.pk:
+            self.fields["employment_proof"].required = False
+
     def clean(self):
         cleaned_data = super().clean()
 
@@ -256,14 +262,12 @@ class EmploymentForm(PortalForm):
 
         if status == "Employed":
 
-            # Employer is required
             if not cleaned_data.get("employer_name"):
                 self.add_error(
                     "employer_name",
                     "Please provide the employer name."
                 )
 
-            # Verification method is required
             if not verification_method:
                 self.add_error(
                     "verification_method",
@@ -294,11 +298,23 @@ class EmploymentForm(PortalForm):
                         "Please select the proof type."
                     )
 
-                if not employment_proof:
+                # New record -> proof is required
+                if not self.instance.pk and not employment_proof:
                     self.add_error(
                         "employment_proof",
                         "Please upload employment proof."
                     )
+
+                # Existing record:
+                # If old proof exists, uploading a new one is optional.
+                elif self.instance.pk:
+                    existing_proof = self.instance.employment_proof
+
+                    if not existing_proof and not employment_proof:
+                        self.add_error(
+                            "employment_proof",
+                            "Please upload employment proof."
+                        )
 
         # ==========================================================
         # SELF-EMPLOYED
@@ -328,7 +344,6 @@ class EmploymentForm(PortalForm):
                 )
 
         return cleaned_data
-
 
 
 

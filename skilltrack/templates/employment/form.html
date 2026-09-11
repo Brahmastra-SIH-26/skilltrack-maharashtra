@@ -222,7 +222,8 @@ document.addEventListener("DOMContentLoaded", function () {
         "employment_type",
         "salary",
         "employment_date",
-        "verification_method"
+        "verification_method",
+        "wage_frequency"
     ];
 
 
@@ -245,17 +246,21 @@ document.addEventListener("DOMContentLoaded", function () {
         "employment_date",
         "apprenticeship_expected_completion",
         "apprenticeship_converted",
-        "stipend"
+        "stipend",
+        "wage_frequency"
     ];
 
 
     /*
-     * Fields that are common to multiple outcomes.
+     * Fields common to all outcomes.
+     *
+     * IMPORTANT:
+     * wage_frequency is NOT here because it should
+     * NOT appear for Unemployed.
      */
     const commonFields = [
         "sector",
         "location",
-        "wage_frequency",
         "outcome_notes"
     ];
 
@@ -292,8 +297,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
         commonFields.forEach(hideField);
 
+        hideField("wage_frequency");
+
         hideField("uan_demo");
+
         hideField("employment_proof_type");
+
         hideField("employment_proof");
 
     }
@@ -305,13 +314,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
         /*
-         * First hide everything conditional.
+         * First hide all conditional fields.
          */
         hideAllConditionalFields();
 
 
         /*
-         * Common fields are always available.
+         * Common fields.
          */
         commonFields.forEach(showField);
 
@@ -347,6 +356,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
         }
 
+
+        /*
+         * UNEMPLOYED
+         *
+         * wage_frequency remains hidden.
+         */
+        else if (status === "Unemployed") {
+
+            // No employment-specific fields.
+
+        }
+
     }
 
 
@@ -362,7 +383,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
         /*
-         * Hide both verification options first.
+         * Hide verification fields first.
          */
         hideField("uan_demo");
 
@@ -372,8 +393,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
         /*
-         * Only show verification fields
-         * when the status is Employed.
+         * Only Employed can use employment verification.
          */
         if (statusField.value !== "Employed") {
             return;

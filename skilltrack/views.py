@@ -14,7 +14,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 
 from .forms import CourseForm, EmploymentForm, FollowUpForm, TraineeForm, TrainerRegistrationForm, TrainingBatch,TrainingBatchForm
-from .models import Course, Employment, FollowUp, Notification, Provider, Trainee, TrainerRegistration, TrainingBatch, UserProfile,TrainingRegistrationRequest, UANVerification, SelfEmploymentVerification
+from .models import Course, Employment, FollowUp, Notification, Provider, Trainee, TrainerRegistration, TrainingBatch, UserProfile,TrainingRegistrationRequest, UANVerification, SelfEmploymentVerification,Training
 
 logger = logging.getLogger(__name__)
 
@@ -214,12 +214,17 @@ def dashboard(request):
     employments = Employment.objects.all()
     trained = batches.filter(status="Completed").aggregate(total=Count("trainees", distinct=True))["total"]
     employment_total = employments.count()
+    wage_average = WageRecord.objects.aggregate(avg=Avg("amount"))["avg"] if "WageRecord" in globals() else None
+    retention_total = RetentionRecord.objects.count() if "RetentionRecord" in globals() else 0
+    retained = RetentionRecord.objects.filter(still_employed=True).count() if "RetentionRecord" in globals() else 0
     context = {
         "total_trainees": trainees.count(), "pending_trainees": trainees.filter(status="Pending").count(), "verified_trainees": trainees.filter(status="Verified").count(),
         "total_trainers": trainers.count(), "verified_trainers": trainers.filter(status="Verified").count(), "total_providers": providers.count(), "verified_providers": providers.filter(status="Verified").count(),
         "total_courses": Course.objects.count(), "active_batches": batches.filter(status="Active").count(), "completed_batches": batches.filter(status="Completed").count(), "trained_trainees": trained,
         "active_training": batches.filter(status="Active").count(), "completed_training": batches.filter(status="Completed").count(),
         "employed": employments.filter(status="Employed").count(), "seeking": employments.filter(status="Seeking").count(), "unemployed": employments.filter(status="Unemployed").count(),
+        "self_employed": employments.filter(status="Self-Employed").count(), "apprenticeships": employments.filter(status="Apprenticeship").count(),
+        "average_wage": round(wage_average or 0), "retention_rate": round(retained * 100 / retention_total) if retention_total else 0,
         "employment_rate": round(employments.filter(status="Employed").count() * 100 / employment_total, 1) if employment_total else 0,
         "district_data": list(trainees.values("district").annotate(total=Count("id")).order_by("district")),
         "sector_data": list(Course.objects.values("sector").annotate(total=Count("id")).order_by("sector")),
@@ -502,14 +507,16 @@ def trainer_batch_progress(request, id):
                     "end_date": batch.end_date,
                     "completion_percentage": progress[trainee_id],
                     "status": "Training",
+                    "batch": batch,
+                    "trainer": request.user,
                 }
             )
 
             # Update existing training progress
             training.completion_percentage = progress[trainee_id]
-            training.save(
-                update_fields=["completion_percentage"]
-            )
+            training.batch = batch
+            training.trainer = request.user
+            training.save(update_fields=["completion_percentage", "batch", "trainer"])
 
             # ==================================================
             # Training Performance
@@ -660,6 +667,7 @@ def trainer_complete_batch(request, id):
     if batch.status != "Completed":
         batch.status, batch.completion_date = "Completed", date.today()
         batch.save(update_fields=["status", "completion_date"])
+        Training.objects.filter(batch=batch).update(status="Completed", end_date=batch.completion_date)
         generate_followups(batch)
         for trainee in batch.trainees.all():
             profile = UserProfile.objects.filter(trainee=trainee, role="Trainee").select_related("user").first()
@@ -825,10 +833,7 @@ def public_dashboard(request):
 @login_required
 @trainee_required
 def trainee_training_request(request, batch_id):
-    """
-    Trainee requests to join a specific training batch.
-    The request goes to the trainer assigned to that batch.
-    """
+
 
     trainee = request.user.userprofile.trainee
 
@@ -842,7 +847,7 @@ def trainee_training_request(request, batch_id):
         status="Active",
     )
 
-    # Trainee must already be Authority-verified
+
     if trainee.status != "Verified":
         messages.error(
             request,
@@ -850,7 +855,7 @@ def trainee_training_request(request, batch_id):
         )
         return redirect("trainee_dashboard")
 
-    # Check if already enrolled
+
     if batch.trainees.filter(id=trainee.id).exists():
         messages.info(
             request,
@@ -1942,3 +1947,223 @@ def run_followup_emails(request):
             "success": False,
             "error": str(e)
         }, status=500)
+
+
+# Longitudinal outcome enhancements.  These definitions intentionally extend the
+# legacy screens above, keeping their URLs and role checks intact.
+from django.db.models import Avg, Q
+from .forms import TrainingRelevanceForm, RetentionRecordForm
+from .models import WageRecord, TrainingRelevance, RetentionRecord, OccupationSkill
+
+
+def _latest_outcome(trainee):
+    return trainee.employment_records.order_by("-recorded_on", "-id").first()
+
+
+def _risk_insight(trainee):
+    performance = trainee.performance_records.order_by("-updated_at").first()
+    attendance = performance.attendance_percentage if performance else 0
+    assessment = performance.assessment_score if performance else 0
+    completed = trainee.training_set.filter(status="Completed").exists()
+    score = min(95, max(5, round(25 + attendance * .35 + assessment * .35 + (15 if completed else 0))))
+    risk = "Low" if score >= 70 else "Medium" if score >= 45 else "High"
+    factors = []
+    factors.append("strong attendance" if attendance >= 75 else "low attendance")
+    factors.append("strong assessment" if assessment >= 60 else "assessment support needed")
+    action = "Maintain placement support and follow-up." if risk == "Low" else "Provide employer linkage and remedial support." if risk == "Medium" else "Trainer intervention and a targeted remedial plan."
+    return {"probability": score, "risk": risk, "factors": factors, "action": action, "prototype": True}
+
+
+def _skill_gaps(trainee):
+    outcome = _latest_outcome(trainee)
+    if not outcome or not outcome.job_role:
+        return []
+    required = OccupationSkill.objects.filter(occupation__iexact=outcome.job_role).values_list("skill", flat=True)
+    taught = []
+    for training in trainee.training_set.select_related("course"):
+        taught.extend(x.strip().lower() for x in training.course.skills_taught.split(",") if x.strip())
+    return [skill for skill in required if skill.lower() not in taught]
+
+
+@login_required
+@authority_required
+def trainee_detail(request, id):
+    trainee = get_object_or_404(Trainee, id=id)
+    trainings = trainee.training_set.select_related("course", "provider", "batch", "trainer").order_by("-start_date")
+    outcomes = trainee.employment_records.select_related("training").order_by("-recorded_on", "-id")
+    return render(request, "trainees/trainee_detail.html", {
+        "trainee": trainee, "trainings": trainings, "outcomes": outcomes,
+        "wages": trainee.wage_records.all(), "followups": trainee.followup_set.all(),
+        "retention_records": trainee.retention_records.all().order_by("-checked_on"),
+        "relevance_records": trainee.relevance_feedback.select_related("training").all(),
+        "skill_gaps": _skill_gaps(trainee), "risk": _risk_insight(trainee),
+    })
+
+
+@login_required
+def employment_list(request):
+    profile = getattr(request.user, "userprofile", None)
+    if request.user.is_staff or getattr(profile, "role", None) == "Authority":
+        qs = Employment.objects.select_related("trainee", "training").order_by("-recorded_on", "-id")
+        status = request.GET.get("status")
+        district = request.GET.get("district")
+        if status:
+            qs = qs.filter(status=status)
+        if district:
+            qs = qs.filter(trainee__district=district)
+        return render(request, "employment/list.html", {"employments": qs, "authority": True, "statuses": Employment.STATUS_CHOICES, "districts": Trainee.objects.values_list("district", flat=True).distinct().order_by("district")})
+    if not profile or profile.role != "Trainee":
+        return redirect("login")
+    trainee = profile.trainee
+    if request.method == "POST":
+        form = EmploymentForm(request.POST)
+        if form.is_valid():
+            outcome = form.save(commit=False)
+            outcome.trainee = trainee
+            outcome.save()
+            if outcome.salary:
+                WageRecord.objects.create(trainee=trainee, employment=outcome, amount=outcome.salary, frequency=outcome.wage_frequency, recorded_on=outcome.employment_date or date.today())
+            messages.success(request, "Outcome recorded. Your earlier outcome history has been preserved.")
+            return redirect("employment_list")
+    else:
+        form = EmploymentForm(initial={"status": _latest_outcome(trainee).status if _latest_outcome(trainee) else "Seeking"})
+    return render(request, "employment/form.html", {"form": form, "employment": _latest_outcome(trainee), "outcomes": trainee.employment_records.all().order_by("-recorded_on", "-id")})
+
+
+@login_required
+@authority_required
+@require_POST
+def verify_employment(request, id):
+    outcome = get_object_or_404(Employment, id=id)
+    outcome.verification_status = request.POST.get("decision") if request.POST.get("decision") in {"Verified", "Rejected", "Pending"} else "Verified"
+    outcome.save(update_fields=["verification_status"])
+    messages.success(request, f"Outcome marked {outcome.verification_status.lower()} by Authority.")
+    return redirect("trainee_detail", id=outcome.trainee_id)
+
+
+@login_required
+@authority_required
+def followup_update(request, id):
+    followup = get_object_or_404(FollowUp, id=id)
+    form = FollowUpForm(request.POST or None, instance=followup)
+    if request.method == "POST" and form.is_valid():
+        followup = form.save()
+        if followup.completed:
+            Employment.objects.create(trainee=followup.trainee, status=followup.employment_status, outcome_notes=f"Recorded during {followup.followup_type} follow-up")
+        messages.success(request, "Follow-up saved; its outcome was added to the longitudinal history.")
+        return redirect("followup_list")
+    return render(request, "followups/form.html", {"form": form, "followup": followup})
+
+
+@login_required
+@authority_required
+def outcome_support(request, id):
+    trainee = get_object_or_404(Trainee, id=id)
+    relevance_form = TrainingRelevanceForm(request.POST or None, prefix="relevance")
+    retention_form = RetentionRecordForm(request.POST or None, prefix="retention")
+    if request.method == "POST":
+        if "save_relevance" in request.POST and relevance_form.is_valid():
+            record = relevance_form.save(commit=False); record.trainee = trainee; record.training = trainee.training_set.order_by("-end_date").first(); record.save()
+        elif "save_retention" in request.POST and retention_form.is_valid():
+            record = retention_form.save(commit=False); record.trainee = trainee; record.employment = _latest_outcome(trainee); record.save()
+        else:
+            messages.error(request, "Please correct the highlighted fields.")
+            return render(request, "trainees/outcome_support.html", {"trainee": trainee, "relevance_form": relevance_form, "retention_form": retention_form})
+        messages.success(request, "Longitudinal outcome evidence recorded.")
+        return redirect("trainee_detail", id=trainee.id)
+    return render(request, "trainees/outcome_support.html", {"trainee": trainee, "relevance_form": relevance_form, "retention_form": retention_form})
+from django.db.models import Avg, Count
+@login_required
+@authority_required
+def analytics(request):
+    outcomes = Employment.objects.select_related(
+        "trainee",
+        "training__course",
+        "training__provider"
+    )
+
+    district = request.GET.get("district")
+    course = request.GET.get("course")
+
+    if district:
+        outcomes = outcomes.filter(trainee__district=district)
+
+    if course:
+        outcomes = outcomes.filter(training__course_id=course)
+
+    completed = Training.objects.filter(status="Completed")
+
+    retained = RetentionRecord.objects.filter(
+        still_employed=True
+    ).count()
+
+    retention_total = RetentionRecord.objects.count()
+
+
+    placement = outcomes.filter(status="Employed").count()
+
+    wage_avg = Employment.objects.filter(
+        status="Employed",
+        salary__isnull=False
+    ).aggregate(
+        avg=Avg("salary")
+    )["avg"] or 0
+
+    common_gaps = (
+        TrainingRelevance.objects
+        .exclude(missing_skills="")
+        .values("missing_skills")
+        .annotate(total=Count("id"))
+        .order_by("-total")[:5]
+    )
+
+    return render(request, "analytics.html", {
+        "course_data": list(
+            completed
+            .values("course__name")
+            .annotate(total=Count("id"))
+            .order_by("course__name")
+        ),
+
+        "provider_data": list(
+            completed
+            .values("provider__name")
+            .annotate(total=Count("id"))
+            .order_by("provider__name")
+        ),
+
+        "employment_data": list(
+            outcomes
+            .values("status")
+            .annotate(total=Count("id"))
+        ),
+
+        "district_data": list(
+            outcomes
+            .values("trainee__district")
+            .annotate(total=Count("id"))
+        ),
+
+        "placement": placement,
+        "outcomes_total": outcomes.count(),
+        "average_wage": round(wage_avg),
+
+        "retention_rate": (
+            round(retained * 100 / retention_total)
+            if retention_total else 0
+        ),
+
+        "common_gaps": common_gaps,
+
+        "districts": (
+            Trainee.objects
+            .values_list("district", flat=True)
+            .distinct()
+            .order_by("district")
+        ),
+
+        "courses": Course.objects.all().order_by("name"),
+    })
+
+
+

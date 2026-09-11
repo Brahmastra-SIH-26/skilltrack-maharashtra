@@ -1,712 +1,440 @@
+
 {% extends 'base.html' %}
 
 {% block content %}
 
+<div class="top">
+    <div>
+        <h1>Record an outcome</h1>
+        <p class="sub">
+            Each submission becomes a dated history entry; it never replaces an earlier outcome.
+        </p>
+    </div>
+</div>
+
+
 <div class="card">
 
-    <h1>My Employment Information</h1>
-
-    <form method="post">
+    <form method="post" enctype="multipart/form-data">
 
         {% csrf_token %}
 
-        <!-- =====================================
-             EMPLOYMENT STATUS
-        ====================================== -->
-
-        <div class="form-group">
-
-            <label for="{{ form.status.id_for_label }}">
-                Employment Status
-            </label>
-
-            {{ form.status }}
-
-            {% if form.status.errors %}
-                <div class="error">
-                    {{ form.status.errors }}
-                </div>
-            {% endif %}
-
-        </div>
+        {{ form.non_field_errors }}
 
 
-        <!-- =====================================
-             EMPLOYED SECTION
-        ====================================== -->
+        {% for field in form %}
 
-        <div id="employed-section">
+            <div
+                class="form-field"
+                data-field-name="{{ field.name }}"
+            >
 
-            <h3>Employment Details</h3>
-
-            <!-- Employer -->
-
-            <div class="form-group">
-
-                <label for="{{ form.employer_name.id_for_label }}">
-                    Employer Name
+                <label for="{{ field.id_for_label }}">
+                    {{ field.label }}
                 </label>
 
-                {{ form.employer_name }}
+                {{ field }}
 
-                {% if form.employer_name.errors %}
-                    <div class="error">
-                        {{ form.employer_name.errors }}
-                    </div>
+                {% if field.help_text %}
+                    <small>{{ field.help_text }}</small>
                 {% endif %}
+
+                {% for error in field.errors %}
+                    <p style="color:#b42318;">
+                        {{ error }}
+                    </p>
+                {% endfor %}
 
             </div>
 
+        {% endfor %}
 
-            <!-- Job Role -->
 
-            <div class="form-group">
-
-                <label for="{{ form.job_role.id_for_label }}">
-                    Job Role
-                </label>
-
-                {{ form.job_role }}
-
-                {% if form.job_role.errors %}
-                    <div class="error">
-                        {{ form.job_role.errors }}
-                    </div>
-                {% endif %}
-
-            </div>
-
-
-            <!-- Employment Type -->
-
-            <div class="form-group">
-
-                <label for="{{ form.employment_type.id_for_label }}">
-                    Employment Type
-                </label>
-
-                {{ form.employment_type }}
-
-                {% if form.employment_type.errors %}
-                    <div class="error">
-                        {{ form.employment_type.errors }}
-                    </div>
-                {% endif %}
-
-            </div>
-
-
-            <!-- Salary -->
-
-            <div class="form-group">
-
-                <label for="{{ form.salary.id_for_label }}">
-                    Salary
-                </label>
-
-                {{ form.salary }}
-
-                {% if form.salary.errors %}
-                    <div class="error">
-                        {{ form.salary.errors }}
-                    </div>
-                {% endif %}
-
-            </div>
-
-
-            <!-- Employment Date -->
-
-            <div class="form-group">
-
-                <label for="{{ form.employment_date.id_for_label }}">
-                    Employment Date
-                </label>
-
-                {{ form.employment_date }}
-
-                {% if form.employment_date.errors %}
-                    <div class="error">
-                        {{ form.employment_date.errors }}
-                    </div>
-                {% endif %}
-
-            </div>
-
-
-            <!-- =====================================
-                 UAN VERIFICATION
-            ====================================== -->
-
-            <div class="form-group">
-
-                <label for="{{ form.uan_demo.id_for_label }}">
-                    UAN
-                </label>
-
-                {{ form.uan_demo }}
-
-                <button
-                    type="button"
-                    id="verifyUANBtn"
-                    onclick="verifyUAN()"
-                >
-                    Verify UAN
-                </button>
-
-                <p id="uanMessage"></p>
-
-                {% if form.uan_demo.errors %}
-                    <div class="error">
-                        {{ form.uan_demo.errors }}
-                    </div>
-                {% endif %}
-
-            </div>
-
-        </div>
-
-
-        <!-- =====================================
-             SELF EMPLOYED SECTION
-        ====================================== -->
-
-        <div id="self-employed-section">
-
-            <h3>Self-Employment Details</h3>
-
-
-            <!-- Registration Number -->
-
-            <div class="form-group">
-
-                <label for="{{ form.registration_number.id_for_label }}">
-                    Registration Number
-                </label>
-
-                {{ form.registration_number }}
-
-                <button
-                    type="button"
-                    id="verifyRegistrationBtn"
-                    onclick="verifyRegistration()"
-                >
-                    Verify Registration
-                </button>
-
-                <p id="registrationMessage"></p>
-
-                {% if form.registration_number.errors %}
-                    <div class="error">
-                        {{ form.registration_number.errors }}
-                    </div>
-                {% endif %}
-
-            </div>
-
-
-            <!-- Business Name -->
-
-            <div class="form-group">
-
-                <label for="{{ form.business_name.id_for_label }}">
-                    Business Name
-                </label>
-
-                {{ form.business_name }}
-
-                {% if form.business_name.errors %}
-                    <div class="error">
-                        {{ form.business_name.errors }}
-                    </div>
-                {% endif %}
-
-            </div>
-
-
-            <!-- Business Type -->
-
-            <div class="form-group">
-
-                <label for="{{ form.business_type.id_for_label }}">
-                    Business Type
-                </label>
-
-                {{ form.business_type }}
-
-                {% if form.business_type.errors %}
-                    <div class="error">
-                        {{ form.business_type.errors }}
-                    </div>
-                {% endif %}
-
-            </div>
-
-
-            <!-- Work Description -->
-
-            <div class="form-group">
-
-                <label for="{{ form.work_description.id_for_label }}">
-                    Work / Business Description
-                </label>
-
-                {{ form.work_description }}
-
-                {% if form.work_description.errors %}
-                    <div class="error">
-                        {{ form.work_description.errors }}
-                    </div>
-                {% endif %}
-
-            </div>
-
-        </div>
-
-
-        <!-- =====================================
-             SAVE BUTTON
-        ====================================== -->
-
-        <div class="form-group">
-
-            <button type="submit">
-                Save Employment Information
-            </button>
-
-        </div>
+        <button type="submit">
+            Save outcome history
+        </button>
 
     </form>
 
 </div>
 
 
+{% if outcomes %}
+
+<div class="section-header">
+    <h2>My outcome history</h2>
+</div>
+
+
+<div class="table-wrap">
+
+    <table>
+
+        <thead>
+            <tr>
+                <th>Recorded</th>
+                <th>Status</th>
+                <th>Organisation / Activity</th>
+                <th>Wage</th>
+                <th>Verification</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            {% for item in outcomes %}
+
+            <tr>
+
+                <td>
+                    {{ item.recorded_on }}
+                </td>
+
+
+                <td>
+                    <span class="badge {{ item.status }}">
+                        {{ item.status }}
+                    </span>
+                </td>
+
+
+                <td>
+                    {% if item.employer_name %}
+                        {{ item.employer_name }}
+
+                    {% elif item.business_name %}
+                        {{ item.business_name }}
+
+                    {% elif item.work_description %}
+                        {{ item.work_description }}
+
+                    {% else %}
+                        —
+                    {% endif %}
+                </td>
+
+
+                <td>
+
+                    {% if item.salary %}
+
+                        ₹{{ item.salary }} / {{ item.wage_frequency }}
+
+                    {% elif item.stipend %}
+
+                        ₹{{ item.stipend }} stipend
+
+                    {% else %}
+
+                        —
+
+                    {% endif %}
+
+                </td>
+
+
+                <td>
+
+                    {% if item.verification_status == "Verified" %}
+
+                        <span
+                            class="badge"
+                            style="color:#067647;"
+                        >
+                            Verified
+                        </span>
+
+                    {% elif item.verification_status == "Pending" %}
+
+                        <span
+                            class="badge"
+                            style="color:#b54708;"
+                        >
+                            Pending
+                        </span>
+
+                    {% elif item.verification_status == "Rejected" %}
+
+                        <span
+                            class="badge"
+                            style="color:#b42318;"
+                        >
+                            Rejected
+                        </span>
+
+                    {% else %}
+
+                        <span class="badge">
+                            Not Verified
+                        </span>
+
+                    {% endif %}
+
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+        </tbody>
+
+    </table>
+
+</div>
+
+{% endif %}
+
+
 <script>
 
-/* =====================================================
-   EMPLOYMENT STATUS SHOW / HIDE
-===================================================== */
+document.addEventListener("DOMContentLoaded", function () {
 
-function updateEmploymentFields() {
+    const statusField =
+        document.querySelector('[name="status"]');
 
-    const statusElement =
-        document.getElementById("id_status");
-
-    const employedSection =
-        document.getElementById("employed-section");
-
-    const selfEmployedSection =
-        document.getElementById("self-employed-section");
+    const verificationField =
+        document.querySelector('[name="verification_method"]');
 
 
-    if (!statusElement) {
+    if (!statusField) {
         return;
     }
 
 
     /*
-       Hide both sections first
-    */
+     * Get the complete wrapper around a Django form field.
+     */
+    function getField(name) {
 
-    employedSection.style.display = "none";
-
-    selfEmployedSection.style.display = "none";
-
-
-    /*
-       EMPLOYED
-    */
-
-    if (statusElement.value === "Employed") {
-
-        employedSection.style.display = "block";
+        return document.querySelector(
+            '[data-field-name="' + name + '"]'
+        );
 
     }
 
 
     /*
-       SELF EMPLOYED
-    */
-
-    else if (statusElement.value === "Self-Employed") {
-
-        selfEmployedSection.style.display = "block";
-
-    }
-
-}
-
-
-/* =====================================================
-   UAN VERIFICATION
-===================================================== */
-
-function verifyUAN() {
-
-    const uanInput =
-        document.getElementById("id_uan_demo");
-
-    const message =
-        document.getElementById("uanMessage");
-
-
-    if (!uanInput) {
-        return;
-    }
-
-
-    const uan =
-        uanInput.value.trim();
+     * Fields shown when status = Employed
+     */
+    const employedFields = [
+        "employer_name",
+        "job_role",
+        "employment_type",
+        "salary",
+        "employment_date",
+        "verification_method"
+    ];
 
 
     /*
-       Empty UAN
-    */
+     * Fields shown when status = Self-Employed
+     */
+    const selfEmployedFields = [
+        "business_name",
+        "business_type",
+        "work_description",
+        "registration_number"
+    ];
 
-    if (!uan) {
 
-        message.innerHTML =
-            "Please enter UAN first.";
+    /*
+     * Fields shown for Apprenticeship
+     */
+    const apprenticeshipFields = [
+        "employer_name",
+        "employment_date",
+        "apprenticeship_expected_completion",
+        "apprenticeship_converted",
+        "stipend"
+    ];
 
-        return;
+
+    /*
+     * Fields that are common to multiple outcomes.
+     */
+    const commonFields = [
+        "sector",
+        "location",
+        "wage_frequency",
+        "outcome_notes"
+    ];
+
+
+    function hideField(name) {
+
+        const field = getField(name);
+
+        if (field) {
+            field.style.display = "none";
+        }
+
     }
 
 
-    /*
-       Disable button while checking
-    */
+    function showField(name) {
 
-    const button =
-        document.getElementById("verifyUANBtn");
+        const field = getField(name);
 
-    button.disabled = true;
+        if (field) {
+            field.style.display = "block";
+        }
 
-    button.innerText = "Verifying...";
-
-
-    /*
-       Send UAN to Django
-    */
-
-    const formData = new FormData();
-
-    formData.append("uan", uan);
+    }
 
 
-    fetch("{% url 'verify_uan' %}", {
+    function hideAllConditionalFields() {
 
-        method: "POST",
+        employedFields.forEach(hideField);
 
-        headers: {
-            "X-CSRFToken": "{{ csrf_token }}"
-        },
+        selfEmployedFields.forEach(hideField);
 
-        body: formData
+        apprenticeshipFields.forEach(hideField);
 
-    })
+        commonFields.forEach(hideField);
 
-    .then(response => response.json())
+        hideField("uan_demo");
+        hideField("employment_proof_type");
+        hideField("employment_proof");
 
-    .then(data => {
+    }
 
-        message.innerHTML = data.message;
+
+    function updateStatusFields() {
+
+        const status = statusField.value;
 
 
         /*
-           Verification successful
-        */
-
-        if (data.success) {
-
-            document.getElementById(
-                "id_employer_name"
-            ).value =
-                data.employer_name;
-
-
-            document.getElementById(
-                "id_job_role"
-            ).value =
-                data.job_role;
-
-
-            document.getElementById(
-                "id_employment_type"
-            ).value =
-                data.employment_type;
-
-
-            document.getElementById(
-                "id_salary"
-            ).value =
-                data.salary;
-
-
-            document.getElementById(
-                "id_employment_date"
-            ).value =
-                data.employment_date;
-
-        }
-
-    })
-
-    .catch(error => {
-
-        console.error(error);
-
-        message.innerHTML =
-            "Something went wrong during UAN verification.";
-
-    })
-
-    .finally(() => {
-
-        button.disabled = false;
-
-        button.innerText = "Verify UAN";
-
-    });
-
-}
-
-
-/* =====================================================
-   REGISTRATION VERIFICATION
-===================================================== */
-
-function verifyRegistration() {
-
-    const registrationInput =
-        document.getElementById(
-            "id_registration_number"
-        );
-
-    const message =
-        document.getElementById(
-            "registrationMessage"
-        );
-
-
-    if (!registrationInput) {
-        return;
-    }
-
-
-    const registrationNumber =
-        registrationInput.value.trim();
-
-
-    /*
-       Empty registration number
-    */
-
-    if (!registrationNumber) {
-
-        message.innerHTML =
-            "Please enter registration number first.";
-
-        return;
-    }
-
-
-    /*
-       Disable button
-    */
-
-    const button =
-        document.getElementById(
-            "verifyRegistrationBtn"
-        );
-
-    button.disabled = true;
-
-    button.innerText = "Verifying...";
-
-
-    /*
-       Send registration number to Django
-    */
-
-    const formData = new FormData();
-
-    formData.append(
-        "registration_number",
-        registrationNumber
-    );
-
-
-    fetch(
-        "{% url 'verify_registration' %}",
-        {
-
-            method: "POST",
-
-            headers: {
-                "X-CSRFToken": "{{ csrf_token }}"
-            },
-
-            body: formData
-
-        }
-    )
-
-    .then(response => response.json())
-
-    .then(data => {
-
-        message.innerHTML =
-            data.message;
+         * First hide everything conditional.
+         */
+        hideAllConditionalFields();
 
 
         /*
-           Verification successful
-        */
-
-        if (data.success) {
-
-            document.getElementById(
-                "id_business_name"
-            ).value =
-                data.business_name;
+         * Common fields are always available.
+         */
+        commonFields.forEach(showField);
 
 
-            document.getElementById(
-                "id_business_type"
-            ).value =
-                data.business_type;
+        /*
+         * EMPLOYED
+         */
+        if (status === "Employed") {
 
+            employedFields.forEach(showField);
 
-            document.getElementById(
-                "id_work_description"
-            ).value =
-                data.work_description;
+            updateVerificationFields();
 
         }
 
-    })
 
-    .catch(error => {
+        /*
+         * SELF-EMPLOYED
+         */
+        else if (status === "Self-Employed") {
 
-        console.error(error);
+            selfEmployedFields.forEach(showField);
 
-        message.innerHTML =
-            "Something went wrong during registration verification.";
-
-    })
-
-    .finally(() => {
-
-        button.disabled = false;
-
-        button.innerText =
-            "Verify Registration";
-
-    });
-
-}
+        }
 
 
-/* =====================================================
-   UAN CHANGE → MUST VERIFY AGAIN
-===================================================== */
+        /*
+         * APPRENTICESHIP
+         */
+        else if (status === "Apprenticeship") {
 
-function setupUANChangeDetection() {
+            apprenticeshipFields.forEach(showField);
 
-    const uanInput =
-        document.getElementById("id_uan_demo");
+        }
 
-
-    if (!uanInput) {
-        return;
     }
 
 
-    uanInput.addEventListener(
-        "input",
-        function () {
+    function updateVerificationFields() {
 
-            const message =
-                document.getElementById(
-                    "uanMessage"
-                );
+        /*
+         * If there is no verification field,
+         * stop safely.
+         */
+        if (!verificationField) {
+            return;
+        }
 
 
-            message.innerHTML =
-                "UAN changed. Please verify again.";
+        /*
+         * Hide both verification options first.
+         */
+        hideField("uan_demo");
+
+        hideField("employment_proof_type");
+
+        hideField("employment_proof");
+
+
+        /*
+         * Only show verification fields
+         * when the status is Employed.
+         */
+        if (statusField.value !== "Employed") {
+            return;
+        }
+
+
+        const method = verificationField.value;
+
+
+        /*
+         * UAN verification
+         */
+        if (method === "UAN") {
+
+            showField("uan_demo");
 
         }
+
+
+        /*
+         * Employment proof verification
+         */
+        else if (method === "Employment Proof") {
+
+            showField("employment_proof_type");
+
+            showField("employment_proof");
+
+        }
+
+    }
+
+
+    /*
+     * Status changed.
+     */
+    statusField.addEventListener(
+        "change",
+        updateStatusFields
     );
 
-}
 
+    /*
+     * Verification method changed.
+     */
+    if (verificationField) {
 
-/* =====================================================
-   REGISTRATION NUMBER CHANGE → VERIFY AGAIN
-===================================================== */
-
-function setupRegistrationChangeDetection() {
-
-    const registrationInput =
-        document.getElementById(
-            "id_registration_number"
+        verificationField.addEventListener(
+            "change",
+            updateVerificationFields
         );
 
-
-    if (!registrationInput) {
-        return;
     }
 
 
-    registrationInput.addEventListener(
-        "input",
-        function () {
+    /*
+     * Initial page load.
+     */
+    updateStatusFields();
 
-            const message =
-                document.getElementById(
-                    "registrationMessage"
-                );
-
-
-            message.innerHTML =
-                "Registration number changed. Please verify again.";
-
-        }
-    );
-
-}
-
-
-/* =====================================================
-   PAGE LOAD
-===================================================== */
-
-document.addEventListener(
-    "DOMContentLoaded",
-    function () {
-
-        const statusElement =
-            document.getElementById("id_status");
-
-
-        if (statusElement) {
-
-            statusElement.addEventListener(
-                "change",
-                updateEmploymentFields
-            );
-
-        }
-
-
-        updateEmploymentFields();
-
-        setupUANChangeDetection();
-
-        setupRegistrationChangeDetection();
-
-    }
-);
+});
 
 </script>
 

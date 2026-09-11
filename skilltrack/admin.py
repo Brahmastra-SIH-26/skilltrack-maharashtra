@@ -11,6 +11,10 @@ from .models import (
     Employment,
     FollowUp,
     Notification,
+    WageRecord,
+    TrainingRelevance,
+    RetentionRecord,
+    OccupationSkill,
 )
 admin.site.register(TrainerRegistration)
 
@@ -23,3 +27,7 @@ admin.site.register(Training)
 admin.site.register(Employment)
 admin.site.register(FollowUp)
 admin.site.register(Notification)
+admin.site.register(WageRecord)
+admin.site.register(TrainingRelevance)
+admin.site.register(RetentionRecord)
+admin.site.register(OccupationSkill)

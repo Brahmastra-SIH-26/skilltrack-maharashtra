@@ -1,1 +1,487 @@
-{% extends 'base.html' %}{% block content %}<div class="top"><div><h1>{{ trainee.name }}</h1><p class="sub">{{ trainee.beneficiary_id }} · <span class="badge {{ trainee.status }}">{{ trainee.status }}</span></p></div><a class="btn secondary" href="{% url 'trainee_update' trainee.id %}">Edit</a></div><div class="card"><p><b>District:</b> {{ trainee.district }}</p><p><b>Phone:</b> {{ trainee.phone }} · <b>Email:</b> {{ trainee.email|default:'—' }}</p><p><b>Qualification:</b> {{ trainee.qualification }} · <b>Gender:</b> {{ trainee.gender }}</p>{% if trainee.status == 'Pending' %}<form class="inline" method="post" action="{% url 'verify_trainee' trainee.id %}">{% csrf_token %}<button>Verify & create account</button></form> <form class="inline" method="post" action="{% url 'reject_trainee' trainee.id %}">{% csrf_token %}<button class="btn danger">Reject</button></form>{% endif %}</div>{% endblock %}
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="top">
+
+    <div>
+        <h1>{{ trainee.name }} · Trainee 360°</h1>
+
+        <p class="sub">
+            {{ trainee.beneficiary_id }}
+            · {{ trainee.district }}
+            ·
+            <span class="badge {{ trainee.status }}">
+                {{ trainee.status }}
+            </span>
+        </p>
+    </div>
+
+    <div style="display:flex; gap:10px;">
+
+        {% if trainee.status == "Pending" %}
+
+        <form method="post" action="{% url 'verify_trainee' trainee.id %}">
+            {% csrf_token %}
+
+            <button
+                type="submit"
+                style="
+                    background:#067647;
+                    color:white;
+                    border:none;
+                    padding:10px 18px;
+                    border-radius:8px;
+                    cursor:pointer;
+                    font-weight:600;
+                "
+            >
+                ✓ Verify Trainee
+            </button>
+
+        </form>
+
+        <form method="post" action="{% url 'reject_trainee' trainee.id %}">
+            {% csrf_token %}
+
+            <button
+                type="submit"
+                style="
+                    background:#b42318;
+                    color:white;
+                    border:none;
+                    padding:10px 18px;
+                    border-radius:8px;
+                    cursor:pointer;
+                    font-weight:600;
+                "
+            >
+                ✕ Reject
+            </button>
+
+        </form>
+
+        {% endif %}
+
+        <a
+            class="btn secondary"
+            href="{% url 'outcome_support' trainee.id %}"
+        >
+            Record follow-up evidence
+        </a>
+
+    </div>
+
+</div>
+
+
+<!-- ========================= -->
+<!-- METRICS -->
+<!-- ========================= -->
+
+<div class="grid">
+
+    <div class="card metric stat-blue">
+
+        <span>Placement prototype</span>
+
+        <b>{{ risk.probability }}%</b>
+
+        <small>
+            {{ risk.risk }} risk
+            ·
+            {{ risk.factors|join:', ' }}
+        </small>
+
+    </div>
+
+
+    <div class="card metric stat-green">
+
+        <span>Skill-gap action</span>
+
+        <b>{{ skill_gaps|length }}</b>
+
+        <small>
+
+            {% if skill_gaps %}
+
+                Remedial:
+                {{ skill_gaps|join:', ' }}
+
+            {% else %}
+
+                Map occupation skills to enable analysis
+
+            {% endif %}
+
+        </small>
+
+    </div>
+
+
+    <div class="card metric stat-purple">
+
+        <span>Recommended action</span>
+
+        <small>
+            {{ risk.action }}
+        </small>
+
+    </div>
+
+</div>
+
+
+<!-- ========================= -->
+<!-- JOURNEY TIMELINE -->
+<!-- ========================= -->
+
+<div class="section-header">
+
+    <h2>Journey timeline</h2>
+
+</div>
+
+<div class="card">
+
+    <p>
+        <b>Registration</b>
+        —
+        {{ trainee.registration_date }}
+
+        ·
+
+        <b>Verification</b>
+        —
+        {{ trainee.status }}
+    </p>
+
+
+    {% for training in trainings %}
+
+        <p>
+
+            <b>Training</b>
+            —
+            {{ training.course.name }}
+
+            ({{ training.start_date }}
+            to
+            {{ training.end_date }})
+
+            ·
+            {{ training.status }}
+
+            ·
+            {{ training.completion_percentage }}%
+
+        </p>
+
+    {% endfor %}
+
+
+    {% for item in outcomes %}
+
+        <p>
+
+            <b>{{ item.recorded_on }}</b>
+            —
+            {{ item.status }}
+
+            {% if item.employer_name %}
+
+                : {{ item.employer_name }}
+
+            {% elif item.business_name %}
+
+                : {{ item.business_name }}
+
+            {% elif item.work_description %}
+
+                : {{ item.work_description }}
+
+            {% endif %}
+
+        </p>
+
+    {% endfor %}
+
+
+    {% for followup in followups %}
+
+        <p>
+
+            <b>{{ followup.followup_type }}</b>
+            follow-up
+            —
+            {{ followup.date }}
+
+            ·
+
+            {% if followup.completed %}
+
+                completed
+
+            {% else %}
+
+                scheduled
+
+            {% endif %}
+
+        </p>
+
+    {% endfor %}
+
+</div>
+
+
+<!-- ========================= -->
+<!-- TRAINING HISTORY -->
+<!-- ========================= -->
+
+<div class="section-header">
+
+    <h2>Training history</h2>
+
+</div>
+
+<div class="table-wrap">
+
+    <table>
+
+        <tr>
+
+            <th>Course</th>
+            <th>Provider / Trainer</th>
+            <th>Dates</th>
+            <th>Status</th>
+
+        </tr>
+
+
+        {% for training in trainings %}
+
+        <tr>
+
+            <td>
+
+                {{ training.course.name }}
+
+                <br>
+
+                <small>
+                    {{ training.course.sector }}
+                </small>
+
+            </td>
+
+
+            <td>
+
+                {{ training.provider.name }}
+
+                <br>
+
+                <small>
+                    {{ training.trainer|default:'—' }}
+                </small>
+
+            </td>
+
+
+            <td>
+
+                {{ training.start_date }}
+                –
+                {{ training.end_date }}
+
+            </td>
+
+
+            <td>
+
+                {{ training.status }}
+
+            </td>
+
+        </tr>
+
+
+        {% empty %}
+
+        <tr>
+
+            <td colspan="4">
+                No training history yet.
+            </td>
+
+        </tr>
+
+        {% endfor %}
+
+    </table>
+
+</div>
+
+
+<!-- ========================= -->
+<!-- EMPLOYMENT HISTORY -->
+<!-- ========================= -->
+
+<div class="section-header">
+
+    <h2>Outcome & wage history</h2>
+
+</div>
+
+<div class="table-wrap">
+
+    <table>
+
+        <tr>
+
+            <th>Date</th>
+            <th>Outcome</th>
+            <th>Work</th>
+            <th>Wage</th>
+            <th>Verification</th>
+
+        </tr>
+
+
+        {% for item in outcomes %}
+
+        <tr>
+
+            <td>
+                {{ item.recorded_on }}
+            </td>
+
+
+            <td>
+
+                <span class="badge {{ item.status }}">
+                    {{ item.status }}
+                </span>
+
+            </td>
+
+
+            <td>
+
+                {{ item.employer_name|default:item.business_name|default:item.work_description|default:'—' }}
+
+                {% if item.job_role %}
+
+                    <br>
+
+                    <small>
+                        {{ item.job_role }}
+                    </small>
+
+                {% endif %}
+
+            </td>
+
+
+            <td>
+
+                {% if item.salary %}
+
+                    ₹{{ item.salary }}
+
+                    {% if item.wage_frequency %}
+                        / {{ item.wage_frequency }}
+                    {% endif %}
+
+                {% elif item.stipend %}
+
+                    ₹{{ item.stipend }} stipend
+
+                {% else %}
+
+                    —
+
+                {% endif %}
+
+            </td>
+
+
+            <td>
+
+                {% if item.verification_status == "Verified" %}
+
+                    <span
+                        class="badge"
+                        style="
+                            background:#ecfdf3;
+                            color:#067647;
+                        "
+                    >
+                        ✓ Verified
+                    </span>
+
+
+                {% elif item.verification_status == "Pending" %}
+
+                    <span
+                        class="badge"
+                        style="
+                            background:#fffaeb;
+                            color:#b54708;
+                        "
+                    >
+                        Pending
+                    </span>
+
+
+                {% elif item.verification_status == "Rejected" %}
+
+                    <span
+                        class="badge"
+                        style="
+                            background:#fef3f2;
+                            color:#b42318;
+                        "
+                    >
+                        Rejected
+                    </span>
+
+
+                {% else %}
+
+                    <span
+                        class="badge"
+                        style="
+                            background:#f2f4f7;
+                            color:#475467;
+                        "
+                    >
+                        Not Verified
+                    </span>
+
+                {% endif %}
+
+            </td>
+
+        </tr>
+
+
+        {% empty %}
+
+        <tr>
+
+            <td colspan="5">
+                No outcomes recorded.
+            </td>
+
+        </tr>
+
+        {% endfor %}
+
+    </table>
+
+</div>
+
+{% endblock %}

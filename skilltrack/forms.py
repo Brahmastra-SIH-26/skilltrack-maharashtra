@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.models import User
-from .models import Course, Employment, FollowUp, Provider, Trainee, TrainerRegistration, TrainingBatch
+from .models import Course, Employment, FollowUp, Provider, Trainee, TrainerRegistration, TrainingBatch, TrainingRelevance, RetentionRecord
 
 
 class PortalForm(forms.ModelForm):
@@ -134,7 +134,7 @@ class TrainerRegistrationForm(PortalForm):
 class CourseForm(PortalForm):
     class Meta:
         model = Course
-        fields = ["name", "sector", "duration"]
+        fields = ["name", "sector", "duration", "skills_taught"]
 
 
 class TrainingBatchForm(PortalForm):
@@ -181,26 +181,64 @@ class FollowUpForm(PortalForm):
     class Meta:
         model = FollowUp
         fields = ["employment_status", "remarks", "completed"]
+
 class EmploymentForm(PortalForm):
     class Meta:
         model = Employment
+
         fields = [
             "status",
+
+
             "employer_name",
             "job_role",
             "employment_type",
             "salary",
             "employment_date",
+
+            # Employment verification
+            "verification_method",
             "uan_demo",
+            "employment_proof_type",
+            "employment_proof",
+
+            # Self-employment details
             "registration_number",
             "business_name",
             "business_type",
             "work_description",
+
+            # Common details
+            "sector",
+            "location",
+            "wage_frequency",
+
+            # Apprenticeship details
+            "apprenticeship_expected_completion",
+            "apprenticeship_converted",
+            "stipend",
+
+            # Additional information
+            "outcome_notes",
         ]
 
         widgets = {
             "employment_date": forms.DateInput(
-                attrs={"type": "date"}
+                attrs={
+                    "type": "date"
+                }
+            ),
+
+            "apprenticeship_expected_completion": forms.DateInput(
+                attrs={
+                    "type": "date"
+                }
+            ),
+
+            "employment_proof": forms.ClearableFileInput(
+                attrs={
+                    "accept": ".pdf,.jpg,.jpeg,.png"
+                }
             ),
         }
 
@@ -208,59 +246,100 @@ class EmploymentForm(PortalForm):
         cleaned_data = super().clean()
 
         status = cleaned_data.get("status")
+        verification_method = cleaned_data.get("verification_method")
+        uan = cleaned_data.get("uan_demo")
+        employment_proof = cleaned_data.get("employment_proof")
 
-        # -----------------------------
+        # ==========================================================
         # EMPLOYED
-        # -----------------------------
+        # ==========================================================
+
         if status == "Employed":
 
-            if not cleaned_data.get("uan_demo"):
+            # Employer is required
+            if not cleaned_data.get("employer_name"):
                 self.add_error(
-                    "uan_demo",
-                    "UAN is required for employed trainees."
+                    "employer_name",
+                    "Please provide the employer name."
                 )
 
-            # Clear self-employment data
-            cleaned_data["registration_number"] = ""
-            cleaned_data["business_name"] = ""
-            cleaned_data["business_type"] = ""
-            cleaned_data["work_description"] = ""
+            # Verification method is required
+            if not verification_method:
+                self.add_error(
+                    "verification_method",
+                    "Please select a verification method."
+                )
 
-        # -----------------------------
-        # SELF EMPLOYED
-        # -----------------------------
+            # ------------------------------
+            # UAN VERIFICATION
+            # ------------------------------
+
+            elif verification_method == "UAN":
+
+                if not uan:
+                    self.add_error(
+                        "uan_demo",
+                        "Please provide the UAN."
+                    )
+
+            # ------------------------------
+            # EMPLOYMENT PROOF
+            # ------------------------------
+
+            elif verification_method == "Employment Proof":
+
+                if not cleaned_data.get("employment_proof_type"):
+                    self.add_error(
+                        "employment_proof_type",
+                        "Please select the proof type."
+                    )
+
+                if not employment_proof:
+                    self.add_error(
+                        "employment_proof",
+                        "Please upload employment proof."
+                    )
+
+        # ==========================================================
+        # SELF-EMPLOYED
+        # ==========================================================
+
         elif status == "Self-Employed":
 
-            if not cleaned_data.get("registration_number"):
+            if not (
+                cleaned_data.get("business_name")
+                or cleaned_data.get("work_description")
+            ):
                 self.add_error(
-                    "registration_number",
-                    "Registration number is required for self-employed trainees."
+                    "business_name",
+                    "Please provide the business or activity."
                 )
 
-            # Clear employment/UAN data
-            cleaned_data["uan_demo"] = ""
-            cleaned_data["employer_name"] = ""
-            cleaned_data["job_role"] = ""
-            cleaned_data["employment_type"] = ""
-            cleaned_data["salary"] = 0
-            cleaned_data["employment_date"] = None
+        # ==========================================================
+        # APPRENTICESHIP
+        # ==========================================================
 
-        # -----------------------------
-        # SEEKING / UNEMPLOYED
-        # -----------------------------
-        else:
+        elif status == "Apprenticeship":
 
-            cleaned_data["uan_demo"] = ""
-
-            cleaned_data["employer_name"] = ""
-            cleaned_data["job_role"] = ""
-            cleaned_data["employment_type"] = ""
-            cleaned_data["salary"] = 0
-            cleaned_data["employment_date"] = None
-
-            cleaned_data["registration_number"] = ""
-            cleaned_data["business_name"] = ""
-            cleaned_data["business_type"] = ""
-            cleaned_data["work_description"] = ""
+            if not cleaned_data.get("employer_name"):
+                self.add_error(
+                    "employer_name",
+                    "Please provide the apprenticeship organisation."
+                )
 
         return cleaned_data
+
+
+
+
+class TrainingRelevanceForm(PortalForm):
+    class Meta:
+        model = TrainingRelevance
+        fields = ["rating", "skills_used", "skills_not_used", "missing_skills", "feedback"]
+
+
+class RetentionRecordForm(PortalForm):
+    class Meta:
+        model = RetentionRecord
+        fields = ["checked_on", "still_employed", "same_employer", "changed_occupation", "reason_for_leaving", "notes"]
+        widgets = {"checked_on": forms.DateInput(attrs={"type": "date"})}

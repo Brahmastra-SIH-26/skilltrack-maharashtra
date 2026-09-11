@@ -1,3 +1,4 @@
+from datetime import date
 from importlib.metadata import requires
 from typing import Required
 
@@ -48,6 +49,7 @@ class Course(models.Model):
     name = models.CharField(max_length=100)
     sector = models.CharField(max_length=100)
     duration = models.CharField(max_length=50)
+    skills_taught = models.TextField(blank=True, help_text="Comma-separated skills taught by this course.")
 
     def __str__(self):
         return self.name
@@ -79,21 +81,71 @@ class Training(models.Model):
         choices=STATUS_CHOICES,
         default="Pending"
     )
+    batch = models.ForeignKey("TrainingBatch", on_delete=models.SET_NULL, null=True, blank=True, related_name="training_records")
+    trainer = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="training_records")
+    certificate_number = models.CharField(max_length=80, blank=True)
 
     def __str__(self):
         return f"{self.trainee.name} - {self.course.name}"
 
 
 class Employment(models.Model):
-    STATUS_CHOICES = [("Employed", "Employed"), ("Seeking", "Seeking"), ("Unemployed", "Unemployed"),("Self-Employed", "Self-Employed"),]
-    trainee = models.OneToOneField(Trainee, on_delete=models.CASCADE)
-    uan_demo = models.CharField(max_length=30, blank=True)
+    STATUS_CHOICES = [
+        ("Employed", "Employed"),
+        ("Unemployed", "Unemployed"),
+        ("Self-Employed", "Self-employed"),
+        ("Apprenticeship", "Apprenticeship"),
+        ("Further Training", "Further training"),
+        ("Other", "Other"),
+        ("Seeking", "Seeking work"),
+    ]
+
+    VERIFICATION_CHOICES = [
+        ("Not Verified", "Not Verified"),
+        ("Pending", "Pending"),
+        ("Verified", "Verified"),
+        ("Rejected", "Rejected"),
+    ]
+
+    VERIFICATION_METHOD_CHOICES = [
+        ("UAN", "UAN"),
+        ("Employment Proof", "Employment Proof"),
+        ("Manual", "Manual Verification"),
+    ]
+
+    trainee = models.ForeignKey(
+        Trainee,
+        on_delete=models.CASCADE,
+        related_name="employment_records"
+    )
+
+    training = models.ForeignKey(
+        Training,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="employment_outcomes"
+    )
+
+    recorded_on = models.DateField(default=date.today)
+
+    # Optional UAN
+    uan_demo = models.CharField(
+        max_length=30,
+        blank=True
+    )
+
     employer_name = models.CharField(max_length=150, blank=True)
     job_role = models.CharField(max_length=100, blank=True)
     employment_type = models.CharField(max_length=50, blank=True)
     salary = models.IntegerField(default=0)
     employment_date = models.DateField(null=True, blank=True)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="Seeking")
+
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default="Seeking"
+    )
 
     registration_number = models.CharField(
         max_length=50,
@@ -115,10 +167,102 @@ class Employment(models.Model):
         blank=True
     )
 
+    sector = models.CharField(max_length=100, blank=True)
+    location = models.CharField(max_length=150, blank=True)
 
+    wage_frequency = models.CharField(
+        max_length=20,
+        choices=[
+            ("Monthly", "Monthly"),
+            ("Daily", "Daily"),
+            ("Annual", "Annual")
+        ],
+        default="Monthly"
+    )
+
+    # Existing verification status
+    verification_status = models.CharField(
+        max_length=20,
+        choices=VERIFICATION_CHOICES,
+        default="Not Verified"
+    )
+
+    # NEW: How employment was verified
+    verification_method = models.CharField(
+        max_length=30,
+        choices=VERIFICATION_METHOD_CHOICES,
+        blank=True
+    )
+
+    # NEW: Uploaded employment proof
+    employment_proof = models.FileField(
+        upload_to="employment_proofs/",
+        blank=True,
+        null=True
+    )
+
+    apprenticeship_expected_completion = models.DateField(
+        null=True,
+        blank=True
+    )
+
+    apprenticeship_converted = models.BooleanField(
+        null=True,
+        blank=True
+    )
+    employment_proof_type = models.CharField(
+        max_length=50,
+        blank=True
+    )
+
+    stipend = models.IntegerField(default=0)
+
+    outcome_notes = models.TextField(blank=True)
 
     def __str__(self):
         return f"{self.trainee.name} - {self.status}"
+
+class WageRecord(models.Model):
+    trainee = models.ForeignKey(Trainee, on_delete=models.CASCADE, related_name="wage_records")
+    employment = models.ForeignKey(Employment, on_delete=models.SET_NULL, null=True, blank=True, related_name="wage_records")
+    amount = models.PositiveIntegerField()
+    frequency = models.CharField(max_length=20, default="Monthly")
+    recorded_on = models.DateField()
+    source = models.CharField(max_length=30, default="Outcome")
+
+    class Meta:
+        ordering = ["recorded_on", "id"]
+
+
+class TrainingRelevance(models.Model):
+    trainee = models.ForeignKey(Trainee, on_delete=models.CASCADE, related_name="relevance_feedback")
+    training = models.ForeignKey(Training, on_delete=models.SET_NULL, null=True, blank=True, related_name="relevance_feedback")
+    rating = models.PositiveSmallIntegerField(choices=[(i, str(i)) for i in range(1, 6)])
+    skills_used = models.TextField(blank=True)
+    skills_not_used = models.TextField(blank=True)
+    missing_skills = models.TextField(blank=True)
+    feedback = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+
+class RetentionRecord(models.Model):
+    trainee = models.ForeignKey(Trainee, on_delete=models.CASCADE, related_name="retention_records")
+    employment = models.ForeignKey(Employment, on_delete=models.SET_NULL, null=True, blank=True, related_name="retention_records")
+    checked_on = models.DateField()
+    still_employed = models.BooleanField()
+    same_employer = models.BooleanField(null=True, blank=True)
+    changed_occupation = models.BooleanField(null=True, blank=True)
+    reason_for_leaving = models.CharField(max_length=80, blank=True, choices=[("", "---------"), ("Low salary", "Low salary"), ("Relocation", "Relocation"), ("Poor working conditions", "Poor working conditions"), ("Skill mismatch", "Skill mismatch"), ("Better opportunity", "Better opportunity"), ("Personal/family reason", "Personal/family reason"), ("Lack of growth", "Lack of growth"), ("Employer issue", "Employer issue"), ("Other", "Other")])
+    notes = models.TextField(blank=True)
+
+
+class OccupationSkill(models.Model):
+    occupation = models.CharField(max_length=100)
+    skill = models.CharField(max_length=100)
+    sector = models.CharField(max_length=100, blank=True)
+
+    class Meta:
+        constraints = [models.UniqueConstraint(fields=["occupation", "skill"], name="unique_occupation_skill")]
 
 
 

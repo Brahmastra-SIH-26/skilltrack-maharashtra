@@ -2238,6 +2238,7 @@ from .forms import (
     CourseForm,
     EmploymentForm,
     FollowUpForm,
+    ProviderRegistrationForm,
     RetentionRecordForm,
     TraineeForm,
     TrainerRegistrationForm,
@@ -2288,6 +2289,17 @@ def has_role(user, role):
     )
 
 
+def is_approved_trainer(user):
+    """Only an Authority-approved trainer may operate trainer workflows."""
+    return (
+        user.is_authenticated
+        and (
+            user.is_staff
+            or TrainerRegistration.objects.filter(user=user, status="Verified").exists()
+        )
+    )
+
+
 def authority_required(view):
     return user_passes_test(
         lambda user: has_role(user, "Authority")
@@ -2296,7 +2308,7 @@ def authority_required(view):
 
 def trainer_required(view):
     return user_passes_test(
-        lambda user: has_role(user, "Trainer")
+        lambda user: has_role(user, "Trainer") and is_approved_trainer(user)
     )(view)
 
 
@@ -2560,7 +2572,7 @@ def redirect_for_user(user):
     if user.is_staff or role == "Authority":
         return redirect("dashboard")
 
-    if role == "Trainer":
+    if role == "Trainer" and is_approved_trainer(user):
         return redirect("trainer_dashboard")
 
     if role == "Trainee":
@@ -2583,6 +2595,12 @@ def login_view(request):
         )
 
         if user:
+            if (
+                getattr(getattr(user, "userprofile", None), "role", None) == "Trainer"
+                and not is_approved_trainer(user)
+            ):
+                messages.error(request, "Your trainer registration is still pending Authority approval.")
+                return render(request, "login.html")
             login(request, user)
             return redirect_for_user(user)
 
@@ -2620,21 +2638,10 @@ def trainee_register(request):
             email = form.cleaned_data["email"]
             password = form.cleaned_data["password"]
 
-            last_trainee = (
-                Trainee.objects
-                .order_by("-id")
-                .first()
-            )
-
-            next_id = (
-                last_trainee.id + 1
-                if last_trainee
-                else 1
-            )
-
-            beneficiary_id = (
-                f"MH-2026-{next_id:06d}"
-            )
+            # Locking the sequence avoids duplicate beneficiary IDs when two
+            # registrations are submitted at the same time.
+            last_trainee = Trainee.objects.select_for_update().order_by("-id").first()
+            beneficiary_id = f"MH-2026-{(last_trainee.id + 1 if last_trainee else 1):06d}"
 
             user = User.objects.create_user(
                 username=beneficiary_id,
@@ -2690,19 +2697,13 @@ def trainer_register(request):
         email = form.cleaned_data["email"]
         password = form.cleaned_data["password"]
 
-        user = User.objects.create_user(
-            username=email,
-            email=email,
-            password=password,
-        )
-
-        trainer = form.save(
-            commit=False
-        )
-
-        trainer.status = "Pending"
-        trainer.user = user
-        trainer.save()
+        with transaction.atomic():
+            user = User.objects.create_user(username=email, email=email, password=password)
+            trainer = form.save(commit=False)
+            trainer.status = "Pending"
+            trainer.user = user
+            trainer.save()
+            UserProfile.objects.create(user=user, role="Trainer")
 
         messages.success(
             request,
@@ -2720,6 +2721,18 @@ def trainer_register(request):
             "form": form
         }
     )
+
+
+def provider_register(request):
+    """Public provider application; approval remains an Authority action."""
+    form = ProviderRegistrationForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        provider = form.save(commit=False)
+        provider.status = "Pending"
+        provider.save()
+        messages.success(request, "Provider registration submitted for Authority review.")
+        return redirect("login")
+    return render(request, "providers/provider_register.html", {"form": form})
 
 
 # ==========================================================
@@ -3119,6 +3132,8 @@ def verify_trainee(request, id):
         }
     )
 
+    notify(user, "Your trainee registration has been verified. You are now eligible for Authority-assigned training.", "Registration")
+
     messages.success(
         request,
         "Trainee verified successfully."
@@ -3151,6 +3166,9 @@ def reject_trainee(request, id):
     trainee.save(
         update_fields=["status"]
     )
+
+    if trainee.user_id:
+        notify(trainee.user, "Your trainee registration was rejected. Please contact the Authority for assistance.", "Registration")
 
     messages.success(
         request,
@@ -3244,6 +3262,8 @@ def verify_trainer(request, id):
         }
     )
 
+    notify(user, "Your trainer registration has been approved. You can now access your assigned batches.", "Registration")
+
     messages.success(
         request,
         "Trainer verified successfully."
@@ -3270,6 +3290,9 @@ def reject_trainer(request, id):
     trainer.save(
         update_fields=["status"]
     )
+
+    if trainer.user_id:
+        notify(trainer.user, "Your trainer registration was rejected. Please contact the Authority for assistance.", "Registration")
 
     messages.success(
         request,
@@ -3497,6 +3520,10 @@ def batch_assign_trainees(request, id):
         .order_by("name")
     )
 
+    if batch.status == "Completed":
+        messages.error(request, "Completed batches cannot be changed.")
+        return redirect("batch_list")
+
     if request.method == "POST":
 
         selected = list(
@@ -3522,7 +3549,16 @@ def batch_assign_trainees(request, id):
 
         else:
 
+            previous_ids = set(batch.trainees.values_list("id", flat=True))
             batch.trainees.set(selected)
+
+            for trainee in selected:
+                if trainee.id not in previous_ids and trainee.user_id:
+                    notify(
+                        trainee.user,
+                        f"You have been assigned by the Authority to the {batch.name} training batch.",
+                        "Training Assignment",
+                    )
 
             messages.success(
                 request,
@@ -3855,6 +3891,21 @@ def trainer_complete_batch(request, id):
     )
 
     if batch.status != "Completed":
+        assigned_trainees = list(batch.trainees.all())
+        records = {
+            record.trainee_id: record
+            for record in Training.objects.filter(batch=batch)
+        }
+        incomplete = [
+            trainee for trainee in assigned_trainees
+            if trainee.id not in records or records[trainee.id].completion_percentage < 100
+        ]
+        if not assigned_trainees or incomplete:
+            messages.error(
+                request,
+                "A batch can be completed only after every assigned trainee has a training record at 100% progress.",
+            )
+            return redirect("trainer_batch_detail", id=id)
 
         batch.status = "Completed"
         batch.completion_date = date.today()
@@ -4792,7 +4843,7 @@ def verify_employment(
     )
 
     return redirect(
-        "trainee_detail",
+        "outcome_support",
         id=outcome.trainee_id
     )
 
@@ -4847,14 +4898,10 @@ def verify_uan(request):
             }
         )
 
-    employment, _ = (
-        Employment.objects
-        .get_or_create(
-            trainee=profile.trainee,
-            defaults={
-                "status": "Seeking"
-            }
-        )
+    employment_id = request.POST.get("employment_id")
+    employment = (
+        get_object_or_404(Employment, id=employment_id, trainee=profile.trainee)
+        if employment_id else None
     )
 
     demo_data = {
@@ -5006,6 +5053,21 @@ def verify_uan(request):
     if uan in demo_data:
 
         data = demo_data[uan]
+        if employment is None:
+            employment = Employment.objects.create(
+                trainee=profile.trainee, status="Employed",
+                verification_method="UAN", verification_status="Verified",
+                uan_demo=uan, uan_verified_on=timezone.now(), **data,
+            )
+        else:
+            for field, value in data.items():
+                setattr(employment, field, value)
+            employment.status = "Employed"
+            employment.verification_method = "UAN"
+            employment.verification_status = "Verified"
+            employment.uan_demo = uan
+            employment.uan_verified_on = timezone.now()
+            employment.save()
 
         UANVerification.objects.update_or_create(
             employment=employment,
@@ -5026,9 +5088,13 @@ def verify_uan(request):
                     "✓ UAN Verified — "
                     "Employment record found.",
                 "uan": uan,
+                "employment_id": employment.id,
                 **data,
             }
         )
+
+    if employment is None:
+        employment = Employment.objects.create(trainee=profile.trainee, status="Seeking")
 
     UANVerification.objects.update_or_create(
         employment=employment,

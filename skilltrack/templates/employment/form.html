@@ -17,6 +17,7 @@
     <form method="post" enctype="multipart/form-data">
 
         {% csrf_token %}
+        <input type="hidden" name="edit_id" value="{% if employment %}{{ employment.id }}{% endif %}">
 
         {{ form.non_field_errors }}
 
@@ -535,8 +536,10 @@ document.addEventListener("DOMContentLoaded", function () {
                         },
 
                         body:
-                            "uan=" +
-                            encodeURIComponent(uan)
+                            "uan=" + encodeURIComponent(uan) +
+                            "&employment_id=" + encodeURIComponent(
+                                (document.querySelector('[name="edit_id"]') || {}).value || ""
+                            )
                     }
                 )
 
@@ -608,6 +611,11 @@ document.addEventListener("DOMContentLoaded", function () {
                      */
                     const employment =
                         data;
+
+                    const employmentIdField = document.querySelector('[name="edit_id"]');
+                    if (employmentIdField && employment.employment_id) {
+                        employmentIdField.value = employment.employment_id;
+                    }
 
 
                         /*

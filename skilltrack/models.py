@@ -60,6 +60,7 @@ class Provider(models.Model):
     name = models.CharField(max_length=150)
     provider_type = models.CharField(max_length=50)
     district = models.CharField(max_length=50)
+    contact_email = models.EmailField(blank=True)
     rating = models.FloatField(default=0)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="Pending")
 

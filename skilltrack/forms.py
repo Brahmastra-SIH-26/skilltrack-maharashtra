@@ -63,6 +63,17 @@ class TraineeForm(PortalForm):
 
         return cleaned_data
 
+    def clean_email(self):
+        email = self.cleaned_data["email"].strip().lower()
+        # An email address identifies one portal account.  This also prevents a
+        # later verification from attaching the wrong account to a trainee.
+        users = User.objects.filter(email__iexact=email)
+        if getattr(self.instance, "user_id", None):
+            users = users.exclude(pk=self.instance.user_id)
+        if email and users.exists():
+            raise forms.ValidationError("An account with this email already exists.")
+        return email
+
 
 from django import forms
 from django.contrib.auth.password_validation import validate_password
@@ -110,7 +121,7 @@ class TrainerRegistrationForm(PortalForm):
     def clean_email(self):
         email = self.cleaned_data["email"].strip().lower()
 
-        if User.objects.filter(username=email).exists():
+        if User.objects.filter(username=email).exists() or TrainerRegistration.objects.filter(email__iexact=email).exclude(pk=self.instance.pk).exists():
             raise forms.ValidationError(
                 "An account with this email already exists."
             )
@@ -137,6 +148,18 @@ class CourseForm(PortalForm):
         fields = ["name", "sector", "duration", "skills_taught"]
 
 
+class ProviderRegistrationForm(PortalForm):
+    class Meta:
+        model = Provider
+        fields = ["name", "provider_type", "district", "contact_email"]
+
+    def clean_contact_email(self):
+        email = self.cleaned_data["contact_email"].strip().lower()
+        if email and Provider.objects.filter(contact_email__iexact=email).exclude(pk=self.instance.pk).exists():
+            raise forms.ValidationError("A provider registration with this email already exists.")
+        return email
+
+
 class TrainingBatchForm(PortalForm):
     class Meta:
         model = TrainingBatch
@@ -153,28 +176,6 @@ class TrainingBatchForm(PortalForm):
         if data.get("end_date") and data.get("start_date") and data["end_date"] < data["start_date"]:
             self.add_error("end_date", "End date cannot be before the start date.")
         return data
-
-
-
-
-    def clean(self):
-        cleaned_data = super().clean()
-
-        status = cleaned_data.get("status")
-        uan = cleaned_data.get("uan_demo")
-
-        # UAN is required only for employed trainees
-        if status == "Employed" and not uan:
-            self.add_error(
-                "uan_demo",
-                "UAN is required for employed trainees."
-            )
-
-        # Remove UAN for other employment statuses
-        if status != "Employed":
-            cleaned_data["uan_demo"] = ""
-
-        return cleaned_data
 
 
 class FollowUpForm(PortalForm):

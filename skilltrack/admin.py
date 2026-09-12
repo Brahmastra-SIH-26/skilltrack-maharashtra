@@ -15,6 +15,12 @@ from .models import (
     TrainingRelevance,
     RetentionRecord,
     OccupationSkill,
+    TrainingBatch,
+    UserProfile,
+    TrainingRegistrationRequest,
+    UANVerification,
+    SelfEmploymentVerification,
+    TrainingPerformance,
 )
 admin.site.register(TrainerRegistration)
 
@@ -31,3 +37,9 @@ admin.site.register(WageRecord)
 admin.site.register(TrainingRelevance)
 admin.site.register(RetentionRecord)
 admin.site.register(OccupationSkill)
+admin.site.register(TrainingBatch)
+admin.site.register(UserProfile)
+admin.site.register(TrainingRegistrationRequest)
+admin.site.register(UANVerification)
+admin.site.register(SelfEmploymentVerification)
+admin.site.register(TrainingPerformance)

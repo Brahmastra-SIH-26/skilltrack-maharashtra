@@ -6,6 +6,7 @@ urlpatterns = [
     path("logout/", views.logout_view, name="logout"),
     path("register-trainee/", views.trainee_register, name="trainee_register"),
     path("register-trainer/", views.trainer_register, name="trainer_register"),
+    path("register-provider/", views.provider_register, name="provider_register"),
     path("dashboard/", views.dashboard, name="dashboard"),
     path("trainees/", views.trainee_list, name="trainee_list"),
     path("trainees/add/", views.trainee_create, name="trainee_create"),
@@ -67,11 +68,6 @@ path(
     "employment/verify-uan/",
     views.verify_uan,
     name="verify_uan",
-),
-path(
-    "employment/verify-uan/",
-    views.verify_uan,
-    name="verify_uan"
 ),
 path(
     "employment/verify-registration/",

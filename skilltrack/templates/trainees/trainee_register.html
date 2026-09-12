@@ -1,3 +1,4 @@
+
 {% extends 'base.html' %}
 
 {% block title %}
@@ -7,461 +8,618 @@ Trainee Registration | SkillTrack Maharashtra
 {% block public_content %}
 
 <style>
-    .trainee-page {
-        min-height: calc(100vh - 80px);
-        background-color: #f7f5f0;
-        background-image: radial-gradient(
+
+/* =========================================================
+   TRAINEE REGISTRATION PAGE
+========================================================= */
+
+.trainee-page {
+    min-height: calc(100vh - 60px);
+    padding: 32px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f7f5f0;
+    background-image:
+        radial-gradient(
             rgba(20, 33, 61, 0.08) 1px,
             transparent 1px
         );
-        background-size: 22px 22px;
-        padding: 32px 16px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
+    background-size: 22px 22px;
+}
+
+
+/* =========================================================
+   MAIN CONTAINER
+========================================================= */
+
+.trainee-container {
+    width: 100%;
+    max-width: 1200px;
+    display: grid;
+    grid-template-columns: 31% 69%;
+    overflow: hidden;
+    border-radius: 28px;
+    background: #ffffff;
+    border: 1px solid rgba(20, 33, 61, 0.10);
+    box-shadow:
+        0 24px 70px rgba(20, 33, 61, 0.12);
+}
+
+
+/* =========================================================
+   LEFT SIDEBAR
+========================================================= */
+
+.trainee-sidebar {
+    position: relative;
+    overflow: hidden;
+    padding: 40px;
+    background: #14213d;
+    color: white;
+}
+
+.trainee-logo {
+    width: 56px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 16px;
+    background: #e06c3b;
+    color: white;
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    box-shadow:
+        0 12px 24px rgba(224, 108, 59, 0.25);
+}
+
+.sidebar-label {
+    margin-top: 36px;
+    color: #f7b49a;
+    font-size: 12px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+}
+
+.sidebar-title {
+    max-width: 330px;
+    margin-top: 12px;
+    color: white;
+    font-size: 43px;
+    line-height: 1.1;
+    font-weight: 800;
+}
+
+.sidebar-description {
+    max-width: 330px;
+    margin-top: 20px;
+    color: #b6c0d1;
+    font-size: 15px;
+    line-height: 1.8;
+}
+
+.steps {
+    margin-top: 55px;
+    display: grid;
+    gap: 18px;
+}
+
+.step {
+    display: flex;
+    align-items: center;
+    color: #d6ddeb;
+    font-size: 14px;
+}
+
+.step-number {
+    width: 30px;
+    height: 30px;
+    margin-right: 11px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #f7b49a;
+    font-size: 11px;
+    font-weight: 800;
+}
+
+
+/* =========================================================
+   RIGHT CONTENT
+========================================================= */
+
+.trainee-content {
+    min-width: 0;
+    padding: 55px 65px;
+    background: white;
+}
+
+.back-link {
+    display: inline-flex;
+    margin-bottom: 30px;
+    color: #667085;
+    text-decoration: none;
+    font-size: 14px;
+    transition: 0.2s ease;
+}
+
+.back-link:hover {
+    color: #bd4e27;
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.form-header {
+    max-width: 650px;
+    margin-bottom: 30px;
+}
+
+.form-header h1 {
+    margin: 0;
+    color: #14213d;
+    font-size: 44px;
+    line-height: 1.1;
+    font-weight: 800;
+}
+
+.form-header p {
+    margin-top: 12px;
+    color: #667085;
+    font-size: 15px;
+}
+
+
+/* =========================================================
+   AUTHORITY VERIFICATION BOX
+========================================================= */
+
+.verification-box {
+    width: 100%;
+    margin-bottom: 28px;
+    padding: 18px 20px;
+    border: 1px solid #bfdbfe;
+    border-radius: 14px;
+    background: #eff6ff;
+}
+
+.verification-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.verification-icon {
+    flex-shrink: 0;
+    font-size: 20px;
+    line-height: 1;
+}
+
+.verification-box h2 {
+    margin: 0;
+    color: #1e40af;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.verification-box p {
+    margin: 5px 0 0;
+    color: #1d4ed8;
+    font-size: 13px;
+    line-height: 1.7;
+}
+
+
+/* =========================================================
+   TRAINEE FORM
+========================================================= */
+
+.trainee-form {
+    width: 100%;
+}
+
+.trainee-form .form-grid {
+    width: 100%;
+    display: grid;
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+    gap: 20px;
+}
+
+.trainee-form .form-group {
+    min-width: 0;
+}
+
+
+/* =========================================================
+   FORM LABEL
+========================================================= */
+
+.trainee-form .form-label {
+    display: block;
+    margin: 0 0 8px;
+    color: #334155;
+    font-size: 13px;
+    line-height: 1.4;
+    font-weight: 700;
+}
+
+.trainee-form .required {
+    color: #dc2626;
+}
+
+
+/* =========================================================
+   FORM INPUTS
+========================================================= */
+
+.trainee-form .form-group input,
+.trainee-form .form-group select,
+.trainee-form .form-group textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 12px 14px;
+    border: 1px solid #cbd5e1;
+    border-radius: 9px;
+    outline: none;
+    background: #ffffff;
+    color: #14213d;
+    font-size: 14px;
+    font-family: inherit;
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.trainee-form .form-group input:focus,
+.trainee-form .form-group select:focus,
+.trainee-form .form-group textarea:focus {
+    border-color: #1769aa;
+    box-shadow:
+        0 0 0 3px rgba(23, 105, 170, 0.12);
+}
+
+.trainee-form .form-group textarea {
+    min-height: 110px;
+    resize: vertical;
+}
+
+.trainee-form .form-group input::placeholder,
+.trainee-form .form-group textarea::placeholder {
+    color: #94a3b8;
+}
+
+
+/* =========================================================
+   HELP TEXT
+========================================================= */
+
+.trainee-form .help-text {
+    display: block;
+    margin-top: 5px;
+    color: #64748b;
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+
+/* =========================================================
+   FIELD ERRORS
+========================================================= */
+
+.trainee-form .field-error {
+    margin-top: 6px;
+    padding: 7px 9px;
+    border-radius: 7px;
+    background: #fff4f2;
+    color: #b42318;
+    font-size: 12px;
+}
+
+.trainee-form .field-error ul {
+    margin: 0;
+    padding-left: 16px;
+}
+
+.trainee-form .field-error li {
+    margin: 2px 0;
+}
+
+
+/* =========================================================
+   NON-FIELD ERRORS
+========================================================= */
+
+.trainee-form .non-field-error {
+    margin-bottom: 20px;
+    padding: 12px 14px;
+    border: 1px solid #fecaca;
+    border-radius: 9px;
+    background: #fff4f2;
+    color: #b42318;
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   CONSENT BOX
+========================================================= */
+
+.trainee-form .consent-box {
+    width: 100%;
+    margin-top: 28px;
+    padding: 18px 20px;
+    box-sizing: border-box;
+    border: 1px solid #dbe3ef;
+    border-radius: 12px;
+    background: #f8fafc;
+    box-shadow:
+        0 2px 6px rgba(15, 23, 42, 0.03);
+}
+
+
+/* =========================================================
+   CONSENT CONTENT
+========================================================= */
+
+.trainee-form .consent-content {
+    width: 100%;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+
+/* =========================================================
+   CONSENT CHECKBOX
+========================================================= */
+
+.trainee-form .consent-content input[type="checkbox"] {
+    width: 18px !important;
+    min-width: 18px !important;
+    max-width: 18px !important;
+
+    height: 18px !important;
+    min-height: 18px !important;
+
+    margin: 3px 0 0 0 !important;
+    padding: 0 !important;
+
+    flex: 0 0 18px;
+
+    border: 1px solid #94a3b8 !important;
+    border-radius: 4px !important;
+
+    background: white !important;
+
+    appearance: auto !important;
+    -webkit-appearance: checkbox !important;
+
+    cursor: pointer;
+
+    accent-color: #1769aa;
+}
+
+
+/* =========================================================
+   CONSENT LABEL
+========================================================= */
+
+.trainee-form .consent-content label {
+    display: block !important;
+    width: auto !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    color: #172b4d !important;
+
+    font-size: 13px !important;
+    line-height: 1.65 !important;
+    font-weight: 600 !important;
+
+    cursor: pointer;
+}
+
+.trainee-form .consent-required {
+    color: #dc2626;
+    font-weight: 800;
+}
+
+
+/* =========================================================
+   CONSENT ERROR
+========================================================= */
+
+.trainee-form .consent-box .field-error {
+    margin-top: 9px;
+}
+
+
+/* =========================================================
+   SUBMIT BUTTON
+========================================================= */
+
+.trainee-form .submit-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 100%;
+
+    margin-top: 22px;
+    padding: 13px 18px;
+
+    border: none;
+    border-radius: 9px;
+
+    background: #1769aa;
+    color: white;
+
+    font-size: 14px;
+    font-weight: 800;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 8px 18px rgba(23, 105, 170, 0.22);
+
+    transition: 0.2s ease;
+}
+
+.trainee-form .submit-btn:hover {
+    background: #0f568f;
+
+    transform:
+        translateY(-1px);
+
+    box-shadow:
+        0 12px 22px rgba(23, 105, 170, 0.28);
+}
+
+.trainee-form .submit-btn:active {
+    transform:
+        translateY(0);
+}
+
+
+/* =========================================================
+   SECURITY NOTE
+========================================================= */
+
+.security-note {
+    margin-top: 22px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 8px;
+
+    color: #64748b;
+
+    font-size: 12px;
+    line-height: 1.5;
+
+    text-align: center;
+}
+
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (max-width: 1000px) {
 
     .trainee-container {
-        width: 100%;
-        max-width: 1200px;
-        min-height: 700px;
-        display: grid;
-        grid-template-columns: 31% 69%;
-        overflow: hidden;
-        border-radius: 28px;
-        background: #ffffff;
-        border: 1px solid rgba(20, 33, 61, 0.10);
-        box-shadow: 0 24px 70px rgba(20, 33, 61, 0.12);
+        grid-template-columns: 1fr;
     }
-
-    /* =========================
-       LEFT SIDEBAR
-    ========================= */
 
     .trainee-sidebar {
-        position: relative;
-        overflow: hidden;
-        background: #14213d;
-        color: white;
-        padding: 40px;
-    }
-
-    .trainee-logo {
-        width: 56px;
-        height: 56px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 16px;
-        background: #e06c3b;
-        color: white;
-        font-weight: 800;
-        letter-spacing: 1px;
-        box-shadow: 0 12px 24px rgba(224, 108, 59, 0.25);
-    }
-
-    .sidebar-label {
-        margin-top: 36px;
-        color: #f7b49a;
-        font-size: 12px;
-        font-weight: 800;
-        text-transform: uppercase;
-        letter-spacing: 1.5px;
+        padding: 32px;
     }
 
     .sidebar-title {
-        max-width: 330px;
-        margin-top: 12px;
-        color: white;
-        font-size: 43px;
-        line-height: 1.1;
-        font-weight: 800;
-    }
-
-    .sidebar-description {
-        max-width: 330px;
-        margin-top: 20px;
-        color: #b6c0d1;
-        line-height: 1.8;
-        font-size: 15px;
+        font-size: 36px;
     }
 
     .steps {
-        margin-top: 55px;
-        display: grid;
-        gap: 18px;
+        display: none;
     }
-
-    .step {
-        display: flex;
-        align-items: center;
-        color: #d6ddeb;
-        font-size: 14px;
-    }
-
-    .step-number {
-        width: 30px;
-        height: 30px;
-        margin-right: 11px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 50%;
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        color: #f7b49a;
-        font-size: 11px;
-        font-weight: 800;
-        flex-shrink: 0;
-    }
-
-
-    /* =========================
-       RIGHT CONTENT
-    ========================= */
 
     .trainee-content {
-        min-width: 0;
-        padding: 55px 65px;
-        background: white;
+        padding: 45px 35px;
+    }
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 650px) {
+
+    .trainee-page {
+        padding: 15px 10px;
     }
 
-    .back-link {
-        display: inline-flex;
-        margin-bottom: 30px;
-        color: #667085;
-        text-decoration: none;
+    .trainee-container {
+        border-radius: 20px;
+    }
+
+    .trainee-sidebar {
+        padding: 25px;
+    }
+
+    .trainee-logo {
+        width: 50px;
+        height: 50px;
+    }
+
+    .sidebar-label {
+        margin-top: 25px;
+    }
+
+    .sidebar-title {
+        font-size: 30px;
+    }
+
+    .sidebar-description {
         font-size: 14px;
-        transition: 0.2s ease;
     }
 
-    .back-link:hover {
-        color: #bd4e27;
+    .trainee-content {
+        padding: 30px 20px;
     }
 
     .form-header {
-        max-width: 650px;
-        margin-bottom: 30px;
+        margin-bottom: 25px;
     }
 
     .form-header h1 {
-        margin: 0;
-        color: #14213d;
-        font-size: 44px;
-        line-height: 1.1;
-        font-weight: 800;
+        font-size: 34px;
     }
 
     .form-header p {
-        margin-top: 12px;
-        color: #667085;
-        font-size: 15px;
+        line-height: 1.6;
     }
 
-
-    /* =========================
-       VERIFICATION BOX
-    ========================= */
+    .trainee-form .form-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
 
     .verification-box {
-        margin-bottom: 28px;
-        padding: 18px 20px;
-        border: 1px solid #bfdbfe;
-        border-radius: 14px;
-        background: #eff6ff;
+        padding: 15px;
     }
 
-    .verification-content {
-        display: flex;
-        align-items: flex-start;
-        gap: 12px;
-    }
-
-    .verification-icon {
-        font-size: 20px;
-        line-height: 1;
-        flex-shrink: 0;
-    }
-
-    .verification-box h2 {
-        margin: 0;
-        color: #1e40af;
-        font-size: 15px;
-        font-weight: 700;
-    }
-
-    .verification-box p {
-        margin: 5px 0 0;
-        color: #1d4ed8;
-        font-size: 13px;
-        line-height: 1.7;
-    }
-
-
-    /* =========================
-       DJANGO FORM
-    ========================= */
-
-    .form-grid {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 20px;
-    }
-
-    .form-group {
-        min-width: 0;
-    }
-
-    .form-label {
-        display: block;
-        margin-bottom: 8px;
-        color: #334155;
-        font-size: 13px;
-        font-weight: 600;
-    }
-
-    .required {
-        color: #dc2626;
-    }
-
-    .form-group input,
-    .form-group select,
-    .form-group textarea {
-        width: 100%;
-        box-sizing: border-box;
-        padding: 12px 14px;
-        border: 1px solid #cbd5e1;
-        border-radius: 9px;
-        outline: none;
-        background: white;
-        color: #14213d;
-        font-size: 14px;
-        font-family: inherit;
-        transition: 0.2s ease;
-    }
-
-    .form-group input:focus,
-    .form-group select:focus,
-    .form-group textarea:focus {
-        border-color: #2563eb;
-        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
-    }
-
-    .form-group textarea {
-        min-height: 110px;
-        resize: vertical;
-    }
-
-    .form-group input::placeholder,
-    .form-group textarea::placeholder {
-        color: #94a3b8;
-    }
-
-
-    /* =========================
-       FORM ERRORS
-    ========================= */
-
-    .field-error {
-        margin-top: 6px;
-        padding: 7px 9px;
-        border-radius: 7px;
-        background: #fff4f2;
-        color: #b42318;
-        font-size: 12px;
-    }
-
-    .field-error ul {
-        margin: 0;
-        padding-left: 16px;
-    }
-
-    .field-error li {
-        margin: 2px 0;
-    }
-
-    .non-field-error {
-        margin-bottom: 20px;
-        padding: 12px 14px;
-        border-radius: 9px;
-        background: #fff4f2;
-        border: 1px solid #fecaca;
-        color: #b42318;
-        font-size: 13px;
-    }
-
-
-    /* =========================
-       TRAINEE CONSENT
-    ========================= */
-
-    .consent-box {
-        margin-top: 28px;
-        padding: 16px 18px;
-        border: 1px solid #dbe3ef;
-        border-radius: 12px;
-        background: #f8fafc;
-    }
-
-    .consent-content {
-        display: flex;
-        align-items: flex-start;
-        gap: 11px;
-    }
-
-    .consent-content input[type="checkbox"] {
-        width: 18px;
-        height: 18px;
-        margin-top: 2px;
-        flex-shrink: 0;
-        cursor: pointer;
-        accent-color: #2563eb;
-    }
-
-    .consent-content label {
-        margin: 0;
-        color: #475569;
-        font-size: 13px;
-        line-height: 1.6;
-        cursor: pointer;
-    }
-
-
-    /* =========================
-       SUBMIT BUTTON
-    ========================= */
-
-    .submit-btn {
-        width: 100%;
+    .trainee-form .consent-box {
         margin-top: 22px;
-        padding: 13px 18px;
-        border: none;
-        border-radius: 9px;
-        background: #2563eb;
-        color: white;
-        font-size: 14px;
-        font-weight: 700;
-        cursor: pointer;
-        box-shadow: 0 8px 18px rgba(37, 99, 235, 0.22);
-        transition: 0.2s ease;
+        padding: 15px;
     }
 
-    .submit-btn:hover {
-        background: #1d4ed8;
-        transform: translateY(-1px);
-        box-shadow: 0 12px 22px rgba(37, 99, 235, 0.28);
+    .trainee-form .consent-content {
+        gap: 10px;
     }
 
-    .submit-btn:active {
-        transform: translateY(0);
+    .trainee-form .consent-content label {
+        font-size: 12px !important;
+        line-height: 1.6 !important;
     }
-
-
-    /* =========================
-       SECURITY NOTE
-    ========================= */
 
     .security-note {
-        margin-top: 22px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        color: #64748b;
-        font-size: 12px;
-        text-align: center;
+        align-items: flex-start;
     }
+}
 
-
-    /* =========================
-       RESPONSIVE
-    ========================= */
-
-    @media (max-width: 1000px) {
-
-        .trainee-container {
-            grid-template-columns: 1fr;
-        }
-
-        .trainee-sidebar {
-            padding: 32px;
-        }
-
-        .sidebar-title {
-            font-size: 36px;
-        }
-
-        .steps {
-            display: none;
-        }
-
-        .trainee-content {
-            padding: 45px 35px;
-        }
-    }
-
-
-    @media (max-width: 650px) {
-
-        .trainee-page {
-            padding: 15px 10px;
-        }
-
-        .trainee-container {
-            border-radius: 20px;
-            min-height: auto;
-        }
-
-        .trainee-sidebar {
-            padding: 25px;
-        }
-
-        .trainee-logo {
-            width: 50px;
-            height: 50px;
-        }
-
-        .sidebar-label {
-            margin-top: 25px;
-        }
-
-        .sidebar-title {
-            font-size: 30px;
-        }
-
-        .sidebar-description {
-            font-size: 14px;
-        }
-
-        .trainee-content {
-            padding: 30px 20px;
-        }
-
-        .form-header {
-            margin-bottom: 25px;
-        }
-
-        .form-header h1 {
-            font-size: 34px;
-        }
-
-        .form-header p {
-            line-height: 1.6;
-        }
-
-        .form-grid {
-            grid-template-columns: 1fr;
-            gap: 16px;
-        }
-
-        .verification-box {
-            padding: 15px;
-        }
-
-        .security-note {
-            align-items: flex-start;
-            line-height: 1.5;
-        }
-    }
 </style>
 
 
@@ -470,9 +628,9 @@ Trainee Registration | SkillTrack Maharashtra
     <div class="trainee-container">
 
 
-        <!-- =====================================
+        <!-- =================================================
              LEFT SIDEBAR
-        ====================================== -->
+        ================================================== -->
 
         <aside class="trainee-sidebar">
 
@@ -494,7 +652,6 @@ Trainee Registration | SkillTrack Maharashtra
                 to help you build a better career.
             </p>
 
-
             <div class="steps">
 
                 <div class="step">
@@ -507,7 +664,6 @@ Trainee Registration | SkillTrack Maharashtra
 
                 </div>
 
-
                 <div class="step">
 
                     <span class="step-number">
@@ -517,7 +673,6 @@ Trainee Registration | SkillTrack Maharashtra
                     Complete Authority verification
 
                 </div>
-
 
                 <div class="step">
 
@@ -534,14 +689,14 @@ Trainee Registration | SkillTrack Maharashtra
         </aside>
 
 
-        <!-- =====================================
+        <!-- =================================================
              RIGHT CONTENT
-        ====================================== -->
+        ================================================== -->
 
         <main class="trainee-content">
 
 
-            <!-- BACK TO HOME -->
+            <!-- BACK -->
 
             <a
                 href="{% url 'public_dashboard' %}"
@@ -567,9 +722,9 @@ Trainee Registration | SkillTrack Maharashtra
             </div>
 
 
-            <!-- =====================================
+            <!-- =================================================
                  AUTHORITY VERIFICATION NOTICE
-            ====================================== -->
+            ================================================== -->
 
             <div class="verification-box">
 
@@ -600,38 +755,45 @@ Trainee Registration | SkillTrack Maharashtra
             </div>
 
 
-            <!-- =====================================
-                 DJANGO REGISTRATION FORM
-            ====================================== -->
+            <!-- =================================================
+                 REGISTRATION FORM
+            ================================================== -->
 
             <form
                 method="post"
                 action="{% url 'trainee_register' %}"
+                class="trainee-form"
             >
 
                 {% csrf_token %}
 
 
-                <!-- NON FIELD ERRORS -->
+                <!-- =================================================
+                     NON-FIELD ERRORS
+                ================================================== -->
 
                 {% if form.non_field_errors %}
 
                     <div class="non-field-error">
-
                         {{ form.non_field_errors }}
-
                     </div>
 
                 {% endif %}
 
 
-                <!-- FORM FIELDS -->
+                <!-- =================================================
+                     FORM FIELDS
+
+                     IMPORTANT:
+                     consent_given is intentionally excluded
+                     because it is rendered manually below.
+                ================================================== -->
 
                 <div class="form-grid">
 
                     {% for field in form %}
 
-                        {% if field.name != "trainee_consent" %}
+                        {% if field.name != "consent_given" %}
 
                             <div class="form-group">
 
@@ -668,9 +830,7 @@ Trainee Registration | SkillTrack Maharashtra
                                 {% if field.errors %}
 
                                     <div class="field-error">
-
                                         {{ field.errors }}
-
                                     </div>
 
                                 {% endif %}
@@ -684,32 +844,41 @@ Trainee Registration | SkillTrack Maharashtra
                 </div>
 
 
-                <!-- =====================================
-                     TRAINEE CONSENT
-                ====================================== -->
+                <!-- =================================================
+                     CONSENT BOX
+
+                     IMPORTANT:
+                     consent_given is rendered ONLY here.
+                ================================================== -->
 
                 <div class="consent-box">
 
                     <div class="consent-content">
 
-                        {{ form.trainee_consent }}
+                        {{ form.consent_given }}
 
                         <label
-                            for="{{ form.trainee_consent.id_for_label }}"
+                            for="{{ form.consent_given.id_for_label }}"
                         >
+
                             I confirm that the information provided by me
                             is correct and I consent to the use of my
                             information for SkillTrack Maharashtra.
+
+                            <span class="consent-required">
+                                *
+                            </span>
+
                         </label>
 
                     </div>
 
 
-                    {% if form.trainee_consent.errors %}
+                    {% if form.consent_given.errors %}
 
                         <div class="field-error">
 
-                            {{ form.trainee_consent.errors }}
+                            {{ form.consent_given.errors }}
 
                         </div>
 
@@ -718,21 +887,25 @@ Trainee Registration | SkillTrack Maharashtra
                 </div>
 
 
-                <!-- =====================================
-                     SUBMIT
-                ====================================== -->
+                <!-- =================================================
+                     SUBMIT BUTTON
+                ================================================== -->
 
                 <button
                     type="submit"
                     class="submit-btn"
                 >
+
                     Submit Trainee Registration
+
                 </button>
 
             </form>
 
 
-            <!-- SECURITY NOTE -->
+            <!-- =================================================
+                 SECURITY NOTE
+            ================================================== -->
 
             <div class="security-note">
 
@@ -755,3 +928,4 @@ Trainee Registration | SkillTrack Maharashtra
 </div>
 
 {% endblock %}
+

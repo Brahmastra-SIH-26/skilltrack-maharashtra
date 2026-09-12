@@ -448,6 +448,70 @@ Trainer Registration | SkillTrack Maharashtra
             line-height: 1.5;
         }
     }
+    /* =========================
+   CONSENT CHECKBOX
+========================= */
+
+.consent-box {
+    grid-column: 1 / -1;
+    margin-top: 4px;
+    padding: 16px 18px;
+    border: 1px solid #dbe3ef;
+    border-radius: 12px;
+    background: #f8fafc;
+}
+
+.consent-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 11px;
+}
+
+.consent-content input[type="checkbox"] {
+    width: 18px !important;
+    min-width: 18px !important;
+    max-width: 18px !important;
+
+    height: 18px !important;
+    min-height: 18px !important;
+
+    margin: 3px 0 0 0 !important;
+    padding: 0 !important;
+
+    border: 1px solid #94a3b8 !important;
+    border-radius: 4px !important;
+
+    background: white !important;
+
+    appearance: auto !important;
+    -webkit-appearance: checkbox !important;
+
+    flex: 0 0 18px;
+    cursor: pointer;
+
+    accent-color: #2563eb;
+}
+
+.consent-content label {
+    display: block !important;
+    margin: 0 !important;
+    padding: 0 !important;
+
+    color: #334155;
+    font-size: 13px;
+    line-height: 1.6;
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+.consent-required {
+    color: #dc2626;
+}
+
+.consent-error {
+    margin-top: 8px;
+}
 </style>
 
 
@@ -617,57 +681,84 @@ Trainer Registration | SkillTrack Maharashtra
 
                 <!-- FORM FIELDS -->
 
-                <div class="form-grid">
+               <div class="form-grid">
 
-                    {% for field in form %}
+    {% for field in form %}
 
-                        <div class="form-group">
+        {% if field.name != "trainee_consent" %}
 
-                            <label
-                                for="{{ field.id_for_label }}"
-                                class="form-label"
-                            >
+            <div class="form-group">
 
-                                {{ field.label }}
+                <label
+                    for="{{ field.id_for_label }}"
+                    class="form-label"
+                >
 
-                                {% if field.field.required %}
+                    {{ field.label }}
 
-                                    <span class="required">
-                                        *
-                                    </span>
+                    {% if field.field.required %}
+                        <span class="required">
+                            *
+                        </span>
+                    {% endif %}
 
-                                {% endif %}
+                </label>
 
-                            </label>
+                {{ field }}
+
+                {% if field.help_text %}
+                    <small class="help-text">
+                        {{ field.help_text }}
+                    </small>
+                {% endif %}
+
+                {% if field.errors %}
+                    <div class="field-error">
+                        {{ field.errors }}
+                    </div>
+                {% endif %}
+
+            </div>
+
+        {% endif %}
+
+    {% endfor %}
 
 
-                            {{ field }}
+    <!-- CONSENT -->
+
+    <div class="consent-box">
+
+        <div class="consent-content">
+
+            {{ form.trainee_consent }}
+
+            <label for="{{ form.trainee_consent.id_for_label }}">
+
+                I consent to the collection and use of my information
+                for registration, training, employment tracking, and
+                verification purposes. I confirm that the information
+                provided by me is accurate.
+
+                <span class="consent-required">*</span>
+
+            </label>
+
+        </div>
 
 
-                            {% if field.help_text %}
+        {% if form.trainee_consent.errors %}
 
-                                <small class="help-text">
-                                    {{ field.help_text }}
-                                </small>
+            <div class="field-error consent-error">
+                {{ form.trainee_consent.errors }}
+            </div>
 
-                            {% endif %}
+        {% endif %}
 
+    </div>
 
-                            {% if field.errors %}
+</div>
 
-                                <div class="field-error">
-
-                                    {{ field.errors }}
-
-                                </div>
-
-                            {% endif %}
-
-                        </div>
-
-                    {% endfor %}
-
-                </div>
 
 
 

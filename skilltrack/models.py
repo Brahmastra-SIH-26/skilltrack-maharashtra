@@ -135,6 +135,11 @@ class Employment(models.Model):
         blank=True
     )
 
+    uan_verified_on = models.DateTimeField(
+        null=True,
+        blank=True
+    )
+
     employer_name = models.CharField(max_length=150, blank=True)
     job_role = models.CharField(max_length=100, blank=True)
     employment_type = models.CharField(max_length=50, blank=True)

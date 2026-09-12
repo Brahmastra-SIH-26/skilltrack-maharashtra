@@ -1,4 +1,3 @@
-
 {% extends 'base.html' %}
 
 {% block content %}
@@ -33,11 +32,45 @@
                     {{ field.label }}
                 </label>
 
-                {{ field }}
+
+                {% if field.name == "uan_demo" %}
+
+                    <div style="
+                        display:flex;
+                        gap:10px;
+                        align-items:center;
+                    ">
+
+                        {{ field }}
+
+                        <button
+                            type="button"
+                            id="verify-uan-btn"
+                        >
+                            Verify UAN
+                        </button>
+
+                    </div>
+
+                    <div
+                        id="uan-status"
+                        style="
+                            margin-top:8px;
+                            font-weight:600;
+                        "
+                    ></div>
+
+                {% else %}
+
+                    {{ field }}
+
+                {% endif %}
+
 
                 {% if field.help_text %}
                     <small>{{ field.help_text }}</small>
                 {% endif %}
+
 
                 {% for error in field.errors %}
                     <p style="color:#b42318;">
@@ -253,10 +286,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     /*
      * Fields common to all outcomes.
-     *
-     * IMPORTANT:
-     * wage_frequency is NOT here because it should
-     * NOT appear for Unemployed.
      */
     const commonFields = [
         "sector",
@@ -332,6 +361,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
             employedFields.forEach(showField);
 
+            showField("uan_demo");
+
             updateVerificationFields();
 
         }
@@ -359,8 +390,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
         /*
          * UNEMPLOYED
-         *
-         * wage_frequency remains hidden.
          */
         else if (status === "Unemployed") {
 
@@ -373,10 +402,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function updateVerificationFields() {
 
-        /*
-         * If there is no verification field,
-         * stop safely.
-         */
         if (!verificationField) {
             return;
         }
@@ -423,6 +448,295 @@ document.addEventListener("DOMContentLoaded", function () {
             showField("employment_proof");
 
         }
+
+    }
+
+
+    /*
+     * ==========================================
+     * VERIFY UAN
+     * ==========================================
+     */
+
+    const verifyUanButton =
+        document.getElementById("verify-uan-btn");
+
+    const uanField =
+        document.querySelector('[name="uan_demo"]');
+
+    const uanStatus =
+        document.getElementById("uan-status");
+
+
+    if (verifyUanButton && uanField) {
+
+        verifyUanButton.addEventListener(
+            "click",
+            function () {
+
+                const uan =
+                    uanField.value.trim();
+
+
+                /*
+                 * Check UAN entered.
+                 */
+                if (!uan) {
+
+                    uanStatus.textContent =
+                        "Please enter UAN first.";
+
+                    uanStatus.style.color =
+                        "#b42318";
+
+                    return;
+                }
+
+
+                /*
+                 * Button loading state.
+                 */
+                verifyUanButton.disabled = true;
+
+                verifyUanButton.textContent =
+                    "Verifying...";
+
+
+                uanStatus.textContent =
+                    "Verifying UAN...";
+
+                uanStatus.style.color =
+                    "#475467";
+
+
+                /*
+                 * Get CSRF token.
+                 */
+                const csrfToken =
+                    document.querySelector(
+                        '[name="csrfmiddlewaretoken"]'
+                    ).value;
+
+
+                /*
+                 * Call existing Django function.
+                 */
+                fetch(
+                    "{% url 'verify_uan' %}",
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type":
+                                "application/x-www-form-urlencoded",
+
+                            "X-CSRFToken":
+                                csrfToken
+                        },
+
+                        body:
+                            "uan=" +
+                            encodeURIComponent(uan)
+                    }
+                )
+
+                .then(function (response) {
+
+                    return response.text()
+                        .then(function (body) {
+
+                            let data;
+
+                            try {
+                                data = JSON.parse(body);
+                            } catch (error) {
+                                throw new Error(
+                                    "UAN verification returned HTTP " +
+                                    response.status +
+                                    " (" +
+                                    (response.headers.get(
+                                        "Content-Type"
+                                    ) || "unknown content type") +
+                                    ")."
+                                );
+                            }
+
+                            return {
+                                ok: response.ok,
+                                status: response.status,
+                                data: data
+                            };
+
+                        });
+
+                })
+
+                .then(function (result) {
+
+                    const data =
+                        result.data;
+
+
+                    /*
+                     * Verification failed.
+                     */
+                    if (!result.ok || !data.success) {
+
+                        uanStatus.textContent =
+                            data.message ||
+                            "UAN verification failed.";
+
+                        uanStatus.style.color =
+                            "#b42318";
+
+                        return;
+                    }
+
+
+                    /*
+                     * Verification successful.
+                     */
+                    uanStatus.textContent =
+                        "✓ UAN Verified Successfully";
+
+                    uanStatus.style.color =
+                        "#067647";
+
+
+                    /*
+                     * Fetch returned employment data.
+                     */
+                    const employment =
+                        data;
+
+
+                        /*
+                         * Employer
+                         */
+                        const employerField =
+                            document.querySelector(
+                                '[name="employer_name"]'
+                            );
+
+                        if (employerField) {
+                            employerField.value =
+                                employment.employer_name || "";
+                        }
+
+
+                        /*
+                         * Job Role
+                         */
+                        const jobRoleField =
+                            document.querySelector(
+                                '[name="job_role"]'
+                            );
+
+                        if (jobRoleField) {
+                            jobRoleField.value =
+                                employment.job_role || "";
+                        }
+
+
+                        /*
+                         * Employment Type
+                         */
+                        const employmentTypeField =
+                            document.querySelector(
+                                '[name="employment_type"]'
+                            );
+
+                        if (employmentTypeField) {
+                            employmentTypeField.value =
+                                employment.employment_type || "";
+                        }
+
+
+                        /*
+                         * Salary
+                         */
+                        const salaryField =
+                            document.querySelector(
+                                '[name="salary"]'
+                            );
+
+                        if (salaryField) {
+                            salaryField.value =
+                                employment.salary || "";
+                        }
+
+
+                        /*
+                         * Employment Date
+                         */
+                        const employmentDateField =
+                            document.querySelector(
+                                '[name="employment_date"]'
+                            );
+
+                        if (employmentDateField) {
+                            employmentDateField.value =
+                                employment.employment_date || "";
+                        }
+
+
+                        /*
+                         * Sector
+                         */
+                        const sectorField =
+                            document.querySelector(
+                                '[name="sector"]'
+                            );
+
+                        if (sectorField) {
+                            sectorField.value =
+                                employment.sector || "";
+                        }
+
+
+                        /*
+                         * Location
+                         */
+                        const locationField =
+                            document.querySelector(
+                                '[name="location"]'
+                            );
+
+                        if (locationField) {
+                            locationField.value =
+                                employment.location || "";
+                        }
+
+                })
+
+                .catch(function (error) {
+
+                    console.error(
+                        "UAN verification error:",
+                        error
+                    );
+
+                    uanStatus.textContent =
+                        error.message ||
+                        "Unable to verify UAN.";
+
+                    uanStatus.style.color =
+                        "#b42318";
+
+                })
+
+                .finally(function () {
+
+                    verifyUanButton.disabled =
+                        false;
+
+                    verifyUanButton.textContent =
+                        "Verify UAN";
+
+                });
+
+            }
+        );
 
     }
 

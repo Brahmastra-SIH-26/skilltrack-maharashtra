@@ -10,377 +10,607 @@ Login | SkillTrack Maharashtra
 
     .login-wrapper {
         min-height: 78vh;
-
         display: flex;
         align-items: center;
         justify-content: center;
-
-        padding: 30px 15px;
+        padding: 35px 15px;
     }
 
     .login-card {
         width: 100%;
-        max-width: 460px;
-
+        max-width: 480px;
         background: #ffffff;
-
-        border: 1px solid #e1e7ee;
-
+        border: 1px solid #e2e8f0;
         border-radius: 18px;
-
         padding: 35px;
-
-        box-shadow:
-            0 15px 45px rgba(16, 42, 67, 0.10);
+        box-shadow: 0 15px 45px rgba(15, 23, 42, 0.10);
     }
 
-    .login-brand {
-        text-align: center;
 
+    /* =========================
+       HEADER
+       ========================= */
+
+    .login-header {
+        text-align: center;
         margin-bottom: 28px;
     }
 
     .login-logo {
         width: 58px;
         height: 58px;
-
         margin: 0 auto 15px;
 
-        display: grid;
-        place-items: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
 
         border-radius: 15px;
 
-        background:
-            linear-gradient(
-                135deg,
-                #1769aa,
-                #2386c8
-            );
+        background: linear-gradient(
+            135deg,
+            #1e3a8a,
+            #2563eb
+        );
 
         color: white;
-
-        font-size: 20px;
+        font-size: 19px;
         font-weight: 800;
 
-        box-shadow:
-            0 8px 20px rgba(23, 105, 170, 0.22);
+        box-shadow: 0 8px 20px rgba(37, 99, 235, 0.22);
     }
 
-    .login-brand h1 {
+    .login-header h1 {
         margin: 0;
-
-        font-family: "Playfair Display", serif;
-
+        color: #0f172a;
         font-size: 27px;
-
-        color: #102a43;
-    }
-
-    .login-brand p {
-        margin: 7px 0 0;
-
-        color: #667085;
-
-        font-size: 12px;
-    }
-
-    .login-form label {
-        display: block;
-
-        margin: 16px 0 7px;
-
-        color: #172b4d;
-
-        font-size: 12px;
-
         font-weight: 800;
+    }
+
+    .login-header p {
+        margin: 8px 0 0;
+        color: #64748b;
+        font-size: 13px;
+        line-height: 1.5;
+    }
+
+
+    /* =========================
+       FORM
+       ========================= */
+
+    .login-form {
+        margin-top: 20px;
+    }
+
+    .form-group {
+        margin-bottom: 18px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 7px;
+
+        color: #334155;
+        font-size: 13px;
+        font-weight: 700;
     }
 
     .login-form input {
         width: 100%;
-
         padding: 12px 13px;
 
-        border: 1px solid #cbd5df;
-
+        border: 1px solid #cbd5e1;
         border-radius: 9px;
 
         background: #ffffff;
-
-        color: #172b4d;
+        color: #0f172a;
 
         font-size: 13px;
-
         outline: none;
 
         transition:
-            border-color .2s ease,
-            box-shadow .2s ease;
+            border-color 0.2s ease,
+            box-shadow 0.2s ease;
     }
 
     .login-form input:focus {
-        border-color: #1769aa;
+        border-color: #2563eb;
 
         box-shadow:
-            0 0 0 4px rgba(23, 105, 170, 0.10);
+            0 0 0 4px rgba(37, 99, 235, 0.10);
     }
+
+    .login-form input::placeholder {
+        color: #94a3b8;
+    }
+
+
+    /* =========================
+       LOGIN BUTTON
+       ========================= */
 
     .login-button {
         width: 100%;
 
-        margin-top: 22px;
+        margin-top: 5px;
 
         padding: 12px 16px;
 
         border: none;
-
         border-radius: 9px;
 
-        background:
-            linear-gradient(
-                135deg,
-                #1769aa,
-                #2386c8
-            );
+        background: linear-gradient(
+            135deg,
+            #1e3a8a,
+            #2563eb
+        );
 
-        color: #ffffff;
+        color: white;
 
         font-size: 13px;
-
         font-weight: 800;
 
         cursor: pointer;
 
         transition:
-            transform .2s ease,
-            box-shadow .2s ease;
+            transform 0.2s ease,
+            box-shadow 0.2s ease;
     }
 
     .login-button:hover {
         transform: translateY(-1px);
 
         box-shadow:
-            0 7px 18px rgba(23, 105, 170, 0.22);
+            0 8px 20px rgba(37, 99, 235, 0.22);
     }
 
-    .login-divider {
+
+    /* =========================
+       ERROR / MESSAGES
+       ========================= */
+
+    .messages {
+        margin-bottom: 18px;
+    }
+
+    .message {
+        padding: 11px 13px;
+
+        border-radius: 8px;
+
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+
+        color: #b91c1c;
+
+        font-size: 12px;
+    }
+
+    .form-errors {
+        margin-bottom: 15px;
+
+        padding: 11px 13px;
+
+        border-radius: 8px;
+
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+
+        color: #b91c1c;
+
+        font-size: 12px;
+    }
+
+
+    /* =========================
+       REGISTRATION SECTION
+       ========================= */
+
+    .registration-divider {
         display: flex;
-
         align-items: center;
-
         gap: 12px;
 
-        margin: 25px 0 18px;
+        margin: 28px 0 20px;
 
-        color: #98a2b3;
+        color: #94a3b8;
 
         font-size: 10px;
+        font-weight: 800;
 
         text-transform: uppercase;
-
         letter-spacing: 1px;
-
-        font-weight: 700;
     }
 
-    .login-divider::before,
-    .login-divider::after {
+    .registration-divider::before,
+    .registration-divider::after {
         content: "";
 
         flex: 1;
 
         height: 1px;
 
-        background: #e1e7ee;
+        background: #e2e8f0;
     }
 
-    .register-text {
+    .registration-heading {
         text-align: center;
+        margin-bottom: 15px;
+    }
 
-        margin: 0;
+    .registration-heading strong {
+        display: block;
 
-        color: #667085;
+        color: #334155;
+
+        font-size: 14px;
+    }
+
+    .registration-heading span {
+        display: block;
+
+        margin-top: 4px;
+
+        color: #64748b;
 
         font-size: 12px;
     }
 
-    .register-links {
+
+    /* =========================
+       REGISTRATION CARDS
+       ========================= */
+
+    .registration-options {
+        display: grid;
+
+        grid-template-columns: 1fr 1fr;
+
+        gap: 12px;
+    }
+
+    .registration-option {
         display: flex;
+
+        flex-direction: column;
+
+        align-items: center;
 
         justify-content: center;
 
-        gap: 10px;
+        min-height: 105px;
 
-        margin-top: 12px;
-    }
+        padding: 15px 10px;
 
-    .register-links a {
-        padding: 8px 12px;
+        border: 1px solid #dbe3ec;
 
-        border-radius: 7px;
+        border-radius: 11px;
 
-        background: #eaf4ff;
+        background: #f8fafc;
 
-        color: #1769aa;
+        color: #334155;
 
-        font-size: 11px;
-
-        font-weight: 800;
+        text-decoration: none;
 
         transition:
-            background .2s ease,
-            transform .2s ease;
+            border-color 0.2s ease,
+            background 0.2s ease,
+            transform 0.2s ease,
+            box-shadow 0.2s ease;
     }
 
-    .register-links a:hover {
-        background: #dceeff;
+    .registration-option:hover {
+        background: #eff6ff;
 
-        transform: translateY(-1px);
+        border-color: #93c5fd;
+
+        transform: translateY(-2px);
+
+        box-shadow:
+            0 7px 18px rgba(37, 99, 235, 0.08);
     }
+
+    .registration-icon {
+        width: 40px;
+        height: 40px;
+
+        margin-bottom: 9px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 10px;
+
+        background: #dbeafe;
+
+        color: #1d4ed8;
+
+        font-size: 19px;
+    }
+
+    .registration-option strong {
+        font-size: 12px;
+
+        color: #1e293b;
+    }
+
+    .registration-option span {
+        margin-top: 4px;
+
+        color: #64748b;
+
+        font-size: 10px;
+
+        text-align: center;
+    }
+
+
+    /* =========================
+       FOOTER
+       ========================= */
 
     .login-footer {
+        margin-top: 25px;
+
+        padding-top: 17px;
+
+        border-top: 1px solid #eef2f7;
+
         text-align: center;
 
-        margin-top: 24px;
-
-        color: #98a2b3;
+        color: #94a3b8;
 
         font-size: 10px;
     }
 
+
+    /* =========================
+       MOBILE
+       ========================= */
+
     @media (max-width: 600px) {
 
         .login-wrapper {
-            padding: 15px 5px;
+            padding: 20px 10px;
         }
 
         .login-card {
             padding: 25px 20px;
-
             border-radius: 15px;
         }
 
-        .login-brand h1 {
+        .login-header h1 {
             font-size: 24px;
         }
 
-        .register-links {
-            flex-direction: column;
+        .registration-options {
+            grid-template-columns: 1fr;
         }
 
-        .register-links a {
-            text-align: center;
-        }
     }
 
 </style>
 
+
 <div class="login-wrapper">
 
+    <div class="login-card">
 
-<div class="login-card">
 
-    <!-- BRAND -->
+        <!-- =========================
+             LOGIN HEADER
+             ========================= -->
 
-    <div class="login-brand">
+        <div class="login-header">
 
-        <div class="login-logo">
-            ST
+            <div class="login-logo">
+                ST
+            </div>
+
+            <h1>
+                SkillTrack Maharashtra
+            </h1>
+
+            <p>
+                Sign in to access your SkillTrack account
+            </p>
+
         </div>
 
-        <h1>
-            SkillTrack Maharashtra
-        </h1>
 
-        <p>
-            Skill development and employment tracking portal
-        </p>
+        <!-- =========================
+             DJANGO MESSAGES
+             ========================= -->
 
-    </div>
+        {% if messages %}
+
+            <div class="messages">
+
+                {% for message in messages %}
+
+                    <div class="message">
+                        {{ message }}
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        {% endif %}
 
 
-    <!-- LOGIN FORM -->
+        <!-- =========================
+             LOGIN FORM
+             ========================= -->
 
-    <form method="post" class="login-form">
-
-        {% csrf_token %}
-
-        <label for="username">
-            Username
-        </label>
-
-        <input
-            id="username"
-            name="username"
-            type="text"
-            placeholder="Enter your username"
-            autocomplete="username"
-            required
-            autofocus
+        <form
+            method="post"
+            class="login-form"
         >
 
-
-        <label for="password">
-            Password
-        </label>
-
-        <input
-            id="password"
-            name="password"
-            type="password"
-            placeholder="Enter your password"
-            autocomplete="current-password"
-            required
-        >
+            {% csrf_token %}
 
 
-        <button
-            type="submit"
-            class="login-button"
-        >
-            Sign in securely
-        </button>
+            {% if form.non_field_errors %}
 
-    </form>
+                <div class="form-errors">
 
+                    {{ form.non_field_errors }}
 
-    <!-- DIVIDER -->
+                </div>
 
-    <div class="login-divider">
-        New applicant?
-    </div>
+            {% endif %}
 
 
-    <!-- REGISTRATION -->
+            <!-- USERNAME -->
 
-    <p class="register-text">
-        Don't have an account yet?
-    </p>
+            <div class="form-group">
 
-    <div class="register-links">
+                <label for="username">
+                    Username
+                </label>
 
-        <a href="{% url 'trainee_register' %}">
-            🎓 Trainee Registration
-        </a>
+                <input
+                    id="username"
+                    name="username"
+                    type="text"
+                    placeholder="Enter your username"
+                    autocomplete="username"
+                    required
+                    autofocus
+                >
 
-        <a href="{% url 'trainer_register' %}">
-            👨‍🏫 Trainer Registration
-        </a>
-
-    </div>
+            </div>
 
 
-    <!-- FOOTER -->
+            <!-- PASSWORD -->
 
-    <div class="login-footer">
-        Secure access to SkillTrack Maharashtra
+            <div class="form-group">
+
+                <label for="password">
+                    Password
+                </label>
+
+                <input
+                    id="password"
+                    name="password"
+                    type="password"
+                    placeholder="Enter your password"
+                    autocomplete="current-password"
+                    required
+                >
+
+            </div>
+
+
+            <!-- LOGIN -->
+
+            <button
+                type="submit"
+                class="login-button"
+            >
+                Sign in securely
+            </button>
+
+        </form>
+
+
+        <!-- =========================
+             REGISTRATION DIVIDER
+             ========================= -->
+
+        <div class="registration-divider">
+            New applicant?
+        </div>
+
+
+        <!-- =========================
+             REGISTRATION HEADING
+             ========================= -->
+
+        <div class="registration-heading">
+
+            <strong>
+                Don't have an account?
+            </strong>
+
+            <span>
+                Choose the registration type that applies to you.
+            </span>
+
+        </div>
+
+
+        <!-- =========================
+             REGISTRATION OPTIONS
+             ========================= -->
+
+        <div class="registration-options">
+
+
+            <!-- TRAINEE -->
+
+            <a
+                href="{% url 'trainee_register' %}"
+                class="registration-option"
+            >
+
+                <div class="registration-icon">
+                    🎓
+                </div>
+
+                <strong>
+                    Trainee Registration
+                </strong>
+
+                <span>
+                    Register as a beneficiary
+                </span>
+
+            </a>
+
+
+            <!-- TRAINER -->
+
+            <a
+                href="{% url 'trainer_register' %}"
+                class="registration-option"
+            >
+
+                <div class="registration-icon">
+                    👨‍🏫
+                </div>
+
+                <strong>
+                    Trainer Registration
+                </strong>
+
+                <span>
+                    Register as a training professional
+                </span>
+
+            </a>
+
+
+        </div>
+
+
+        <!-- =========================
+             FOOTER
+             ========================= -->
+
+        <div class="login-footer">
+
+            Secure access to SkillTrack Maharashtra
+
+        </div>
+
+
     </div>
 
 </div>
 
-
-</div>
 
 {% endblock %}
-

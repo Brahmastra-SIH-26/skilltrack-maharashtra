@@ -46,12 +46,20 @@
                     </span>
                 </td>
 
-                <td>
-                    <a href="{% url 'trainee_detail' trainee.id %}">
-                        View
-                    </a>
-                </td>
-            </tr>
+    <td>
+    {% if trainee.status == "Verified" %}
+        <a href="{% url 'trainee_detail' trainee.id %}">
+            View 360
+        </a>
+    {% else %}
+        <a href="{% url 'trainee_detail' trainee.id %}">
+            View Details
+        </a>
+    {% endif %}
+</td>
+
+
+     </tr>
 
             {% empty %}
             <tr>

@@ -3259,34 +3259,37 @@ def trainee_update(request, id):
 @require_POST
 def verify_trainee(request, id):
 
-    trainee = get_object_or_404(
-        Trainee,
-        id=id
-    )
+    trainee = get_object_or_404(Trainee, id=id)
 
-    trainee.status = "Verified"
-    trainee.save(
-        update_fields=["status"]
-    )
-
-    user, created = User.objects.get_or_create(
-        username=trainee.beneficiary_id,
-        defaults={
-            "email": trainee.email
-        }
-    )
-
-    password = None
-
-    if created:
-
-        password = (
-            f"Skill@{trainee.phone[-4:]}"
+    # Already verified
+    if trainee.status == "Verified":
+        messages.info(
+            request,
+            "This trainee is already verified."
         )
+        return redirect("trainee_detail", id=trainee.id)
 
-        user.set_password(password)
-        user.save()
+    # Verify trainee
+    trainee.status = "Verified"
+    trainee.save(update_fields=["status"])
 
+    # The account is normally created during trainee registration.
+    # Reuse it instead of treating an existing account as "already verified".
+    user = trainee.user
+
+    # Safety fallback for older records that don't have a linked user
+    if not user:
+        user = User.objects.get_or_create(
+            username=trainee.beneficiary_id,
+            defaults={
+                "email": trainee.email or "",
+            }
+        )[0]
+
+        trainee.user = user
+        trainee.save(update_fields=["user"])
+
+    # Ensure the correct trainee profile exists
     UserProfile.objects.update_or_create(
         user=user,
         defaults={
@@ -3295,7 +3298,11 @@ def verify_trainee(request, id):
         }
     )
 
-    notify(user, "Your trainee registration has been verified. You are now eligible for Authority-assigned training.", "Registration")
+    notify(
+        user,
+        "Your trainee registration has been verified. You are now eligible for Authority-assigned training.",
+        "Registration"
+    )
 
     messages.success(
         request,
@@ -3308,12 +3315,10 @@ def verify_trainee(request, id):
         {
             "trainee": trainee,
             "username": user.username,
-            "password": password,
-            "created": created,
+            "password": None,
+            "created": False,
         }
     )
-
-
 @login_required
 @authority_required
 @require_POST

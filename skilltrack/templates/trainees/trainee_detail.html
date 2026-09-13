@@ -1,3 +1,73 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<!-- =====================================================
+     TRAINEE VERIFICATION STATUS
+     ===================================================== -->
+
+{% if trainee.status == "Pending" %}
+
+<div style="
+    background: #fff8e1;
+    border: 1px solid #f0c36d;
+    border-radius: 12px;
+    padding: 18px 20px;
+    margin-bottom: 20px;
+">
+
+    <h3 style="
+        margin: 0 0 8px;
+        color: #664d03;
+    ">
+        Registration Verification
+    </h3>
+
+    <p style="
+        margin: 0 0 15px;
+        color: #667085;
+    ">
+        This trainee is currently pending Authority verification.
+        Review the trainee information before approving.
+    </p>
+
+    <form method="post"
+          action="{% url 'verify_trainee' trainee.id %}">
+        {% csrf_token %}
+
+        <button type="submit"
+                style="
+                    background: #198754;
+                    color: white;
+                    border: none;
+                    padding: 11px 18px;
+                    border-radius: 8px;
+                    font-weight: 700;
+                    cursor: pointer;
+                ">
+            ✓ Verify Trainee
+        </button>
+
+    </form>
+
+</div>
+
+{% elif trainee.status == "Verified" %}
+
+<div style="
+    background: #e8f7ee;
+    border: 1px solid #a3d9b8;
+    border-radius: 12px;
+    padding: 15px 20px;
+    margin-bottom: 20px;
+    color: #146c43;
+">
+    ✓ This trainee is verified and eligible for training.
+</div>
+
+{% endif %}
+
+
 <!-- ========================= -->
 <!-- AI INSIGHTS DASHBOARD -->
 <!-- ========================= -->
@@ -114,7 +184,7 @@
     }
 
     /* =====================================================
-       RISK CARD (donut, driven only by risk.probability / risk.risk)
+       RISK CARD
     ===================================================== */
 
     .risk-card {
@@ -182,24 +252,31 @@
         display: inline-flex;
         padding: 6px 11px;
         border-radius: 999px;
+
         {% if risk.risk == "High" %}
         background: #fef3f2;
         color: #b42318;
+
         {% elif risk.risk == "Medium" %}
         background: #fffaeb;
         color: #b54708;
+
         {% elif risk.risk == "Low" %}
         background: #ecfdf3;
         color: #067647;
+
         {% else %}
         background: #f2f4f7;
         color: #475467;
         {% endif %}
+
         font-size: 11px;
         font-weight: 800;
     }
 
-    /* Risk meter (second chart, still just risk.probability) */
+    /* =====================================================
+       RISK METER
+    ===================================================== */
 
     .risk-meter {
         margin-top: 16px;
@@ -209,7 +286,15 @@
         position: relative;
         height: 10px;
         border-radius: 999px;
-        background: linear-gradient(90deg, #0e9384 0%, #0e9384 33%, #dc6803 33%, #dc6803 66%, #d92d20 66%, #d92d20 100%);
+        background: linear-gradient(
+            90deg,
+            #0e9384 0%,
+            #0e9384 33%,
+            #dc6803 33%,
+            #dc6803 66%,
+            #d92d20 66%,
+            #d92d20 100%
+        );
     }
 
     .risk-meter-pointer {
@@ -233,7 +318,7 @@
     }
 
     /* =====================================================
-       SKILL GAP CARD (driven only by risk.skill_gaps)
+       SKILL GAP CARD
     ===================================================== */
 
     .gap-card {
@@ -266,8 +351,6 @@
         color: #98a2b3;
         margin-bottom: 14px;
     }
-
-    /* volume bar: how many gaps, scaled against a fixed ceiling of 8 so the bar has visual meaning */
 
     .gap-volume-track {
         width: 100%;
@@ -324,7 +407,7 @@
     }
 
     /* =====================================================
-       RECOMMENDATIONS (driven only by risk.recommendations / risk.action)
+       RECOMMENDATIONS
     ===================================================== */
 
     .recommendation-card {
@@ -378,8 +461,7 @@
     }
 
     /* =====================================================
-       SECOND ROW: risk profile diagram, built only from
-       risk.probability + risk.risk + the two list lengths
+       SECOND ROW
     ===================================================== */
 
     .ai-mid-grid {
@@ -422,13 +504,25 @@
         border-radius: 999px;
     }
 
-    .zone-fill.low { background: linear-gradient(90deg, #0e9384, #2dd4bf); }
-    .zone-fill.medium { background: linear-gradient(90deg, #dc6803, #f79009); }
-    .zone-fill.high { background: linear-gradient(90deg, #b42318, #d92d20); }
+    .zone-fill.low {
+        background: linear-gradient(90deg, #0e9384, #2dd4bf);
+    }
 
-    .zone-item.active .zone-label { color: #101828; }
+    .zone-fill.medium {
+        background: linear-gradient(90deg, #dc6803, #f79009);
+    }
 
-    /* skill gaps vs recommendations comparison bars */
+    .zone-fill.high {
+        background: linear-gradient(90deg, #b42318, #d92d20);
+    }
+
+    .zone-item.active .zone-label {
+        color: #101828;
+    }
+
+    /* =====================================================
+       COMPARISON
+    ===================================================== */
 
     .compare-row {
         display: flex;
@@ -466,8 +560,13 @@
         border-radius: 999px;
     }
 
-    .compare-fill.gaps { background: linear-gradient(90deg, #f97316, #dc6803); }
-    .compare-fill.recs { background: linear-gradient(90deg, #2dd4bf, #0e7490); }
+    .compare-fill.gaps {
+        background: linear-gradient(90deg, #f97316, #dc6803);
+    }
+
+    .compare-fill.recs {
+        background: linear-gradient(90deg, #2dd4bf, #0e7490);
+    }
 
     /* =====================================================
        AUTHORITY DECISION
@@ -498,15 +597,19 @@
         margin-top: 15px;
         padding: 13px 15px;
         border-radius: 11px;
+
         {% if risk.risk == "High" %}
         background: #fef3f2;
         border: 1px solid #fecdca;
+
         {% elif risk.risk == "Medium" %}
         background: #fffaeb;
         border: 1px solid #fedf89;
+
         {% elif risk.risk == "Low" %}
         background: #ecfdf3;
         border: 1px solid #abefc6;
+
         {% else %}
         background: #f9fafb;
         border: 1px solid #eaecf0;
@@ -515,11 +618,20 @@
 
     .decision-status strong {
         display: block;
-        {% if risk.risk == "High" %}color: #b42318;
-        {% elif risk.risk == "Medium" %}color: #b54708;
-        {% elif risk.risk == "Low" %}color: #067647;
-        {% else %}color: #344054;
+
+        {% if risk.risk == "High" %}
+        color: #b42318;
+
+        {% elif risk.risk == "Medium" %}
+        color: #b54708;
+
+        {% elif risk.risk == "Low" %}
+        color: #067647;
+
+        {% else %}
+        color: #344054;
         {% endif %}
+
         font-size: 13px;
         margin-bottom: 4px;
     }
@@ -569,15 +681,34 @@
     ===================================================== */
 
     @media (max-width: 1100px) {
-        .ai-top-grid { grid-template-columns: 1fr 1fr; }
-        .ai-mid-grid { grid-template-columns: 1fr; }
-        .decision-actions { grid-template-columns: 1fr; }
+        .ai-top-grid {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .ai-mid-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .decision-actions {
+            grid-template-columns: 1fr;
+        }
     }
 
     @media (max-width: 700px) {
-        .ai-top-grid { grid-template-columns: 1fr; }
-        .risk-body { flex-direction: column; align-items: flex-start; }
-        .ai-dashboard-title { flex-direction: column; align-items: flex-start; gap: 12px; }
+        .ai-top-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .risk-body {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .ai-dashboard-title {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 12px;
+        }
     }
 </style>
 
@@ -591,9 +722,16 @@
     <div class="ai-dashboard-title">
         <div>
             <h2>AI Employment Intelligence</h2>
-            <p>Data-driven assessment of employment readiness, skill gaps and recommended intervention.</p>
+
+            <p>
+                Data-driven assessment of employment readiness,
+                skill gaps and recommended intervention.
+            </p>
         </div>
-        <span class="ai-powered">AI Powered</span>
+
+        <span class="ai-powered">
+            AI Powered
+        </span>
     </div>
 
 
@@ -604,108 +742,207 @@
     <div class="ai-top-grid">
 
         <!-- RISK CARD -->
+
         <div class="ai-card risk-card">
 
             <div class="ai-card-header">
-                <span class="ai-card-title"><span class="title-dot"></span>Employment risk</span>
-                <span class="risk-badge">{{ risk.risk|default:"Unknown" }} risk</span>
+
+                <span class="ai-card-title">
+                    <span class="title-dot"></span>
+                    Employment risk
+                </span>
+
+                <span class="risk-badge">
+                    {{ risk.risk|default:"Unknown" }} risk
+                </span>
+
             </div>
+
 
             <div class="risk-body">
 
                 <div class="risk-chart">
+
                     <div class="risk-chart-inner">
-                        <span class="risk-number">{{ risk.probability|default:0 }}%</span>
-                        <span class="risk-label">probability</span>
+
+                        <span class="risk-number">
+                            {{ risk.probability|default:0 }}%
+                        </span>
+
+                        <span class="risk-label">
+                            probability
+                        </span>
+
                     </div>
+
                 </div>
 
+
                 <div class="risk-description">
-                    <h3>{{ risk.outcome|default:"Prediction unavailable" }}</h3>
-                    <p>The AI model evaluates training performance and employment indicators to identify placement readiness.</p>
-                    <span class="risk-badge">{{ risk.risk|default:"Unknown" }} risk</span>
+
+                    <h3>
+                        {{ risk.outcome|default:"Prediction unavailable" }}
+                    </h3>
+
+                    <p>
+                        The AI model evaluates training performance
+                        and employment indicators to identify
+                        placement readiness.
+                    </p>
+
+                    <span class="risk-badge">
+                        {{ risk.risk|default:"Unknown" }} risk
+                    </span>
+
                 </div>
 
             </div>
 
-            <!-- second chart: same probability shown as a risk-zone meter -->
+
             <div class="risk-meter">
+
                 <div class="risk-meter-track">
+
                     <div class="risk-meter-pointer"></div>
+
                 </div>
+
                 <div class="risk-meter-scale">
                     <span>Low</span>
                     <span>Medium</span>
                     <span>High</span>
                 </div>
+
             </div>
 
         </div>
 
 
         <!-- SKILL GAP CARD -->
+
         <div class="ai-card gap-card">
 
             <div class="ai-card-header">
-                <span class="ai-card-title"><span class="title-dot"></span>Skill gap analysis</span>
+
+                <span class="ai-card-title">
+                    <span class="title-dot"></span>
+                    Skill gap analysis
+                </span>
+
             </div>
+
 
             <div class="gap-summary">
-                <span class="gap-count">{{ risk.skill_gaps|length }}</span>
-                <span class="gap-word">identified</span>
+
+                <span class="gap-count">
+                    {{ risk.skill_gaps|length }}
+                </span>
+
+                <span class="gap-word">
+                    identified
+                </span>
+
             </div>
 
-            <div class="gap-caption">Areas requiring intervention</div>
+
+            <div class="gap-caption">
+                Areas requiring intervention
+            </div>
+
 
             {% if risk.skill_gaps %}
 
                 <div class="gap-volume-track">
-                    <div class="gap-volume-fill" style="width: {% widthratio risk.skill_gaps|length 8 100 %}%;"></div>
+
+                    <div class="gap-volume-fill"
+                         style="width: {% widthratio risk.skill_gaps|length 8 100 %}%;"></div>
+
                 </div>
 
+
                 <div class="gap-list">
+
                     {% for gap in risk.skill_gaps %}
+
                         <div class="gap-item">
+
                             <span class="gap-dot"></span>
+
                             {{ gap }}
+
                         </div>
+
                     {% endfor %}
+
                 </div>
 
             {% else %}
-                <div class="no-gap">✓ No major skill gaps detected</div>
+
+                <div class="no-gap">
+                    ✓ No major skill gaps detected
+                </div>
+
             {% endif %}
 
         </div>
 
 
         <!-- RECOMMENDATION CARD -->
+
         <div class="ai-card recommendation-card">
 
             <div class="ai-card-header">
-                <span class="ai-card-title"><span class="title-dot"></span>Recommended intervention</span>
+
+                <span class="ai-card-title">
+                    <span class="title-dot"></span>
+                    Recommended intervention
+                </span>
+
             </div>
+
 
             {% if risk.recommendations %}
 
                 <div class="recommendation-list">
+
                     {% for recommendation in risk.recommendations %}
+
                         <div class="recommendation-item">
-                            <div class="recommendation-number">{{ forloop.counter }}</div>
-                            <div class="recommendation-text">{{ recommendation }}</div>
+
+                            <div class="recommendation-number">
+                                {{ forloop.counter }}
+                            </div>
+
+                            <div class="recommendation-text">
+                                {{ recommendation }}
+                            </div>
+
                         </div>
+
                     {% endfor %}
+
                 </div>
 
             {% elif risk.action %}
 
                 <div class="recommendation-item">
-                    <div class="recommendation-number">1</div>
-                    <div class="recommendation-text">{{ risk.action }}</div>
+
+                    <div class="recommendation-number">
+                        1
+                    </div>
+
+                    <div class="recommendation-text">
+                        {{ risk.action }}
+                    </div>
+
                 </div>
 
             {% else %}
-                <div class="empty-recommendation">No intervention recommendation available.</div>
+
+                <div class="empty-recommendation">
+                    No intervention recommendation available.
+                </div>
+
             {% endif %}
 
         </div>
@@ -714,69 +951,144 @@
 
 
     <!-- ========================= -->
-    <!-- SECOND ROW: two extra diagrams, still built only -->
-    <!-- from risk.probability / risk.risk / the two lists -->
+    <!-- SECOND ROW -->
     <!-- ========================= -->
 
     <div class="ai-mid-grid">
 
-        <!-- risk zone diagram -->
+        <!-- RISK ZONE -->
+
         <div class="ai-card">
 
             <div class="ai-card-header">
-                <span class="ai-card-title"><span class="title-dot"></span>Risk zone position</span>
+
+                <span class="ai-card-title">
+                    <span class="title-dot"></span>
+                    Risk zone position
+                </span>
+
             </div>
 
+
             <div class="zone-row">
+
                 <div class="zone-item {% if risk.risk == "Low" %}active{% endif %}">
-                    <span class="zone-label">Low</span>
+
+                    <span class="zone-label">
+                        Low
+                    </span>
+
                     <div class="zone-track">
-                        <div class="zone-fill low" style="width: {% if risk.risk == "Low" %}{{ risk.probability|default:0 }}{% else %}0{% endif %}%;"></div>
+
+                        <div class="zone-fill low"
+                             style="width: {% if risk.risk == "Low" %}{{ risk.probability|default:0 }}{% else %}0{% endif %}%;"></div>
+
                     </div>
+
                 </div>
+
+
                 <div class="zone-item {% if risk.risk == "Medium" %}active{% endif %}">
-                    <span class="zone-label">Medium</span>
+
+                    <span class="zone-label">
+                        Medium
+                    </span>
+
                     <div class="zone-track">
-                        <div class="zone-fill medium" style="width: {% if risk.risk == "Medium" %}{{ risk.probability|default:0 }}{% else %}0{% endif %}%;"></div>
+
+                        <div class="zone-fill medium"
+                             style="width: {% if risk.risk == "Medium" %}{{ risk.probability|default:0 }}{% else %}0{% endif %}%;"></div>
+
                     </div>
+
                 </div>
+
+
                 <div class="zone-item {% if risk.risk == "High" %}active{% endif %}">
-                    <span class="zone-label">High</span>
+
+                    <span class="zone-label">
+                        High
+                    </span>
+
                     <div class="zone-track">
-                        <div class="zone-fill high" style="width: {% if risk.risk == "High" %}{{ risk.probability|default:0 }}{% else %}0{% endif %}%;"></div>
+
+                        <div class="zone-fill high"
+                             style="width: {% if risk.risk == "High" %}{{ risk.probability|default:0 }}{% else %}0{% endif %}%;"></div>
+
                     </div>
+
                 </div>
+
             </div>
 
         </div>
 
 
-        <!-- gaps vs recommendations comparison -->
+        <!-- GAPS VS INTERVENTIONS -->
+
         <div class="ai-card">
 
             <div class="ai-card-header">
-                <span class="ai-card-title"><span class="title-dot"></span>Gaps vs. interventions</span>
+
+                <span class="ai-card-title">
+                    <span class="title-dot"></span>
+                    Gaps vs. interventions
+                </span>
+
             </div>
 
+
             <div class="compare-row">
+
                 <div>
+
                     <div class="compare-item-top">
-                        <span class="compare-name">Skill gaps identified</span>
-                        <span class="compare-value">{{ risk.skill_gaps|length }}</span>
+
+                        <span class="compare-name">
+                            Skill gaps identified
+                        </span>
+
+                        <span class="compare-value">
+                            {{ risk.skill_gaps|length }}
+                        </span>
+
                     </div>
+
+
                     <div class="compare-track">
-                        <div class="compare-fill gaps" style="width: {% widthratio risk.skill_gaps|length 8 100 %}%;"></div>
+
+                        <div class="compare-fill gaps"
+                             style="width: {% widthratio risk.skill_gaps|length 8 100 %}%;"></div>
+
                     </div>
+
                 </div>
+
+
                 <div>
+
                     <div class="compare-item-top">
-                        <span class="compare-name">Recommendations issued</span>
-                        <span class="compare-value">{{ risk.recommendations|length }}</span>
+
+                        <span class="compare-name">
+                            Recommendations issued
+                        </span>
+
+                        <span class="compare-value">
+                            {{ risk.recommendations|length }}
+                        </span>
+
                     </div>
+
+
                     <div class="compare-track">
-                        <div class="compare-fill recs" style="width: {% widthratio risk.recommendations|length 8 100 %}%;"></div>
+
+                        <div class="compare-fill recs"
+                             style="width: {% widthratio risk.recommendations|length 8 100 %}%;"></div>
+
                     </div>
+
                 </div>
+
             </div>
 
         </div>
@@ -792,36 +1104,78 @@
 
         <div class="decision-card">
 
-            <h3>Authority action</h3>
+            <h3>
+                Authority action
+            </h3>
+
 
             <div class="decision-status">
+
                 <strong>
+
                     {% if risk.risk == "High" %}
+
                         Intervention required
+
                     {% elif risk.risk == "Medium" %}
+
                         Monitor trainee
+
                     {% elif risk.risk == "Low" %}
+
                         Placement ready
+
                     {% else %}
+
                         Assessment required
+
                     {% endif %}
+
                 </strong>
-                <span>AI insights can guide the next support or placement decision.</span>
+
+
+                <span>
+                    AI insights can guide the next support
+                    or placement decision.
+                </span>
+
             </div>
 
+
             <div class="decision-actions">
+
                 <div class="decision-action">
-                    <div class="decision-icon">1</div>
+
+                    <div class="decision-icon">
+                        1
+                    </div>
+
                     Review training performance
+
                 </div>
+
+
                 <div class="decision-action">
-                    <div class="decision-icon">2</div>
+
+                    <div class="decision-icon">
+                        2
+                    </div>
+
                     Address identified skill gaps
+
                 </div>
+
+
                 <div class="decision-action">
-                    <div class="decision-icon">3</div>
+
+                    <div class="decision-icon">
+                        3
+                    </div>
+
                     Reassess before placement referral
+
                 </div>
+
             </div>
 
         </div>
@@ -829,3 +1183,5 @@
     </div>
 
 </div>
+
+{% endblock %}

@@ -101,28 +101,23 @@
 
 
 
-        {% else %}
-
-            <h1>Already Verified</h1>
-
-            <div class="success">
-                This trainee already has a login account.
-            </div>
-
-            <div class="credential">
-                <div class="label">Username / Beneficiary ID</div>
-                <div class="value">{{ username }}</div>
-            </div>
-
-        {% endif %}
-
-        <a href="{% url 'trainee_detail' trainee.id %}" class="btn">
-            Back to Trainee Details
-        </a>
-
     </div>
 
 </div>
 
 </body>
-</html>
+</html>{% else %}
+
+    <h1>✓ Trainee Verified</h1>
+
+    <div class="success">
+        <strong>{{ trainee.name }}</strong> has been successfully verified.
+        Their trainee login account already exists.
+    </div>
+
+    <div class="credential">
+        <div class="label">Username / Beneficiary ID</div>
+        <div class="value">{{ username }}</div>
+    </div>
+
+{% endif %}

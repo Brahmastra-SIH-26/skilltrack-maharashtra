@@ -724,17 +724,31 @@
 
 
                                 <!-- Action -->
+<td>
 
-                                <td>
+<div style="
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+">
 
-                                    <a
-                                        href="{% url 'trainer_batch_detail' batch.id %}"
-                                        class="manage-btn"
-                                    >
-                                        Manage
-                                    </a>
+    <a
+        href="{% url 'trainer_batch_detail' batch.id %}"
+        class="manage-btn"
+    >
+        Manage
+    </a>
 
-                                </td>
+    <a
+        href="{% url 'trainer_batch_progress' batch.id %}"
+        class="manage-btn"
+        style="background: #0f766e;"
+    >
+        Performance
+    </a>
+
+</div>
+</td>
 
                             </tr>
 

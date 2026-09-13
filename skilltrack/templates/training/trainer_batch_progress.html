@@ -1,165 +1,542 @@
 <!DOCTYPE html>
+
 <html>
 <head>
     <title>Attendance & Progress | SkillTrack Maharashtra</title>
 
-    <style>
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #f5f7fb;
+        margin: 0;
+        padding: 30px;
+    }
+
+    .container {
+        max-width: 1100px;
+        margin: auto;
+    }
+
+    .header,
+    .trainee-card {
+        background: white;
+        padding: 24px;
+        border-radius: 12px;
+        margin-bottom: 20px;
+    }
+
+    .header h1 {
+        margin-top: 0;
+    }
+
+    .trainee-card {
+        display: block;
+    }
+
+    .trainee-header {
+        padding-bottom: 18px;
+        margin-bottom: 20px;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .trainee-header strong {
+        font-size: 20px;
+    }
+
+    .section {
+        margin-top: 20px;
+    }
+
+    .section-title {
+        font-size: 16px;
+        font-weight: bold;
+        margin-bottom: 12px;
+        color: #1f2937;
+    }
+
+    .field-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+    }
+
+    .field {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    label {
+        font-size: 14px;
+        font-weight: 600;
+        color: #374151;
+    }
+
+    select,
+    input {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        box-sizing: border-box;
+        font-size: 14px;
+    }
+
+    input:focus,
+    select:focus {
+        outline: none;
+        border-color: #2563eb;
+    }
+
+    .remarks {
+        margin-top: 15px;
+    }
+
+    .remarks input {
+        width: 100%;
+    }
+
+    .save-btn {
+        padding: 13px 24px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        background: #1f2937;
+        color: white;
+        font-size: 15px;
+        font-weight: 600;
+    }
+
+    .save-btn:hover {
+        opacity: 0.9;
+    }
+
+    .back-btn {
+        display: inline-block;
+        margin-bottom: 20px;
+        text-decoration: none;
+        color: #2563eb;
+    }
+
+    .empty-card {
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+    }
+
+    @media (max-width: 800px) {
+        .field-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 550px) {
         body {
-            font-family: Arial, sans-serif;
-            background: #f5f7fb;
-            margin: 0;
-            padding: 30px;
+            padding: 15px;
         }
 
-        .container {
-            max-width: 1000px;
-            margin: auto;
+        .field-grid {
+            grid-template-columns: 1fr;
         }
+    }
+</style>
 
-        .header,
-        .trainee-card {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-        }
 
-        .header h1 {
-            margin-top: 0;
-        }
-
-        .trainee-card {
-            display: grid;
-            grid-template-columns: 2fr 1fr 1fr;
-            gap: 20px;
-            align-items: center;
-        }
-
-        select,
-        input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            box-sizing: border-box;
-        }
-
-        .save-btn {
-            padding: 12px 20px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-        }
-
-        .back-btn {
-            display: inline-block;
-            margin-bottom: 20px;
-            text-decoration: none;
-        }
-
-        @media (max-width: 700px) {
-            .trainee-card {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
 </head>
 
 <body>
 
 <div class="container">
 
-    <a href="{% url 'trainer_batch_detail' batch.id %}" class="back-btn">
-        ← Back to Batch
-    </a>
 
-    <div class="header">
-        <h1>Attendance & Training Progress</h1>
+<a href="{% url 'trainer_batch_detail' batch.id %}" class="back-btn">
+    ← Back to Batch
+</a>
 
-        <p>
-            <strong>Batch:</strong>
-            {{ batch.name }}
-        </p>
+<div class="header">
+    <h1>Attendance & Training Progress</h1>
 
-        <p>
-            <strong>Course:</strong>
-            {{ batch.course.name }}
-        </p>
-    </div>
+    <p>
+        <strong>Batch:</strong>
+        {{ batch.name }}
+    </p>
 
-    <form method="POST">
+    <p>
+        <strong>Course:</strong>
+        {{ batch.course.name }}
+    </p>
 
-        {% csrf_token %}
+    {% if batch.provider %}
+    <p>
+        <strong>Provider:</strong>
+        {{ batch.provider.name }}
+    </p>
+    {% endif %}
+</div>
 
-        {% for trainee in trainees %}
+<form method="POST">
 
-            <div class="trainee-card">
+    {% csrf_token %}
 
-                <div>
-                    <strong>{{ trainee.name }}</strong>
+    {% for trainee in trainees %}
 
-                    <br>
+        <div class="trainee-card">
 
-                    <small>
-                        {{ trainee.beneficiary_id }}
-                    </small>
+            <div class="trainee-header">
+                <strong>{{ trainee.name }}</strong>
+
+                <br>
+
+                <small>
+                    Beneficiary ID: {{ trainee.beneficiary_id }}
+                </small>
+            </div>
+
+
+            <!-- =========================================
+                 ATTENDANCE
+            ========================================== -->
+
+            <div class="section">
+
+                <div class="section-title">
+                    Attendance
                 </div>
 
-                <div>
-                    <label>Attendance</label>
+                <div class="field-grid">
 
-                    <select name="attendance_{{ trainee.id }}">
+                    <div class="field">
 
-                        <option value="Present">
-                            Present
-                        </option>
+                        <label>
+                            Attendance Status
+                        </label>
 
-                        <option value="Absent">
-                            Absent
-                        </option>
+                        <select
+                            name="attendance_{{ trainee.id }}"
+                        >
 
-                    </select>
+                            <option value="Present">
+                                Present
+                            </option>
+
+                            <option value="Absent">
+                                Absent
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="field">
+
+                        <label>
+                            Total Classes
+                        </label>
+
+                        <input
+                            type="number"
+                            name="total_classes_{{ trainee.id }}"
+                            min="0"
+                            value="0"
+                        >
+
+                    </div>
+
+                    <div class="field">
+
+                        <label>
+                            Attended Classes
+                        </label>
+
+                        <input
+                            type="number"
+                            name="attended_classes_{{ trainee.id }}"
+                            min="0"
+                            value="0"
+                        >
+
+                    </div>
+
                 </div>
 
-                <div>
-                    <label>Progress (%)</label>
+            </div>
+
+
+            <!-- =========================================
+                 TRAINING PROGRESS
+            ========================================== -->
+
+            <div class="section">
+
+                <div class="section-title">
+                    Training Progress
+                </div>
+
+                <div class="field-grid">
+
+                    <div class="field">
+
+                        <label>
+                            Progress (%)
+                        </label>
+
+                        <input
+                            type="number"
+                            name="progress_{{ trainee.id }}"
+                            min="0"
+                            max="100"
+                            step="0.01"
+                            value="0"
+                        >
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =========================================
+                 ASSIGNMENTS
+            ========================================== -->
+
+            <div class="section">
+
+                <div class="section-title">
+                    Assignment Performance
+                </div>
+
+                <div class="field-grid">
+
+                    <div class="field">
+
+                        <label>
+                            Total Assignments
+                        </label>
+
+                        <input
+                            type="number"
+                            name="total_assignments_{{ trainee.id }}"
+                            min="0"
+                            value="0"
+                        >
+
+                    </div>
+
+                    <div class="field">
+
+                        <label>
+                            Completed Assignments
+                        </label>
+
+                        <input
+                            type="number"
+                            name="completed_assignments_{{ trainee.id }}"
+                            min="0"
+                            value="0"
+                        >
+
+                    </div>
+
+                    <div class="field">
+
+                        <label>
+                            Assignment Score (%)
+                        </label>
+
+                        <input
+                            type="number"
+                            name="assignment_score_{{ trainee.id }}"
+                            min="0"
+                            max="100"
+                            step="0.01"
+                            value="0"
+                        >
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =========================================
+                 ASSESSMENTS
+            ========================================== -->
+
+            <div class="section">
+
+                <div class="section-title">
+                    Assessment Performance
+                </div>
+
+                <div class="field-grid">
+
+                    <div class="field">
+
+                        <label>
+                            Total Assessments
+                        </label>
+
+                        <input
+                            type="number"
+                            name="total_assessments_{{ trainee.id }}"
+                            min="0"
+                            value="0"
+                        >
+
+                    </div>
+
+                    <div class="field">
+
+                        <label>
+                            Completed Assessments
+                        </label>
+
+                        <input
+                            type="number"
+                            name="completed_assessments_{{ trainee.id }}"
+                            min="0"
+                            value="0"
+                        >
+
+                    </div>
+
+                    <div class="field">
+
+                        <label>
+                            Assessment Score (%)
+                        </label>
+
+                        <input
+                            type="number"
+                            name="assessment_score_{{ trainee.id }}"
+                            min="0"
+                            max="100"
+                            step="0.01"
+                            value="0"
+                        >
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =========================================
+                 PRACTICAL + FINAL
+            ========================================== -->
+
+            <div class="section">
+
+                <div class="section-title">
+                    Practical & Final Performance
+                </div>
+
+                <div class="field-grid">
+
+                    <div class="field">
+
+                        <label>
+                            Practical Score (%)
+                        </label>
+
+                        <input
+                            type="number"
+                            name="practical_score_{{ trainee.id }}"
+                            min="0"
+                            max="100"
+                            step="0.01"
+                            value="0"
+                        >
+
+                    </div>
+
+                    <div class="field">
+
+                        <label>
+                            Final Score (%)
+                        </label>
+
+                        <input
+                            type="number"
+                            name="final_score_{{ trainee.id }}"
+                            min="0"
+                            max="100"
+                            step="0.01"
+                            value="0"
+                        >
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =========================================
+                 REMARKS
+            ========================================== -->
+
+            <div class="section">
+
+                <div class="section-title">
+                    Trainer Remarks
+                </div>
+
+                <div class="field">
+
+                    <label>
+                        General Batch Remarks
+                    </label>
 
                     <input
-                        type="number"
-                        name="progress_{{ trainee.id }}"
-                        min="0"
-                        max="100"
-                        value="0"
+                        type="text"
+                        name="remarks_{{ trainee.id }}"
+                        placeholder="Add trainer remarks"
                     >
+
                 </div>
-<div>
-    <label>Remarks</label>
 
-    <input
-        type="text"
-        name="remarks_{{ trainee.id }}"
-        placeholder="Add trainer remarks"
-    >
-</div>
+                <div class="field remarks">
+
+                    <label>
+                        Performance Remarks
+                    </label>
+
+                    <input
+                        type="text"
+                        name="performance_remarks_{{ trainee.id }}"
+                        placeholder="Add performance-specific remarks"
+                    >
+
+                </div>
+
             </div>
 
-        {% empty %}
+        </div>
 
-            <div class="trainee-card">
-                <p>No trainees assigned to this batch.</p>
-            </div>
+    {% empty %}
 
-        {% endfor %}
+        <div class="empty-card">
+            <p>No trainees assigned to this batch.</p>
+        </div>
 
-        {% if trainees %}
+    {% endfor %}
 
-            <button type="submit" class="save-btn">
-                Save Attendance & Progress
-            </button>
 
-        {% endif %}
+    {% if trainees %}
 
-    </form>
+        <button type="submit" class="save-btn">
+            Save Attendance & Performance
+        </button>
+
+    {% endif %}
+
+</form>
+
 
 </div>
 

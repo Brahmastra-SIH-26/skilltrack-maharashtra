@@ -79,4 +79,9 @@ path(
         views.run_followup_emails,
         name="run_followup_emails"
     ),
+path(
+    "employment/<int:id>/detail/",
+    views.employment_detail,
+    name="employment_detail",
+),
 ]

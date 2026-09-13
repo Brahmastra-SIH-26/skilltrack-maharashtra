@@ -1,487 +1,831 @@
-{% extends 'base.html' %}
+<!-- ========================= -->
+<!-- AI INSIGHTS DASHBOARD -->
+<!-- ========================= -->
 
-{% block content %}
+<style>
+    .ai-dashboard {
+        margin-bottom: 34px;
+        font-family: inherit;
+    }
 
-<div class="top">
+    /* =====================================================
+       HEADER
+    ===================================================== */
 
-    <div>
-        <h1>{{ trainee.name }} · Trainee 360°</h1>
+    .ai-dashboard-title {
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin-bottom: 20px;
+        padding: 22px 26px;
+        border-radius: 18px;
+        background: linear-gradient(120deg, #0b2540 0%, #10375c 45%, #0e4a5e 100%);
+    }
 
-        <p class="sub">
-            {{ trainee.beneficiary_id }}
-            · {{ trainee.district }}
-            ·
-            <span class="badge {{ trainee.status }}">
-                {{ trainee.status }}
-            </span>
-        </p>
-    </div>
+    .ai-dashboard-title::after {
+        content: "";
+        position: absolute;
+        top: -60%;
+        right: -8%;
+        width: 260px;
+        height: 260px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(45, 212, 191, 0.28) 0%, rgba(45, 212, 191, 0) 70%);
+        pointer-events: none;
+    }
 
-    <div style="display:flex; gap:10px;">
+    .ai-dashboard-title h2 {
+        margin: 0;
+        font-size: 22px;
+        color: #ffffff;
+        position: relative;
+        z-index: 1;
+    }
 
-        {% if trainee.status == "Pending" %}
+    .ai-dashboard-title p {
+        margin: 6px 0 0;
+        color: #b6c7d9;
+        font-size: 13px;
+        position: relative;
+        z-index: 1;
+        max-width: 460px;
+    }
 
-        <form method="post" action="{% url 'verify_trainee' trainee.id %}">
-            {% csrf_token %}
+    .ai-powered {
+        position: relative;
+        z-index: 1;
+        padding: 6px 12px;
+        border-radius: 999px;
+        background: rgba(45, 212, 191, 0.16);
+        border: 1px solid rgba(45, 212, 191, 0.4);
+        color: #5eead4;
+        font-size: 11px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
 
-            <button
-                type="submit"
-                style="
-                    background:#067647;
-                    color:white;
-                    border:none;
-                    padding:10px 18px;
-                    border-radius:8px;
-                    cursor:pointer;
-                    font-weight:600;
-                "
-            >
-                ✓ Verify Trainee
-            </button>
+    /* =====================================================
+       SHARED CARD SHELL
+    ===================================================== */
 
-        </form>
+    .ai-card {
+        background: #ffffff;
+        border: 1px solid #e4e7ec;
+        border-radius: 16px;
+        padding: 22px;
+        box-shadow: 0 4px 14px rgba(16, 24, 40, 0.05);
+    }
 
-        <form method="post" action="{% url 'reject_trainee' trainee.id %}">
-            {% csrf_token %}
+    .ai-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 18px;
+        gap: 10px;
+    }
 
-            <button
-                type="submit"
-                style="
-                    background:#b42318;
-                    color:white;
-                    border:none;
-                    padding:10px 18px;
-                    border-radius:8px;
-                    cursor:pointer;
-                    font-weight:600;
-                "
-            >
-                ✕ Reject
-            </button>
+    .ai-card-title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        font-weight: 700;
+        color: #101828;
+    }
 
-        </form>
+    .ai-card-title .title-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 2px;
+        background: #0e7490;
+        flex-shrink: 0;
+    }
 
+    /* =====================================================
+       TOP GRID
+    ===================================================== */
+
+    .ai-top-grid {
+        display: grid;
+        grid-template-columns: 1.2fr 1fr 1fr;
+        gap: 18px;
+    }
+
+    /* =====================================================
+       RISK CARD (donut, driven only by risk.probability / risk.risk)
+    ===================================================== */
+
+    .risk-card {
+        min-height: 300px;
+    }
+
+    .risk-body {
+        display: flex;
+        align-items: center;
+        gap: 24px;
+    }
+
+    .risk-chart {
+        width: 145px;
+        height: 145px;
+        border-radius: 50%;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: conic-gradient(
+            {% if risk.risk == "High" %}#d92d20{% elif risk.risk == "Medium" %}#dc6803{% elif risk.risk == "Low" %}#0e9384{% else %}#667085{% endif %} {{ risk.probability|default:0 }}%,
+            #f2f4f7 0
+        );
+    }
+
+    .risk-chart-inner {
+        width: 108px;
+        height: 108px;
+        border-radius: 50%;
+        background: #ffffff;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .risk-number {
+        font-size: 27px;
+        font-weight: 800;
+        line-height: 1;
+        color: #101828;
+    }
+
+    .risk-label {
+        margin-top: 5px;
+        font-size: 11px;
+        color: #667085;
+    }
+
+    .risk-description h3 {
+        margin: 0 0 7px;
+        font-size: 18px;
+        color: #101828;
+    }
+
+    .risk-description p {
+        margin: 0 0 13px;
+        font-size: 12px;
+        line-height: 1.55;
+        color: #667085;
+    }
+
+    .risk-badge {
+        display: inline-flex;
+        padding: 6px 11px;
+        border-radius: 999px;
+        {% if risk.risk == "High" %}
+        background: #fef3f2;
+        color: #b42318;
+        {% elif risk.risk == "Medium" %}
+        background: #fffaeb;
+        color: #b54708;
+        {% elif risk.risk == "Low" %}
+        background: #ecfdf3;
+        color: #067647;
+        {% else %}
+        background: #f2f4f7;
+        color: #475467;
         {% endif %}
+        font-size: 11px;
+        font-weight: 800;
+    }
 
-        <a
-            class="btn secondary"
-            href="{% url 'outcome_support' trainee.id %}"
-        >
-            Record follow-up evidence
-        </a>
+    /* Risk meter (second chart, still just risk.probability) */
 
+    .risk-meter {
+        margin-top: 16px;
+    }
+
+    .risk-meter-track {
+        position: relative;
+        height: 10px;
+        border-radius: 999px;
+        background: linear-gradient(90deg, #0e9384 0%, #0e9384 33%, #dc6803 33%, #dc6803 66%, #d92d20 66%, #d92d20 100%);
+    }
+
+    .risk-meter-pointer {
+        position: absolute;
+        top: -5px;
+        width: 3px;
+        height: 20px;
+        border-radius: 2px;
+        background: #101828;
+        left: {{ risk.probability|default:0 }}%;
+        transform: translateX(-50%);
+    }
+
+    .risk-meter-scale {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 6px;
+        font-size: 10px;
+        color: #98a2b3;
+        font-weight: 600;
+    }
+
+    /* =====================================================
+       SKILL GAP CARD (driven only by risk.skill_gaps)
+    ===================================================== */
+
+    .gap-card {
+        min-height: 300px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .gap-summary {
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+        margin-bottom: 5px;
+    }
+
+    .gap-count {
+        font-size: 38px;
+        line-height: 1;
+        font-weight: 800;
+        color: #101828;
+    }
+
+    .gap-word {
+        font-size: 13px;
+        color: #667085;
+    }
+
+    .gap-caption {
+        font-size: 12px;
+        color: #98a2b3;
+        margin-bottom: 14px;
+    }
+
+    /* volume bar: how many gaps, scaled against a fixed ceiling of 8 so the bar has visual meaning */
+
+    .gap-volume-track {
+        width: 100%;
+        height: 8px;
+        border-radius: 999px;
+        background: #f2f4f7;
+        overflow: hidden;
+        margin-bottom: 16px;
+    }
+
+    .gap-volume-fill {
+        height: 100%;
+        border-radius: 999px;
+        background: linear-gradient(90deg, #f97316, #dc6803);
+    }
+
+    .gap-list {
+        display: flex;
+        flex-direction: column;
+        gap: 9px;
+        max-height: 130px;
+        overflow-y: auto;
+    }
+
+    .gap-item {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        padding: 9px 11px;
+        border-radius: 9px;
+        background: #fff7ed;
+        border: 1px solid #fed7aa;
+        color: #9a3412;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .gap-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: #f97316;
+        flex-shrink: 0;
+    }
+
+    .no-gap {
+        padding: 13px;
+        border-radius: 10px;
+        background: #ecfdf3;
+        color: #067647;
+        font-size: 12px;
+        font-weight: 700;
+        margin-top: auto;
+    }
+
+    /* =====================================================
+       RECOMMENDATIONS (driven only by risk.recommendations / risk.action)
+    ===================================================== */
+
+    .recommendation-card {
+        min-height: 300px;
+    }
+
+    .recommendation-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .recommendation-item {
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+        padding: 10px;
+        border-radius: 10px;
+        background: #f0fdfa;
+        border: 1px solid #ccfbf1;
+    }
+
+    .recommendation-number {
+        width: 26px;
+        height: 26px;
+        border-radius: 7px;
+        background: #0e7490;
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        font-weight: 800;
+        flex-shrink: 0;
+    }
+
+    .recommendation-text {
+        font-size: 12px;
+        line-height: 1.5;
+        color: #344054;
+        font-weight: 600;
+    }
+
+    .empty-recommendation {
+        padding: 13px;
+        border-radius: 10px;
+        background: #f9fafb;
+        color: #667085;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    /* =====================================================
+       SECOND ROW: risk profile diagram, built only from
+       risk.probability + risk.risk + the two list lengths
+    ===================================================== */
+
+    .ai-mid-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px;
+        margin-top: 18px;
+    }
+
+    .zone-row {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .zone-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .zone-label {
+        width: 64px;
+        flex-shrink: 0;
+        font-size: 11px;
+        font-weight: 700;
+        color: #667085;
+    }
+
+    .zone-track {
+        flex: 1;
+        height: 10px;
+        border-radius: 999px;
+        background: #f2f4f7;
+        overflow: hidden;
+    }
+
+    .zone-fill {
+        height: 100%;
+        border-radius: 999px;
+    }
+
+    .zone-fill.low { background: linear-gradient(90deg, #0e9384, #2dd4bf); }
+    .zone-fill.medium { background: linear-gradient(90deg, #dc6803, #f79009); }
+    .zone-fill.high { background: linear-gradient(90deg, #b42318, #d92d20); }
+
+    .zone-item.active .zone-label { color: #101828; }
+
+    /* skill gaps vs recommendations comparison bars */
+
+    .compare-row {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .compare-item-top {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 6px;
+        font-size: 12px;
+    }
+
+    .compare-name {
+        color: #344054;
+        font-weight: 600;
+    }
+
+    .compare-value {
+        color: #101828;
+        font-weight: 800;
+    }
+
+    .compare-track {
+        width: 100%;
+        height: 10px;
+        border-radius: 999px;
+        background: #f2f4f7;
+        overflow: hidden;
+    }
+
+    .compare-fill {
+        height: 100%;
+        border-radius: 999px;
+    }
+
+    .compare-fill.gaps { background: linear-gradient(90deg, #f97316, #dc6803); }
+    .compare-fill.recs { background: linear-gradient(90deg, #2dd4bf, #0e7490); }
+
+    /* =====================================================
+       AUTHORITY DECISION
+    ===================================================== */
+
+    .ai-lower-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 18px;
+        margin-top: 18px;
+    }
+
+    .decision-card {
+        background: #ffffff;
+        border: 1px solid #e4e7ec;
+        border-radius: 16px;
+        padding: 22px;
+        box-shadow: 0 4px 14px rgba(16, 24, 40, 0.05);
+    }
+
+    .decision-card h3 {
+        margin: 0;
+        font-size: 16px;
+        color: #101828;
+    }
+
+    .decision-status {
+        margin-top: 15px;
+        padding: 13px 15px;
+        border-radius: 11px;
+        {% if risk.risk == "High" %}
+        background: #fef3f2;
+        border: 1px solid #fecdca;
+        {% elif risk.risk == "Medium" %}
+        background: #fffaeb;
+        border: 1px solid #fedf89;
+        {% elif risk.risk == "Low" %}
+        background: #ecfdf3;
+        border: 1px solid #abefc6;
+        {% else %}
+        background: #f9fafb;
+        border: 1px solid #eaecf0;
+        {% endif %}
+    }
+
+    .decision-status strong {
+        display: block;
+        {% if risk.risk == "High" %}color: #b42318;
+        {% elif risk.risk == "Medium" %}color: #b54708;
+        {% elif risk.risk == "Low" %}color: #067647;
+        {% else %}color: #344054;
+        {% endif %}
+        font-size: 13px;
+        margin-bottom: 4px;
+    }
+
+    .decision-status span {
+        color: #667085;
+        font-size: 11px;
+        line-height: 1.5;
+    }
+
+    .decision-actions {
+        margin-top: 15px;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+    }
+
+    .decision-action {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 11px;
+        border-radius: 9px;
+        background: #f9fafb;
+        border: 1px solid #eaecf0;
+        font-size: 11px;
+        color: #344054;
+        font-weight: 600;
+    }
+
+    .decision-icon {
+        width: 20px;
+        height: 20px;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #ccfbf1;
+        color: #0e7490;
+        font-size: 10px;
+        font-weight: 800;
+        flex-shrink: 0;
+    }
+
+    /* =====================================================
+       RESPONSIVE
+    ===================================================== */
+
+    @media (max-width: 1100px) {
+        .ai-top-grid { grid-template-columns: 1fr 1fr; }
+        .ai-mid-grid { grid-template-columns: 1fr; }
+        .decision-actions { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 700px) {
+        .ai-top-grid { grid-template-columns: 1fr; }
+        .risk-body { flex-direction: column; align-items: flex-start; }
+        .ai-dashboard-title { flex-direction: column; align-items: flex-start; gap: 12px; }
+    }
+</style>
+
+
+<div class="ai-dashboard">
+
+    <!-- ========================= -->
+    <!-- SECTION HEADER -->
+    <!-- ========================= -->
+
+    <div class="ai-dashboard-title">
+        <div>
+            <h2>AI Employment Intelligence</h2>
+            <p>Data-driven assessment of employment readiness, skill gaps and recommended intervention.</p>
+        </div>
+        <span class="ai-powered">AI Powered</span>
     </div>
 
-</div>
+
+    <!-- ========================= -->
+    <!-- TOP THREE CARDS -->
+    <!-- ========================= -->
+
+    <div class="ai-top-grid">
+
+        <!-- RISK CARD -->
+        <div class="ai-card risk-card">
+
+            <div class="ai-card-header">
+                <span class="ai-card-title"><span class="title-dot"></span>Employment risk</span>
+                <span class="risk-badge">{{ risk.risk|default:"Unknown" }} risk</span>
+            </div>
+
+            <div class="risk-body">
+
+                <div class="risk-chart">
+                    <div class="risk-chart-inner">
+                        <span class="risk-number">{{ risk.probability|default:0 }}%</span>
+                        <span class="risk-label">probability</span>
+                    </div>
+                </div>
+
+                <div class="risk-description">
+                    <h3>{{ risk.outcome|default:"Prediction unavailable" }}</h3>
+                    <p>The AI model evaluates training performance and employment indicators to identify placement readiness.</p>
+                    <span class="risk-badge">{{ risk.risk|default:"Unknown" }} risk</span>
+                </div>
+
+            </div>
+
+            <!-- second chart: same probability shown as a risk-zone meter -->
+            <div class="risk-meter">
+                <div class="risk-meter-track">
+                    <div class="risk-meter-pointer"></div>
+                </div>
+                <div class="risk-meter-scale">
+                    <span>Low</span>
+                    <span>Medium</span>
+                    <span>High</span>
+                </div>
+            </div>
+
+        </div>
 
 
-<!-- ========================= -->
-<!-- METRICS -->
-<!-- ========================= -->
+        <!-- SKILL GAP CARD -->
+        <div class="ai-card gap-card">
 
-<div class="grid">
+            <div class="ai-card-header">
+                <span class="ai-card-title"><span class="title-dot"></span>Skill gap analysis</span>
+            </div>
 
-    <div class="card metric stat-blue">
+            <div class="gap-summary">
+                <span class="gap-count">{{ risk.skill_gaps|length }}</span>
+                <span class="gap-word">identified</span>
+            </div>
 
-        <span>Placement prototype</span>
+            <div class="gap-caption">Areas requiring intervention</div>
 
-        <b>{{ risk.probability }}%</b>
+            {% if risk.skill_gaps %}
 
-        <small>
-            {{ risk.risk }} risk
-            ·
-            {{ risk.factors|join:', ' }}
-        </small>
+                <div class="gap-volume-track">
+                    <div class="gap-volume-fill" style="width: {% widthratio risk.skill_gaps|length 8 100 %}%;"></div>
+                </div>
 
-    </div>
-
-
-    <div class="card metric stat-green">
-
-        <span>Skill-gap action</span>
-
-        <b>{{ skill_gaps|length }}</b>
-
-        <small>
-
-            {% if skill_gaps %}
-
-                Remedial:
-                {{ skill_gaps|join:', ' }}
+                <div class="gap-list">
+                    {% for gap in risk.skill_gaps %}
+                        <div class="gap-item">
+                            <span class="gap-dot"></span>
+                            {{ gap }}
+                        </div>
+                    {% endfor %}
+                </div>
 
             {% else %}
-
-                Map occupation skills to enable analysis
-
+                <div class="no-gap">✓ No major skill gaps detected</div>
             {% endif %}
 
-        </small>
-
-    </div>
+        </div>
 
 
-    <div class="card metric stat-purple">
+        <!-- RECOMMENDATION CARD -->
+        <div class="ai-card recommendation-card">
 
-        <span>Recommended action</span>
+            <div class="ai-card-header">
+                <span class="ai-card-title"><span class="title-dot"></span>Recommended intervention</span>
+            </div>
 
-        <small>
-            {{ risk.action }}
-        </small>
+            {% if risk.recommendations %}
 
-    </div>
+                <div class="recommendation-list">
+                    {% for recommendation in risk.recommendations %}
+                        <div class="recommendation-item">
+                            <div class="recommendation-number">{{ forloop.counter }}</div>
+                            <div class="recommendation-text">{{ recommendation }}</div>
+                        </div>
+                    {% endfor %}
+                </div>
 
-</div>
+            {% elif risk.action %}
 
-
-<!-- ========================= -->
-<!-- JOURNEY TIMELINE -->
-<!-- ========================= -->
-
-<div class="section-header">
-
-    <h2>Journey timeline</h2>
-
-</div>
-
-<div class="card">
-
-    <p>
-        <b>Registration</b>
-        —
-        {{ trainee.registration_date }}
-
-        ·
-
-        <b>Verification</b>
-        —
-        {{ trainee.status }}
-    </p>
-
-
-    {% for training in trainings %}
-
-        <p>
-
-            <b>Training</b>
-            —
-            {{ training.course.name }}
-
-            ({{ training.start_date }}
-            to
-            {{ training.end_date }})
-
-            ·
-            {{ training.status }}
-
-            ·
-            {{ training.completion_percentage }}%
-
-        </p>
-
-    {% endfor %}
-
-
-    {% for item in outcomes %}
-
-        <p>
-
-            <b>{{ item.recorded_on }}</b>
-            —
-            {{ item.status }}
-
-            {% if item.employer_name %}
-
-                : {{ item.employer_name }}
-
-            {% elif item.business_name %}
-
-                : {{ item.business_name }}
-
-            {% elif item.work_description %}
-
-                : {{ item.work_description }}
-
-            {% endif %}
-
-        </p>
-
-    {% endfor %}
-
-
-    {% for followup in followups %}
-
-        <p>
-
-            <b>{{ followup.followup_type }}</b>
-            follow-up
-            —
-            {{ followup.date }}
-
-            ·
-
-            {% if followup.completed %}
-
-                completed
+                <div class="recommendation-item">
+                    <div class="recommendation-number">1</div>
+                    <div class="recommendation-text">{{ risk.action }}</div>
+                </div>
 
             {% else %}
-
-                scheduled
-
+                <div class="empty-recommendation">No intervention recommendation available.</div>
             {% endif %}
 
-        </p>
-
-    {% endfor %}
-
-</div>
-
-
-<!-- ========================= -->
-<!-- TRAINING HISTORY -->
-<!-- ========================= -->
-
-<div class="section-header">
-
-    <h2>Training history</h2>
-
-</div>
-
-<div class="table-wrap">
-
-    <table>
-
-        <tr>
-
-            <th>Course</th>
-            <th>Provider / Trainer</th>
-            <th>Dates</th>
-            <th>Status</th>
-
-        </tr>
-
-
-        {% for training in trainings %}
-
-        <tr>
-
-            <td>
-
-                {{ training.course.name }}
-
-                <br>
-
-                <small>
-                    {{ training.course.sector }}
-                </small>
-
-            </td>
-
-
-            <td>
-
-                {{ training.provider.name }}
-
-                <br>
-
-                <small>
-                    {{ training.trainer|default:'—' }}
-                </small>
-
-            </td>
-
-
-            <td>
-
-                {{ training.start_date }}
-                –
-                {{ training.end_date }}
-
-            </td>
-
-
-            <td>
-
-                {{ training.status }}
-
-            </td>
-
-        </tr>
-
-
-        {% empty %}
-
-        <tr>
-
-            <td colspan="4">
-                No training history yet.
-            </td>
-
-        </tr>
-
-        {% endfor %}
-
-    </table>
-
-</div>
-
-
-<!-- ========================= -->
-<!-- EMPLOYMENT HISTORY -->
-<!-- ========================= -->
-
-<div class="section-header">
-
-    <h2>Outcome & wage history</h2>
-
-</div>
-
-<div class="table-wrap">
-
-    <table>
-
-        <tr>
-
-            <th>Date</th>
-            <th>Outcome</th>
-            <th>Work</th>
-            <th>Wage</th>
-            <th>Verification</th>
-
-        </tr>
-
-
-        {% for item in outcomes %}
-
-        <tr>
-
-            <td>
-                {{ item.recorded_on }}
-            </td>
-
-
-            <td>
-
-                <span class="badge {{ item.status }}">
-                    {{ item.status }}
-                </span>
-
-            </td>
-
-
-            <td>
-
-                {{ item.employer_name|default:item.business_name|default:item.work_description|default:'—' }}
-
-                {% if item.job_role %}
-
-                    <br>
-
-                    <small>
-                        {{ item.job_role }}
-                    </small>
-
-                {% endif %}
-
-            </td>
-
-
-            <td>
-
-                {% if item.salary %}
-
-                    ₹{{ item.salary }}
-
-                    {% if item.wage_frequency %}
-                        / {{ item.wage_frequency }}
+        </div>
+
+    </div>
+
+
+    <!-- ========================= -->
+    <!-- SECOND ROW: two extra diagrams, still built only -->
+    <!-- from risk.probability / risk.risk / the two lists -->
+    <!-- ========================= -->
+
+    <div class="ai-mid-grid">
+
+        <!-- risk zone diagram -->
+        <div class="ai-card">
+
+            <div class="ai-card-header">
+                <span class="ai-card-title"><span class="title-dot"></span>Risk zone position</span>
+            </div>
+
+            <div class="zone-row">
+                <div class="zone-item {% if risk.risk == "Low" %}active{% endif %}">
+                    <span class="zone-label">Low</span>
+                    <div class="zone-track">
+                        <div class="zone-fill low" style="width: {% if risk.risk == "Low" %}{{ risk.probability|default:0 }}{% else %}0{% endif %}%;"></div>
+                    </div>
+                </div>
+                <div class="zone-item {% if risk.risk == "Medium" %}active{% endif %}">
+                    <span class="zone-label">Medium</span>
+                    <div class="zone-track">
+                        <div class="zone-fill medium" style="width: {% if risk.risk == "Medium" %}{{ risk.probability|default:0 }}{% else %}0{% endif %}%;"></div>
+                    </div>
+                </div>
+                <div class="zone-item {% if risk.risk == "High" %}active{% endif %}">
+                    <span class="zone-label">High</span>
+                    <div class="zone-track">
+                        <div class="zone-fill high" style="width: {% if risk.risk == "High" %}{{ risk.probability|default:0 }}{% else %}0{% endif %}%;"></div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+        <!-- gaps vs recommendations comparison -->
+        <div class="ai-card">
+
+            <div class="ai-card-header">
+                <span class="ai-card-title"><span class="title-dot"></span>Gaps vs. interventions</span>
+            </div>
+
+            <div class="compare-row">
+                <div>
+                    <div class="compare-item-top">
+                        <span class="compare-name">Skill gaps identified</span>
+                        <span class="compare-value">{{ risk.skill_gaps|length }}</span>
+                    </div>
+                    <div class="compare-track">
+                        <div class="compare-fill gaps" style="width: {% widthratio risk.skill_gaps|length 8 100 %}%;"></div>
+                    </div>
+                </div>
+                <div>
+                    <div class="compare-item-top">
+                        <span class="compare-name">Recommendations issued</span>
+                        <span class="compare-value">{{ risk.recommendations|length }}</span>
+                    </div>
+                    <div class="compare-track">
+                        <div class="compare-fill recs" style="width: {% widthratio risk.recommendations|length 8 100 %}%;"></div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================= -->
+    <!-- AUTHORITY ACTION -->
+    <!-- ========================= -->
+
+    <div class="ai-lower-grid">
+
+        <div class="decision-card">
+
+            <h3>Authority action</h3>
+
+            <div class="decision-status">
+                <strong>
+                    {% if risk.risk == "High" %}
+                        Intervention required
+                    {% elif risk.risk == "Medium" %}
+                        Monitor trainee
+                    {% elif risk.risk == "Low" %}
+                        Placement ready
+                    {% else %}
+                        Assessment required
                     {% endif %}
+                </strong>
+                <span>AI insights can guide the next support or placement decision.</span>
+            </div>
 
-                {% elif item.stipend %}
+            <div class="decision-actions">
+                <div class="decision-action">
+                    <div class="decision-icon">1</div>
+                    Review training performance
+                </div>
+                <div class="decision-action">
+                    <div class="decision-icon">2</div>
+                    Address identified skill gaps
+                </div>
+                <div class="decision-action">
+                    <div class="decision-icon">3</div>
+                    Reassess before placement referral
+                </div>
+            </div>
 
-                    ₹{{ item.stipend }} stipend
+        </div>
 
-                {% else %}
-
-                    —
-
-                {% endif %}
-
-            </td>
-
-
-            <td>
-
-                {% if item.verification_status == "Verified" %}
-
-                    <span
-                        class="badge"
-                        style="
-                            background:#ecfdf3;
-                            color:#067647;
-                        "
-                    >
-                        ✓ Verified
-                    </span>
-
-
-                {% elif item.verification_status == "Pending" %}
-
-                    <span
-                        class="badge"
-                        style="
-                            background:#fffaeb;
-                            color:#b54708;
-                        "
-                    >
-                        Pending
-                    </span>
-
-
-                {% elif item.verification_status == "Rejected" %}
-
-                    <span
-                        class="badge"
-                        style="
-                            background:#fef3f2;
-                            color:#b42318;
-                        "
-                    >
-                        Rejected
-                    </span>
-
-
-                {% else %}
-
-                    <span
-                        class="badge"
-                        style="
-                            background:#f2f4f7;
-                            color:#475467;
-                        "
-                    >
-                        Not Verified
-                    </span>
-
-                {% endif %}
-
-            </td>
-
-        </tr>
-
-
-        {% empty %}
-
-        <tr>
-
-            <td colspan="5">
-                No outcomes recorded.
-            </td>
-
-        </tr>
-
-        {% endfor %}
-
-    </table>
+    </div>
 
 </div>
-
-{% endblock %}

@@ -5,13 +5,11 @@
 <div class="top">
 
     <div>
-
         <h1>Longitudinal outcomes</h1>
 
         <p class="sub">
             Historical employment, self-employment, apprenticeship and non-placement records.
         </p>
-
     </div>
 
 </div>
@@ -32,16 +30,12 @@
             </option>
 
             {% for value, label in statuses %}
-
                 <option
                     value="{{ value }}"
-                    {% if request.GET.status == value %}
-                        selected
-                    {% endif %}
+                    {% if request.GET.status == value %}selected{% endif %}
                 >
                     {{ label }}
                 </option>
-
             {% endfor %}
 
         </select>
@@ -55,17 +49,13 @@
                 All districts
             </option>
 
-            {% for item in districts %}
-
+            {% for district in districts %}
                 <option
-                    value="{{ item }}"
-                    {% if request.GET.district == item %}
-                        selected
-                    {% endif %}
+                    value="{{ district }}"
+                    {% if request.GET.district == district %}selected{% endif %}
                 >
-                    {{ item }}
+                    {{ district }}
                 </option>
-
             {% endfor %}
 
         </select>
@@ -73,7 +63,7 @@
 
         <!-- Filter Button -->
 
-        <button>
+        <button type="submit">
             Filter
         </button>
 
@@ -88,144 +78,184 @@
 
     <table>
 
-        <tr>
+        <thead>
+            <tr>
 
-            <th>
-                Trainee
-            </th>
+                <th>Trainee</th>
 
-            <th>
-                Recorded
-            </th>
+                <th>Recorded</th>
 
-            <th>
-                Outcome
-            </th>
+                <th>Outcome</th>
 
-            <th>
-                Organisation / role
-            </th>
+                <th>Organisation / Role</th>
 
-            <th>
-                Verification
-            </th>
+                <th>Verification</th>
 
-            <th>
-                Action
-            </th>
+                <th>Action</th>
 
-        </tr>
+            </tr>
+        </thead>
 
 
-        {% for item in employments %}
+        <tbody>
 
-        <tr>
+            {% for item in employments %}
 
-            <!-- TRAINEE -->
+            <tr>
 
-            <td>
+                <!-- TRAINEE -->
 
-                <a href="{% url 'trainee_detail' item.trainee.id %}">
-                    {{ item.trainee.name }}
-                </a>
+                <td>
 
-                <br>
+                    <a href="{% url 'trainee_detail' item.trainee.id %}">
+                        {{ item.trainee.name }}
+                    </a>
 
-                <small>
-                    {{ item.trainee.district }}
-                </small>
+                    <br>
 
-            </td>
+                    <small>
+                        {{ item.trainee.district }}
+                    </small>
 
-
-            <!-- DATE -->
-
-            <td>
-                {{ item.recorded_on }}
-            </td>
+                </td>
 
 
-            <!-- OUTCOME STATUS -->
+                <!-- DATE -->
 
-            <td>
-
-                <span class="badge {{ item.status }}">
-                    {{ item.status }}
-                </span>
-
-            </td>
+                <td>
+                    {{ item.recorded_on|default:"—" }}
+                </td>
 
 
-            <!-- ORGANISATION / ROLE -->
+                <!-- OUTCOME STATUS -->
 
-            <td>
+                <td>
 
-                {{ item.employer_name|default:item.business_name|default:"—" }}
+                    <span class="badge {{ item.status }}">
+                        {{ item.status|default:"—" }}
+                    </span>
 
-                <br>
-
-                <small>
-                    {{ item.job_role }}
-                </small>
-
-            </td>
+                </td>
 
 
-            <!-- VERIFICATION STATUS -->
+                <!-- ORGANISATION / ROLE -->
 
-            <td>
-                {{ item.verification_status }}
-            </td>
+                <td>
+
+                    {% if item.employer_name %}
+
+                        {{ item.employer_name }}
+
+                    {% elif item.business_name %}
+
+                        {{ item.business_name }}
+
+                    {% elif item.work_description %}
+
+                        {{ item.work_description }}
+
+                    {% else %}
+
+                        —
+
+                    {% endif %}
+
+                    {% if item.job_role %}
+                        <br>
+                        <small>{{ item.job_role }}</small>
+                    {% endif %}
+
+                </td>
 
 
-            <!-- VERIFY ACTION -->
+                <!-- VERIFICATION STATUS -->
 
-            <td>
+                <td>
 
-                {% if item.verification_status != 'Verified' %}
+                    {% if item.verification_status == "Verified" %}
 
-                    <form
-                        method="post"
-                        action="{% url 'verify_employment' item.id %}"
-                        class="inline"
-                    >
-
-                        {% csrf_token %}
-
-                        <input
-                            type="hidden"
-                            name="decision"
-                            value="Verified"
+                        <span
+                            class="badge"
+                            style="background:#ecfdf3;color:#067647;"
                         >
+                            ✓ Verified
+                        </span>
 
-                        <button class="btn success">
-                            Verify
-                        </button>
+                    {% elif item.verification_status == "Pending" %}
 
-                    </form>
+                        <span
+                            class="badge"
+                            style="background:#fffaeb;color:#b54708;"
+                        >
+                            Pending
+                        </span>
 
-                {% endif %}
+                    {% elif item.verification_status == "Rejected" %}
 
-            </td>
+                        <span
+                            class="badge"
+                            style="background:#fef3f2;color:#b42318;"
+                        >
+                            Rejected
+                        </span>
 
-        </tr>
+                    {% else %}
+
+                        <span
+                            class="badge"
+                            style="background:#f2f4f7;color:#475467;"
+                        >
+                            {{ item.verification_status|default:"Not Verified" }}
+                        </span>
+
+                    {% endif %}
+
+                </td>
 
 
-        {% empty %}
+                <!-- ACTION -->
 
-        <!-- NO RECORDS -->
+               <td>
 
-        <tr>
+    {% if item.verification_status != "Verified" %}
 
-            <td colspan="6">
+        <a
+            href="{% url 'employment_detail' item.id %}"
+            class="btn success"
+            style="text-decoration:none;display:inline-block;"
+        >
+            Review & Verify
+        </a>
 
-                No outcome records match these filters.
+    {% else %}
 
-            </td>
+        <a
+            href="{% url 'employment_detail' item.id %}"
+            class="btn"
+            style="text-decoration:none;display:inline-block;"
+        >
+            View
+        </a>
 
-        </tr>
+    {% endif %}
 
-        {% endfor %}
+</td>
+
+            </tr>
+
+            {% empty %}
+
+            <tr>
+
+                <td colspan="6">
+                    No outcome records match these filters.
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+        </tbody>
 
     </table>
 

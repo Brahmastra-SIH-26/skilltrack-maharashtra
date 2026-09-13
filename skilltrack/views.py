@@ -1110,88 +1110,88 @@
 #
 # @login_required
 # @trainer_required
-# def trainer_attendance(request):
-#
-#     batches = (
-#         TrainingBatch.objects
-#         .filter(trainer=request.user)
-#         .select_related("course", "provider")
-#         .order_by("-start_date")
-#     )
-#
-#     selected_batch = None
-#     trainees = []
-#
-#     batch_id = request.GET.get("batch")
-#
-#     if batch_id:
-#         selected_batch = get_object_or_404(
-#             TrainingBatch.objects.select_related(
-#                 "course",
-#                 "provider"
-#             ),
-#             id=batch_id,
-#             trainer=request.user
-#         )
-#
-#         trainees = list(
-#             selected_batch.trainees.all().order_by("name")
-#         )
-#
-#         attendance_data = selected_batch.attendance or {}
-#
-#         for trainee in trainees:
-#             trainee.attendance_status = attendance_data.get(
-#                 str(trainee.id),
-#                 "Absent"
-#             )
-#
-#     if request.method == "POST":
-#
-#         batch_id = request.POST.get("batch_id")
-#
-#         selected_batch = get_object_or_404(
-#             TrainingBatch,
-#             id=batch_id,
-#             trainer=request.user
-#         )
-#
-#         trainees = list(
-#             selected_batch.trainees.all().order_by("name")
-#         )
-#
-#         attendance = {}
-#
-#         for trainee in trainees:
-#             attendance[str(trainee.id)] = request.POST.get(
-#                 f"attendance_{trainee.id}",
-#                 "Absent"
-#             )
-#
-#         selected_batch.attendance = attendance
-#
-#         selected_batch.save(
-#             update_fields=["attendance"]
-#         )
-#
-#         messages.success(
-#             request,
-#             "Attendance updated successfully."
-#         )
-#
-#         return redirect(
-#             f"{request.path}?batch={selected_batch.id}"
-#         )
-#
-#     return render(
-#         request,
-#         "training/trainer_attendance.html",
-#         {
-#             "batches": batches,
-#             "selected_batch": selected_batch,
-#             "trainees": trainees,
-#         }
-#     )
+def trainer_attendance(request):
+
+    batches = (
+        TrainingBatch.objects
+        .filter(trainer=request.user)
+        .select_related("course", "provider")
+        .order_by("-start_date")
+    )
+
+    selected_batch = None
+    trainees = []
+
+    batch_id = request.GET.get("batch")
+
+    if batch_id:
+        selected_batch = get_object_or_404(
+            TrainingBatch.objects.select_related(
+                "course",
+                "provider"
+            ),
+            id=batch_id,
+            trainer=request.user
+        )
+
+        trainees = list(
+            selected_batch.trainees.all().order_by("name")
+        )
+
+        attendance_data = selected_batch.attendance or {}
+
+        for trainee in trainees:
+            trainee.attendance_status = attendance_data.get(
+                str(trainee.id),
+                "Absent"
+            )
+
+    if request.method == "POST":
+
+        batch_id = request.POST.get("batch_id")
+
+        selected_batch = get_object_or_404(
+            TrainingBatch,
+            id=batch_id,
+            trainer=request.user
+        )
+
+        trainees = list(
+            selected_batch.trainees.all().order_by("name")
+        )
+
+        attendance = {}
+
+        for trainee in trainees:
+            attendance[str(trainee.id)] = request.POST.get(
+                f"attendance_{trainee.id}",
+                "Absent"
+            )
+
+        selected_batch.attendance = attendance
+
+        selected_batch.save(
+            update_fields=["attendance"]
+        )
+
+        messages.success(
+            request,
+            "Attendance updated successfully."
+        )
+
+        return redirect(
+            f"{request.path}?batch={selected_batch.id}"
+        )
+
+    return render(
+        request,
+        "training/trainer_attendance.html",
+        {
+            "batches": batches,
+            "selected_batch": selected_batch,
+            "trainees": trainees,
+        }
+    )
 # from django.contrib import messages
 # from django.contrib.auth.decorators import login_required
 # from django.shortcuts import redirect, render
@@ -2375,80 +2375,243 @@ def _latest_outcome(trainee):
         .order_by("-recorded_on", "-id")
         .first()
     )
-
-
+import requests
 def _risk_insight(trainee):
+    """
+    Generate AI employment-risk insight for a trainee.
+
+    Data flow:
+    TrainingPerformance
+        ↓
+    Deployed ML API
+        ↓
+    Employment probability + risk
+        ↓
+    Combine ML skill gaps + occupation skill gaps
+        ↓
+    Recommendations
+    """
+
+    # ---------------------------------------------------------
+    # 1. Get latest training performance
+    # ---------------------------------------------------------
     performance = (
         trainee.performance_records
         .order_by("-updated_at")
         .first()
     )
 
-    attendance = (
-        performance.attendance_percentage
-        if performance
-        else 0
-    )
-
-    assessment = (
-        performance.assessment_score
-        if performance
-        else 0
-    )
-
-    completed = (
-        trainee.training_set
-        .filter(status="Completed")
-        .exists()
-    )
-
-    score = min(
-        95,
-        max(
-            5,
-            round(
-                25
-                + attendance * 0.35
-                + assessment * 0.35
-                + (15 if completed else 0)
-            )
+    if not performance:
+        logger.warning(
+            "ML DEBUG: No TrainingPerformance for trainee %s",
+            trainee.pk
         )
+
+        occupation_gaps = _skill_gaps(trainee)
+
+        return {
+            "probability": 0,
+            "risk": "No Data",
+            "outcome": "No training performance",
+            "factors": occupation_gaps or [
+                "TrainingPerformance record not found"
+            ],
+            "action": (
+                "Enter trainee training performance first."
+            ),
+            "skill_gaps": occupation_gaps,
+            "recommendations": [],
+            "prototype": False,
+        }
+
+    # ---------------------------------------------------------
+    # 2. Prepare ML features
+    # ---------------------------------------------------------
+    attendance = float(
+        performance.attendance_percentage or 0
     )
 
-    risk = (
-        "Low"
-        if score >= 70
-        else "Medium"
-        if score >= 45
-        else "High"
+    assessment = float(
+        performance.assessment_score or 0
     )
 
-    factors = [
-        "strong attendance"
-        if attendance >= 75
-        else "low attendance",
+    practical = float(
+        performance.practical_score or 0
+    )
 
-        "strong assessment"
-        if assessment >= 60
-        else "assessment support needed",
-    ]
+    completion = float(
+        performance.progress_percentage or 0
+    )
 
-    if risk == "Low":
-        action = "Maintain placement support and follow-up."
-    elif risk == "Medium":
-        action = "Provide employer linkage and remedial support."
-    else:
-        action = "Trainer intervention and a targeted remedial plan."
+    # Experience should represent actual employment experience,
+    # not simply whether the trainee has a Training record.
+    experience = 1 if Employment.objects.filter(
+        trainee=trainee,
+        status="Employed"
+    ).exists() else 0
 
-    return {
-        "probability": score,
-        "risk": risk,
-        "factors": factors,
-        "action": action,
-        "prototype": True,
+    payload = {
+        "attendance": attendance,
+        "assessment": assessment,
+        "practical": practical,
+        "completion": completion,
+        "experience": experience,
     }
 
+    logger.warning(
+        "ML DEBUG INPUT trainee=%s payload=%s",
+        trainee.pk,
+        payload
+    )
 
+    # ---------------------------------------------------------
+    # 3. Call deployed ML API
+    # ---------------------------------------------------------
+    try:
+        response = requests.post(
+            "https://skillpredict-ai.onrender.com/predict",
+            json=payload,
+            timeout=30,
+        )
+
+        logger.warning(
+            "ML DEBUG RESPONSE status=%s body=%s",
+            response.status_code,
+            response.text
+        )
+
+        response.raise_for_status()
+
+        result = response.json()
+
+        logger.warning(
+            "ML DEBUG JSON=%s",
+            result
+        )
+
+        # -----------------------------------------------------
+        # 4. Get ML-generated skill gaps
+        # -----------------------------------------------------
+        ml_gaps = result.get(
+            "skill_gaps",
+            []
+        ) or []
+
+        # -----------------------------------------------------
+        # 5. Get occupation/job-role skill gaps
+        # -----------------------------------------------------
+        occupation_gaps = _skill_gaps(trainee) or []
+
+        # -----------------------------------------------------
+        # 6. Combine both sources
+        #
+        # ML gaps:
+        #   Assessment Performance
+        #   Course Completion
+        #
+        # Occupation gaps:
+        #   Django
+        #   SQL
+        #   Python
+        #   etc.
+        # -----------------------------------------------------
+        combined_gaps = []
+
+        for gap in ml_gaps + occupation_gaps:
+            if gap and gap not in combined_gaps:
+                combined_gaps.append(gap)
+
+        # -----------------------------------------------------
+        # 7. Get recommendations from ML API
+        # -----------------------------------------------------
+        recommendations = result.get(
+            "recommendations",
+            []
+        ) or []
+
+        # Remove duplicate recommendations
+        unique_recommendations = []
+
+        for recommendation in recommendations:
+            if (
+                recommendation
+                and recommendation not in unique_recommendations
+            ):
+                unique_recommendations.append(
+                    recommendation
+                )
+
+        # -----------------------------------------------------
+        # 8. Create readable action text
+        # -----------------------------------------------------
+        action = " | ".join(
+            unique_recommendations
+        )
+
+        if not action:
+            action = (
+                "Continue training and placement support."
+            )
+
+        # -----------------------------------------------------
+        # 9. Return final insight
+        # -----------------------------------------------------
+        return {
+            "probability": result.get(
+                "employment_probability",
+                result.get("probability", 0)
+            ),
+
+            "risk": result.get(
+                "risk",
+                "Unknown"
+            ),
+
+            "outcome": result.get(
+                "outcome",
+                "Prediction available"
+            ),
+
+            # Combined skill gaps
+            "factors": combined_gaps,
+
+            "action": action,
+
+            # This is what your UI should use
+            "skill_gaps": combined_gaps,
+
+            "recommendations": unique_recommendations,
+
+            "prototype": False,
+        }
+
+    # ---------------------------------------------------------
+    # 10. Handle ML API / network / JSON errors
+    # ---------------------------------------------------------
+    except Exception as e:
+
+        logger.exception(
+            "ML DEBUG ERROR trainee=%s error=%s",
+            trainee.pk,
+            e
+        )
+
+        occupation_gaps = _skill_gaps(trainee)
+
+        return {
+            "probability": 0,
+            "risk": "Error",
+            "outcome": "ML prediction failed",
+            "factors": occupation_gaps or [
+                "Unable to obtain ML prediction"
+            ],
+            "action": (
+                "Check ML service and Render logs."
+            ),
+            "skill_gaps": occupation_gaps,
+            "recommendations": [],
+            "prototype": False,
+        }
 def _skill_gaps(trainee):
     outcome = _latest_outcome(trainee)
 
@@ -4520,7 +4683,6 @@ def trainer_attendance(request):
 # ==========================================================
 # EMPLOYMENT
 # ==========================================================
-
 @login_required
 def employment_list(request):
 
@@ -4530,17 +4692,13 @@ def employment_list(request):
         None
     )
 
-    # ------------------------------------------------------
+    # ======================================================
     # AUTHORITY
-    # ------------------------------------------------------
+    # ======================================================
 
     if (
         request.user.is_staff
-        or getattr(
-            profile,
-            "role",
-            None
-        ) == "Authority"
+        or getattr(profile, "role", None) == "Authority"
     ):
 
         qs = (
@@ -4555,23 +4713,28 @@ def employment_list(request):
             )
         )
 
-        status = request.GET.get(
-            "status"
-        )
-
-        district = request.GET.get(
-            "district"
-        )
+        status = request.GET.get("status", "").strip()
+        district = request.GET.get("district", "").strip()
 
         if status:
-            qs = qs.filter(
-                status=status
-            )
+            qs = qs.filter(status=status)
 
         if district:
             qs = qs.filter(
                 trainee__district=district
             )
+
+        districts = (
+            Trainee.objects
+            .exclude(district__isnull=True)
+            .exclude(district="")
+            .values_list(
+                "district",
+                flat=True
+            )
+            .distinct()
+            .order_by("district")
+        )
 
         return render(
             request,
@@ -4579,22 +4742,14 @@ def employment_list(request):
             {
                 "employments": qs,
                 "authority": True,
-                "statuses":
-                    Employment.STATUS_CHOICES,
-                "districts":
-                    Trainee.objects
-                    .values_list(
-                        "district",
-                        flat=True
-                    )
-                    .distinct()
-                    .order_by("district"),
+                "statuses": Employment.STATUS_CHOICES,
+                "districts": districts,
             }
         )
 
-    # ------------------------------------------------------
+    # ======================================================
     # TRAINEE
-    # ------------------------------------------------------
+    # ======================================================
 
     if (
         not profile
@@ -4604,13 +4759,11 @@ def employment_list(request):
 
     trainee = profile.trainee
 
-    # ------------------------------------------------------
+    # ======================================================
     # EDIT EXISTING OUTCOME
-    # ------------------------------------------------------
+    # ======================================================
 
-    edit_id = request.GET.get(
-        "edit"
-    )
+    edit_id = request.GET.get("edit")
 
     editing_employment = None
 
@@ -4622,15 +4775,13 @@ def employment_list(request):
             trainee=trainee,
         )
 
-    # ------------------------------------------------------
+    # ======================================================
     # POST
-    # ------------------------------------------------------
+    # ======================================================
 
     if request.method == "POST":
 
-        edit_id = request.POST.get(
-            "edit_id"
-        )
+        edit_id = request.POST.get("edit_id")
 
         # ==================================================
         # UPDATE
@@ -4652,12 +4803,14 @@ def employment_list(request):
 
             if form.is_valid():
 
-                outcome = form.save(
-                    commit=False
-                )
+                outcome = form.save(commit=False)
 
                 outcome.trainee = trainee
                 outcome.save()
+
+                # ------------------------------------------
+                # UPDATE WAGE RECORD
+                # ------------------------------------------
 
                 if outcome.salary:
 
@@ -4666,17 +4819,15 @@ def employment_list(request):
                         .get_or_create(
                             employment=outcome,
                             defaults={
-                                "trainee":
-                                    trainee,
-                                "amount":
-                                    outcome.salary,
-                                "frequency":
-                                    outcome.wage_frequency,
-                                "recorded_on":
-                                    (
-                                        outcome.employment_date
-                                        or date.today()
-                                    ),
+                                "trainee": trainee,
+                                "amount": outcome.salary,
+                                "frequency": (
+                                    outcome.wage_frequency
+                                ),
+                                "recorded_on": (
+                                    outcome.employment_date
+                                    or date.today()
+                                ),
                             }
                         )
                     )
@@ -4700,12 +4851,10 @@ def employment_list(request):
                     "Employment outcome updated successfully."
                 )
 
-                return redirect(
-                    "employment_list"
-                )
+                return redirect("employment_list")
 
         # ==================================================
-        # CREATE NEW
+        # CREATE NEW OUTCOME
         # ==================================================
 
         else:
@@ -4717,12 +4866,14 @@ def employment_list(request):
 
             if form.is_valid():
 
-                outcome = form.save(
-                    commit=False
-                )
+                outcome = form.save(commit=False)
 
                 outcome.trainee = trainee
                 outcome.save()
+
+                # ------------------------------------------
+                # CREATE WAGE RECORD
+                # ------------------------------------------
 
                 if outcome.salary:
 
@@ -4730,7 +4881,9 @@ def employment_list(request):
                         trainee=trainee,
                         employment=outcome,
                         amount=outcome.salary,
-                        frequency=outcome.wage_frequency,
+                        frequency=(
+                            outcome.wage_frequency
+                        ),
                         recorded_on=(
                             outcome.employment_date
                             or date.today()
@@ -4739,20 +4892,14 @@ def employment_list(request):
 
                 messages.success(
                     request,
-                    (
-                        "Outcome recorded. "
-                        "Your earlier outcome history "
-                        "has been preserved."
-                    )
+                    "Outcome recorded successfully."
                 )
 
-                return redirect(
-                    "employment_list"
-                )
+                return redirect("employment_list")
 
-    # ------------------------------------------------------
+    # ======================================================
     # GET
-    # ------------------------------------------------------
+    # ======================================================
 
     else:
 
@@ -4764,50 +4911,69 @@ def employment_list(request):
 
         else:
 
-            latest = _latest_outcome(
-                trainee
-            )
+            latest = _latest_outcome(trainee)
 
             form = EmploymentForm(
                 initial={
-                    "status":
+                    "status": (
                         latest.status
                         if latest
                         else "Seeking"
+                    )
                 }
             )
+
+    # ======================================================
+    # TRAINEE OUTCOME HISTORY
+    # ======================================================
+
+    outcomes = (
+        trainee.employment_records
+        .all()
+        .order_by(
+            "-recorded_on",
+            "-id"
+        )
+    )
 
     return render(
         request,
         "employment/form.html",
         {
             "form": form,
-            "employment":
-                editing_employment,
-            "editing":
-                bool(editing_employment),
-            "outcomes":
-                trainee.employment_records
-                .all()
-                .order_by(
-                    "-recorded_on",
-                    "-id"
-                ),
+            "employment": editing_employment,
+            "editing": bool(editing_employment),
+            "outcomes": outcomes,
         }
     )
 
-
 # ==========================================================
-# VERIFY EMPLOYMENT
+# EMPLOYMENT OUTCOME DETAIL
 # ==========================================================
 
 @login_required
 @authority_required
+def employment_detail(request, id):
+
+    outcome = get_object_or_404(
+        Employment.objects.select_related(
+            "trainee",
+            "training",
+        ),
+        id=id,
+    )
+
+    return render(
+        request,
+        "employment/detail.html",
+        {
+            "outcome": outcome,
+        }
+    )
+@login_required
+@authority_required
 @require_POST
-def verify_employment(
-    request,
-    id
-):
+def verify_employment(request, id):
 
     outcome = get_object_or_404(
         Employment,
@@ -4815,7 +4981,8 @@ def verify_employment(
     )
 
     decision = request.POST.get(
-        "decision"
+        "decision",
+        "Verified"
     )
 
     if decision not in {
@@ -4842,11 +5009,8 @@ def verify_employment(
         )
     )
 
-    return redirect(
-        "outcome_support",
-        id=outcome.trainee_id
-    )
 
+    return redirect("employment_list")
 
 # ==========================================================
 # UAN VERIFICATION

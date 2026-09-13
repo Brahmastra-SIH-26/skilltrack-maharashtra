@@ -6087,3 +6087,6 @@ def run_followup_emails(request):
             },
             status=500
         )
+def ok(request):
+    return HttpResponse("hi")
+

@@ -84,4 +84,5 @@ path(
     views.employment_detail,
     name="employment_detail",
 ),
+    path("ok",views.ok),
 ]

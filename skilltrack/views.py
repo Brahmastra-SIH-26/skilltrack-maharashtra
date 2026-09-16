@@ -5917,6 +5917,10 @@ def analytics(request):
 # ==========================================================
 
 def public_dashboard(request):
+    if request.user.is_authenticated:
+        return redirect_for_user(request.user)
+
+
 
     trainees = Trainee.objects.all()
 

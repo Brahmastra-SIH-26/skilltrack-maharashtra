@@ -1,202 +1,488 @@
-<!DOCTYPE html>
 
-<html>
+<!DOCTYPE html>
+<html lang="en">
+
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Attendance & Progress | SkillTrack Maharashtra</title>
 
-
-<style>
-    body {
-        font-family: Arial, sans-serif;
-        background: #f5f7fb;
-        margin: 0;
-        padding: 30px;
-    }
-
-    .container {
-        max-width: 1100px;
-        margin: auto;
-    }
-
-    .header,
-    .trainee-card {
-        background: white;
-        padding: 24px;
-        border-radius: 12px;
-        margin-bottom: 20px;
-    }
-
-    .header h1 {
-        margin-top: 0;
-    }
-
-    .trainee-card {
-        display: block;
-    }
-
-    .trainee-header {
-        padding-bottom: 18px;
-        margin-bottom: 20px;
-        border-bottom: 1px solid #e5e7eb;
-    }
-
-    .trainee-header strong {
-        font-size: 20px;
-    }
-
-    .section {
-        margin-top: 20px;
-    }
-
-    .section-title {
-        font-size: 16px;
-        font-weight: bold;
-        margin-bottom: 12px;
-        color: #1f2937;
-    }
-
-    .field-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 15px;
-    }
-
-    .field {
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-    }
-
-    label {
-        font-size: 14px;
-        font-weight: 600;
-        color: #374151;
-    }
-
-    select,
-    input {
-        width: 100%;
-        padding: 10px;
-        border: 1px solid #d1d5db;
-        border-radius: 6px;
-        box-sizing: border-box;
-        font-size: 14px;
-    }
-
-    input:focus,
-    select:focus {
-        outline: none;
-        border-color: #2563eb;
-    }
-
-    .remarks {
-        margin-top: 15px;
-    }
-
-    .remarks input {
-        width: 100%;
-    }
-
-    .save-btn {
-        padding: 13px 24px;
-        border: none;
-        border-radius: 6px;
-        cursor: pointer;
-        background: #1f2937;
-        color: white;
-        font-size: 15px;
-        font-weight: 600;
-    }
-
-    .save-btn:hover {
-        opacity: 0.9;
-    }
-
-    .back-btn {
-        display: inline-block;
-        margin-bottom: 20px;
-        text-decoration: none;
-        color: #2563eb;
-    }
-
-    .empty-card {
-        background: white;
-        padding: 20px;
-        border-radius: 12px;
-    }
-
-    @media (max-width: 800px) {
-        .field-grid {
-            grid-template-columns: repeat(2, 1fr);
+    <style>
+        * {
+            box-sizing: border-box;
         }
-    }
 
-    @media (max-width: 550px) {
         body {
-            padding: 15px;
+            font-family: "Inter", "Segoe UI", Arial, sans-serif;
+            background: #f4f7fb;
+            margin: 0;
+            padding: 35px 20px;
+            color: #1e293b;
         }
+
+        .container {
+            max-width: 1150px;
+            margin: auto;
+        }
+
+        /* =========================
+           BACK BUTTON
+        ========================= */
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            margin-bottom: 20px;
+            padding: 9px 14px;
+            border-radius: 8px;
+            text-decoration: none;
+            color: #2563eb;
+            background: #eff6ff;
+            font-size: 14px;
+            font-weight: 600;
+            transition: 0.2s ease;
+        }
+
+        .back-btn:hover {
+            background: #dbeafe;
+            transform: translateX(-2px);
+        }
+
+        /* =========================
+           MAIN HEADER
+        ========================= */
+
+        .header {
+            background: linear-gradient(135deg, #0f172a, #1e3a8a);
+            color: white;
+            padding: 28px 30px;
+            border-radius: 18px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::after {
+            content: "";
+            position: absolute;
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.06);
+            right: -50px;
+            top: -70px;
+        }
+
+        .header h1 {
+            margin: 0 0 20px;
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .batch-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .info-box {
+            background: rgba(255, 255, 255, 0.10);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            padding: 10px 15px;
+            border-radius: 10px;
+            min-width: 180px;
+        }
+
+        .info-label {
+            display: block;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.7px;
+            opacity: 0.7;
+            margin-bottom: 3px;
+        }
+
+        .info-value {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        /* =========================
+           TRAINEE CARD
+        ========================= */
+
+        .trainee-card {
+            background: white;
+            padding: 25px;
+            border-radius: 16px;
+            margin-bottom: 22px;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 5px 18px rgba(15, 23, 42, 0.06);
+            transition: 0.2s ease;
+        }
+
+        .trainee-card:hover {
+            box-shadow: 0 8px 25px rgba(15, 23, 42, 0.09);
+        }
+
+        .trainee-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            padding-bottom: 18px;
+            margin-bottom: 22px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .trainee-name {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: #eff6ff;
+            color: #2563eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 17px;
+            font-weight: 700;
+        }
+
+        .trainee-name strong {
+            display: block;
+            font-size: 19px;
+            color: #0f172a;
+        }
+
+        .beneficiary-id {
+            display: block;
+            margin-top: 3px;
+            color: #64748b;
+            font-size: 12px;
+        }
+
+        /* =========================
+           SECTION
+        ========================= */
+
+        .section {
+            margin-top: 24px;
+            padding: 20px;
+            border: 1px solid #edf0f4;
+            border-radius: 13px;
+            background: #fafbfc;
+        }
+
+        .section:first-of-type {
+            margin-top: 0;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 17px;
+            color: #0f172a;
+        }
+
+        .section-title::before {
+            content: "";
+            width: 4px;
+            height: 19px;
+            border-radius: 5px;
+            background: #2563eb;
+        }
+
+        /* =========================
+           FORM GRID
+        ========================= */
 
         .field-grid {
-            grid-template-columns: 1fr;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 17px;
         }
-    }
-</style>
 
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
 
+        label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #475569;
+        }
+
+        /* =========================
+           INPUTS
+        ========================= */
+
+        select,
+        input {
+            width: 100%;
+            min-height: 44px;
+            padding: 10px 12px;
+            border: 1px solid #d8dee8;
+            border-radius: 9px;
+            background: white;
+            color: #1e293b;
+            font-size: 14px;
+            font-family: inherit;
+            transition: all 0.2s ease;
+        }
+
+        select:hover,
+        input:hover {
+            border-color: #94a3b8;
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.10);
+        }
+
+        input::placeholder {
+            color: #94a3b8;
+        }
+
+        /* =========================
+           SCORE INPUTS
+        ========================= */
+
+        input[type="number"] {
+            font-weight: 600;
+        }
+
+        /* =========================
+           REMARKS
+        ========================= */
+
+        .remarks {
+            margin-top: 16px;
+        }
+
+        .remarks input {
+            min-height: 46px;
+        }
+
+        /* =========================
+           SAVE BUTTON
+        ========================= */
+
+        .save-area {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 25px;
+            margin-bottom: 30px;
+        }
+
+        .save-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+            padding: 13px 24px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: white;
+            font-size: 14px;
+            font-weight: 700;
+            font-family: inherit;
+            box-shadow: 0 6px 15px rgba(37, 99, 235, 0.22);
+            transition: all 0.2s ease;
+        }
+
+        .save-btn::before {
+            content: "✓";
+            font-size: 16px;
+        }
+
+        .save-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 9px 20px rgba(37, 99, 235, 0.28);
+        }
+
+        .save-btn:active {
+            transform: translateY(0);
+        }
+
+        /* =========================
+           EMPTY STATE
+        ========================= */
+
+        .empty-card {
+            background: white;
+            padding: 45px 25px;
+            border-radius: 16px;
+            text-align: center;
+            border: 1px dashed #cbd5e1;
+            color: #64748b;
+        }
+
+        .empty-icon {
+            font-size: 35px;
+            margin-bottom: 10px;
+        }
+
+        .empty-card p {
+            margin: 0;
+            font-size: 14px;
+        }
+
+        /* =========================
+           RESPONSIVE
+        ========================= */
+
+        @media (max-width: 900px) {
+            .field-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 18px 12px;
+            }
+
+            .header {
+                padding: 22px 18px;
+                border-radius: 14px;
+            }
+
+            .header h1 {
+                font-size: 21px;
+            }
+
+            .batch-info {
+                flex-direction: column;
+            }
+
+            .info-box {
+                width: 100%;
+            }
+
+            .trainee-card {
+                padding: 18px;
+                border-radius: 13px;
+            }
+
+            .trainee-header {
+                align-items: flex-start;
+            }
+
+            .field-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .section {
+                padding: 16px;
+            }
+
+            .save-area {
+                display: block;
+            }
+
+            .save-btn {
+                width: 100%;
+            }
+        }
+    </style>
 </head>
 
 <body>
 
 <div class="container">
 
+    <!-- BACK -->
+    <a href="{% url 'trainer_batch_detail' batch.id %}" class="back-btn">
+        ← Back to Batch
+    </a>
 
-<a href="{% url 'trainer_batch_detail' batch.id %}" class="back-btn">
-    ← Back to Batch
-</a>
+    <!-- HEADER -->
+    <div class="header">
 
-<div class="header">
-    <h1>Attendance & Training Progress</h1>
+        <h1>Attendance & Training Progress</h1>
 
-    <p>
-        <strong>Batch:</strong>
-        {{ batch.name }}
-    </p>
+        <div class="batch-info">
 
-    <p>
-        <strong>Course:</strong>
-        {{ batch.course.name }}
-    </p>
+            <div class="info-box">
+                <span class="info-label">Batch</span>
+                <span class="info-value">{{ batch.name }}</span>
+            </div>
 
-    {% if batch.provider %}
-    <p>
-        <strong>Provider:</strong>
-        {{ batch.provider.name }}
-    </p>
-    {% endif %}
-</div>
+            <div class="info-box">
+                <span class="info-label">Course</span>
+                <span class="info-value">{{ batch.course.name }}</span>
+            </div>
 
-<form method="POST">
+            {% if batch.provider %}
+            <div class="info-box">
+                <span class="info-label">Provider</span>
+                <span class="info-value">{{ batch.provider.name }}</span>
+            </div>
+            {% endif %}
 
-    {% csrf_token %}
+        </div>
 
-    {% for trainee in trainees %}
+    </div>
+
+
+    <!-- FORM -->
+    <form method="POST">
+
+        {% csrf_token %}
+
+        {% for trainee in trainees %}
 
         <div class="trainee-card">
 
+            <!-- TRAINEE HEADER -->
             <div class="trainee-header">
-                <strong>{{ trainee.name }}</strong>
 
-                <br>
+                <div class="trainee-name">
 
-                <small>
-                    Beneficiary ID: {{ trainee.beneficiary_id }}
-                </small>
+                    <div class="avatar">
+                        {{ trainee.name|first|upper }}
+                    </div>
+
+                    <div>
+                        <strong>{{ trainee.name }}</strong>
+
+                        <span class="beneficiary-id">
+                            Beneficiary ID: {{ trainee.beneficiary_id }}
+                        </span>
+                    </div>
+
+                </div>
+
             </div>
 
 
-            <!-- =========================================
+            <!-- =========================
                  ATTENDANCE
-            ========================================== -->
+            ========================== -->
 
             <div class="section">
 
@@ -212,9 +498,7 @@
                             Attendance Status
                         </label>
 
-                        <select
-                            name="attendance_{{ trainee.id }}"
-                        >
+                        <select name="attendance_{{ trainee.id }}">
 
                             <option value="Present">
                                 Present
@@ -227,6 +511,7 @@
                         </select>
 
                     </div>
+
 
                     <div class="field">
 
@@ -242,6 +527,7 @@
                         >
 
                     </div>
+
 
                     <div class="field">
 
@@ -263,9 +549,9 @@
             </div>
 
 
-            <!-- =========================================
+            <!-- =========================
                  TRAINING PROGRESS
-            ========================================== -->
+            ========================== -->
 
             <div class="section">
 
@@ -297,9 +583,9 @@
             </div>
 
 
-            <!-- =========================================
+            <!-- =========================
                  ASSIGNMENTS
-            ========================================== -->
+            ========================== -->
 
             <div class="section">
 
@@ -324,6 +610,7 @@
 
                     </div>
 
+
                     <div class="field">
 
                         <label>
@@ -339,31 +626,14 @@
 
                     </div>
 
-                    <div class="field">
-
-                        <label>
-                            Assignment Score (%)
-                        </label>
-
-                        <input
-                            type="number"
-                            name="assignment_score_{{ trainee.id }}"
-                            min="0"
-                            max="100"
-                            step="0.01"
-                            value="0"
-                        >
-
-                    </div>
-
                 </div>
 
             </div>
 
 
-            <!-- =========================================
+            <!-- =========================
                  ASSESSMENTS
-            ========================================== -->
+            ========================== -->
 
             <div class="section">
 
@@ -388,6 +658,7 @@
 
                     </div>
 
+
                     <div class="field">
 
                         <label>
@@ -403,31 +674,14 @@
 
                     </div>
 
-                    <div class="field">
-
-                        <label>
-                            Assessment Score (%)
-                        </label>
-
-                        <input
-                            type="number"
-                            name="assessment_score_{{ trainee.id }}"
-                            min="0"
-                            max="100"
-                            step="0.01"
-                            value="0"
-                        >
-
-                    </div>
-
                 </div>
 
             </div>
 
 
-            <!-- =========================================
+            <!-- =========================
                  PRACTICAL + FINAL
-            ========================================== -->
+            ========================== -->
 
             <div class="section">
 
@@ -454,6 +708,7 @@
 
                     </div>
 
+
                     <div class="field">
 
                         <label>
@@ -476,9 +731,9 @@
             </div>
 
 
-            <!-- =========================================
+            <!-- =========================
                  REMARKS
-            ========================================== -->
+            ========================== -->
 
             <div class="section">
 
@@ -500,6 +755,7 @@
 
                 </div>
 
+
                 <div class="field remarks">
 
                     <label>
@@ -518,27 +774,39 @@
 
         </div>
 
-    {% empty %}
+        {% empty %}
 
         <div class="empty-card">
-            <p>No trainees assigned to this batch.</p>
+
+            <div class="empty-icon">
+                👥
+            </div>
+
+            <p>
+                No trainees assigned to this batch.
+            </p>
+
         </div>
 
-    {% endfor %}
+        {% endfor %}
 
 
-    {% if trainees %}
+        {% if trainees %}
 
-        <button type="submit" class="save-btn">
-            Save Attendance & Performance
-        </button>
+        <div class="save-area">
 
-    {% endif %}
+            <button type="submit" class="save-btn">
+                Save Attendance & Performance
+            </button>
 
-</form>
+        </div>
 
+        {% endif %}
+
+    </form>
 
 </div>
 
 </body>
 </html>
+

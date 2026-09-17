@@ -3807,9 +3807,6 @@ def trainer_batch_detail(request, id):
     )
 
 
-# ==========================================================
-# TRAINER BATCH PROGRESS
-# ==========================================================
 
 @login_required
 @trainer_required
@@ -3835,16 +3832,20 @@ def trainer_batch_progress(request, id):
 
         for trainee in trainees:
 
-            trainee_id = str(
-                trainee.id
+            trainee_id = str(trainee.id)
+
+            # =========================================
+            # ATTENDANCE STATUS
+            # =========================================
+
+            attendance[trainee_id] = request.POST.get(
+                f"attendance_{trainee.id}",
+                "Absent"
             )
 
-            attendance[trainee_id] = (
-                request.POST.get(
-                    f"attendance_{trainee.id}",
-                    "Absent"
-                )
-            )
+            # =========================================
+            # TRAINING PROGRESS
+            # =========================================
 
             progress[trainee_id] = max(
                 0,
@@ -3859,40 +3860,34 @@ def trainer_batch_progress(request, id):
                 )
             )
 
-            remarks[trainee_id] = (
-                request.POST.get(
-                    f"remarks_{trainee.id}",
-                    ""
-                )
+            # =========================================
+            # GENERAL REMARKS
+            # =========================================
+
+            remarks[trainee_id] = request.POST.get(
+                f"remarks_{trainee.id}",
+                ""
             )
 
-            training, _ = (
-                Training.objects
-                .get_or_create(
-                    trainee=trainee,
-                    course=batch.course,
-                    provider=batch.provider,
-                    defaults={
-                        "start_date":
-                            batch.start_date,
-                        "end_date":
-                            batch.end_date,
-                        "completion_percentage":
-                            progress[trainee_id],
-                        "status":
-                            "Training",
-                        "batch":
-                            batch,
-                        "trainer":
-                            request.user,
-                    }
-                )
+            # =========================================
+            # TRAINING
+            # =========================================
+
+            training, _ = Training.objects.get_or_create(
+                trainee=trainee,
+                course=batch.course,
+                provider=batch.provider,
+                defaults={
+                    "start_date": batch.start_date,
+                    "end_date": batch.end_date,
+                    "completion_percentage": progress[trainee_id],
+                    "status": "Training",
+                    "batch": batch,
+                    "trainer": request.user,
+                }
             )
 
-            training.completion_percentage = (
-                progress[trainee_id]
-            )
-
+            training.completion_percentage = progress[trainee_id]
             training.batch = batch
             training.trainer = request.user
 
@@ -3904,13 +3899,18 @@ def trainer_batch_progress(request, id):
                 ]
             )
 
-            performance, _ = (
-                TrainingPerformance.objects
-                .get_or_create(
-                    trainee=trainee,
-                    training=training,
-                )
+            # =========================================
+            # TRAINING PERFORMANCE
+            # =========================================
+
+            performance, _ = TrainingPerformance.objects.get_or_create(
+                trainee=trainee,
+                training=training,
             )
+
+            # =========================================
+            # ATTENDANCE
+            # =========================================
 
             performance.total_classes = int(
                 request.POST.get(
@@ -3926,6 +3926,14 @@ def trainer_batch_progress(request, id):
                 ) or 0
             )
 
+            # Prevent attended classes from being greater
+            # than total classes
+
+            if performance.attended_classes > performance.total_classes:
+                performance.attended_classes = (
+                    performance.total_classes
+                )
+
             if performance.total_classes > 0:
 
                 performance.attendance_percentage = round(
@@ -3937,7 +3945,13 @@ def trainer_batch_progress(request, id):
                 )
 
             else:
+
                 performance.attendance_percentage = 0
+
+
+            # =========================================
+            # ASSIGNMENTS
+            # =========================================
 
             performance.total_assignments = int(
                 request.POST.get(
@@ -3953,12 +3967,37 @@ def trainer_batch_progress(request, id):
                 ) or 0
             )
 
-            performance.assignment_score = float(
-                request.POST.get(
-                    f"assignment_score_{trainee.id}",
-                    performance.assignment_score
-                ) or 0
-            )
+            # Prevent completed assignments from being
+            # greater than total assignments
+
+            if (
+                performance.completed_assignments
+                > performance.total_assignments
+            ):
+                performance.completed_assignments = (
+                    performance.total_assignments
+                )
+
+            # Automatically calculate assignment percentage
+
+            if performance.total_assignments > 0:
+
+                performance.assignment_score = round(
+                    (
+                        performance.completed_assignments
+                        / performance.total_assignments
+                    ) * 100,
+                    2
+                )
+
+            else:
+
+                performance.assignment_score = 0
+
+
+            # =========================================
+            # ASSESSMENTS
+            # =========================================
 
             performance.total_assessments = int(
                 request.POST.get(
@@ -3974,12 +4013,37 @@ def trainer_batch_progress(request, id):
                 ) or 0
             )
 
-            performance.assessment_score = float(
-                request.POST.get(
-                    f"assessment_score_{trainee.id}",
-                    performance.assessment_score
-                ) or 0
-            )
+            # Prevent completed assessments from being
+            # greater than total assessments
+
+            if (
+                performance.completed_assessments
+                > performance.total_assessments
+            ):
+                performance.completed_assessments = (
+                    performance.total_assessments
+                )
+
+            # Automatically calculate assessment percentage
+
+            if performance.total_assessments > 0:
+
+                performance.assessment_score = round(
+                    (
+                        performance.completed_assessments
+                        / performance.total_assessments
+                    ) * 100,
+                    2
+                )
+
+            else:
+
+                performance.assessment_score = 0
+
+
+            # =========================================
+            # PRACTICAL SCORE
+            # =========================================
 
             performance.practical_score = float(
                 request.POST.get(
@@ -3988,9 +4052,27 @@ def trainer_batch_progress(request, id):
                 ) or 0
             )
 
+            performance.practical_score = max(
+                0,
+                min(
+                    100,
+                    performance.practical_score
+                )
+            )
+
+
+            # =========================================
+            # PROGRESS
+            # =========================================
+
             performance.progress_percentage = float(
                 progress[trainee_id]
             )
+
+
+            # =========================================
+            # FINAL SCORE
+            # =========================================
 
             performance.final_score = float(
                 request.POST.get(
@@ -3999,14 +4081,30 @@ def trainer_batch_progress(request, id):
                 ) or 0
             )
 
-            performance.trainer_remarks = (
-                request.POST.get(
-                    f"performance_remarks_{trainee.id}",
-                    remarks[trainee_id]
+            performance.final_score = max(
+                0,
+                min(
+                    100,
+                    performance.final_score
                 )
             )
 
+
+            # =========================================
+            # PERFORMANCE REMARKS
+            # =========================================
+
+            performance.trainer_remarks = request.POST.get(
+                f"performance_remarks_{trainee.id}",
+                remarks[trainee_id]
+            )
+
+
+
             performance.save()
+
+
+
 
         batch.attendance = attendance
         batch.progress = progress
@@ -4033,6 +4131,11 @@ def trainer_batch_progress(request, id):
             id=id
         )
 
+
+    # =========================================
+    # GET REQUEST
+    # =========================================
+
     return render(
         request,
         "training/trainer_batch_progress.html",
@@ -4041,6 +4144,7 @@ def trainer_batch_progress(request, id):
             "trainees": trainees,
         }
     )
+
 
 
 # ==========================================================
@@ -4173,28 +4277,106 @@ def trainee_dashboard(request):
         )
     )
 
+    # ======================================================
+    # PERFORMANCE
+    # ======================================================
+
+    latest_performance = (
+        performance_records
+        .first()
+    )
+
+    if latest_performance:
+
+        attendance_percentage = (
+            latest_performance.attendance_percentage or 0
+        )
+
+        assignment_percentage = (
+            latest_performance.assignment_score or 0
+        )
+
+        assessment_percentage = (
+            latest_performance.assessment_score or 0
+        )
+
+        overall_progress = (
+            latest_performance.progress_percentage or 0
+        )
+
+        trainer_remarks = (
+            latest_performance.trainer_remarks or ""
+        )
+
+    else:
+
+        attendance_percentage = 0
+        assignment_percentage = 0
+        assessment_percentage = 0
+        overall_progress = 0
+        trainer_remarks = ""
+
+    # ======================================================
+    # EMPLOYMENT
+    # ======================================================
+
+    employment = (
+        Employment.objects
+        .filter(
+            trainee=trainee
+        )
+        .order_by(
+            "-recorded_on",
+            "-id"
+        )
+        .first()
+    )
+
+    # ======================================================
+    # FOLLOW UPS
+    # ======================================================
+
+    followups = (
+        FollowUp.objects
+        .filter(
+            trainee=trainee,
+            completed=False
+        )
+        .order_by("date")[:4]
+    )
+
     return render(
         request,
         "trainees/trainee_dashboard.html",
         {
             "trainee": trainee,
+
             "batches": batches,
+
             "performance_records":
                 performance_records,
+
+            # Performance values for dashboard
+            "attendance_percentage":
+                attendance_percentage,
+
+            "assignment_percentage":
+                assignment_percentage,
+
+            "assessment_percentage":
+                assessment_percentage,
+
+            "overall_progress":
+                overall_progress,
+
+            "trainer_remarks":
+                trainer_remarks,
+
             "employment":
-                Employment.objects
-                .filter(trainee=trainee)
-                .order_by(
-                    "-recorded_on",
-                    "-id"
-                )
-                .first(),
+                employment,
+
             "followups":
-                FollowUp.objects
-                .filter(
-                    trainee=trainee,
-                    completed=False
-                )[:4],
+                followups,
         }
     )
 

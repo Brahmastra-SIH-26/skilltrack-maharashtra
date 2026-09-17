@@ -6,7 +6,7 @@
 
 /* =========================================================
    SKILLTRACK MAHARASHTRA
-   TRAINEE DASHBOARD — PREMIUM UI
+   TRAINEE DASHBOARD — PREMIUM ANALYTICS UI
    ========================================================= */
 
 :root {
@@ -15,6 +15,7 @@
     --primary-light: #eff6ff;
 
     --navy: #0f172a;
+    --navy-2: #172554;
     --slate: #334155;
     --muted: #64748b;
 
@@ -47,6 +48,7 @@
 .trainee-dashboard {
     min-height: 100vh;
     padding: 30px;
+
     background:
         radial-gradient(
             circle at 5% 5%,
@@ -109,11 +111,9 @@
         0 20px 50px rgba(30, 64, 175, .20);
 }
 
-
-/* Decorative circles */
-
 .welcome-hero::before {
     content: "";
+
     position: absolute;
 
     width: 280px;
@@ -127,9 +127,9 @@
     background: rgba(255,255,255,.07);
 }
 
-
 .welcome-hero::after {
     content: "";
+
     position: absolute;
 
     width: 170px;
@@ -143,15 +143,11 @@
     background: rgba(255,255,255,.05);
 }
 
-
 .welcome-content,
 .welcome-action {
     position: relative;
     z-index: 2;
 }
-
-
-/* Hero text */
 
 .welcome-label {
     display: inline-flex;
@@ -164,7 +160,6 @@
     border-radius: 999px;
 
     background: rgba(255,255,255,.10);
-    backdrop-filter: blur(10px);
 
     color: #dbeafe;
 
@@ -172,7 +167,6 @@
     font-weight: 800;
     letter-spacing: 1px;
 }
-
 
 .welcome-content h1 {
     margin: 16px 0 10px;
@@ -183,7 +177,6 @@
     font-weight: 850;
     letter-spacing: -1px;
 }
-
 
 .welcome-description {
     max-width: 650px;
@@ -209,7 +202,6 @@
     margin-top: 24px;
 }
 
-
 .meta-item {
     display: flex;
     align-items: center;
@@ -223,9 +215,7 @@
     border-radius: 14px;
 
     background: rgba(255,255,255,.08);
-    backdrop-filter: blur(12px);
 }
-
 
 .meta-icon {
     display: flex;
@@ -242,7 +232,6 @@
     font-size: 16px;
 }
 
-
 .meta-item small {
     display: block;
 
@@ -252,10 +241,10 @@
 
     font-size: 10px;
     font-weight: 700;
+
     text-transform: uppercase;
     letter-spacing: .5px;
 }
-
 
 .meta-item strong {
     display: block;
@@ -279,7 +268,6 @@
     gap: 16px;
 }
 
-
 .hero-icon {
     display: flex;
     align-items: center;
@@ -298,10 +286,7 @@
         0 15px 30px rgba(0,0,0,.12);
 
     font-size: 42px;
-
-    backdrop-filter: blur(12px);
 }
-
 
 .hero-button {
     display: inline-flex;
@@ -326,7 +311,6 @@
     transition: .25s ease;
 }
 
-
 .hero-button:hover {
     color: var(--primary);
     transform: translateY(-3px);
@@ -349,7 +333,6 @@
     margin-bottom: 30px;
 }
 
-
 .quick-stat-card {
     position: relative;
     overflow: hidden;
@@ -370,7 +353,6 @@
     transition: .25s ease;
 }
 
-
 .quick-stat-card:hover {
     transform: translateY(-4px);
 
@@ -378,7 +360,6 @@
 
     box-shadow: var(--shadow);
 }
-
 
 .quick-stat-card::after {
     content: "";
@@ -395,7 +376,6 @@
 
     background: rgba(37,99,235,.05);
 }
-
 
 .quick-stat-icon {
     position: relative;
@@ -417,16 +397,13 @@
     font-size: 23px;
 }
 
-
 .quick-stat-card:nth-child(2) .quick-stat-icon {
     background: var(--purple-light);
 }
 
-
 .quick-stat-card:nth-child(3) .quick-stat-icon {
     background: var(--green-light);
 }
-
 
 .quick-stat-card span {
     display: block;
@@ -437,10 +414,10 @@
 
     font-size: 11px;
     font-weight: 700;
+
     text-transform: uppercase;
     letter-spacing: .6px;
 }
-
 
 .quick-stat-card strong {
     color: var(--navy);
@@ -484,13 +461,11 @@
     transition: .25s ease;
 }
 
-
 .dashboard-card:hover {
     border-color: rgba(37,99,235,.14);
 
     box-shadow: var(--shadow);
 }
-
 
 .full-width {
     margin-bottom: 22px;
@@ -513,7 +488,6 @@
     border-bottom: 1px solid #f1f5f9;
 }
 
-
 .card-icon {
     display: flex;
     align-items: center;
@@ -532,11 +506,8 @@
         #dbeafe
     );
 
-    box-shadow: inset 0 0 0 1px rgba(37,99,235,.06);
-
     font-size: 21px;
 }
-
 
 .card-heading h2 {
     margin: 0 0 4px;
@@ -545,9 +516,7 @@
 
     font-size: 19px;
     font-weight: 850;
-    letter-spacing: -.3px;
 }
-
 
 .card-heading p {
     margin: 0;
@@ -563,8 +532,6 @@
    ========================================================= */
 
 .training-item {
-    position: relative;
-
     padding: 20px;
 
     margin-bottom: 13px;
@@ -582,20 +549,18 @@
     transition: .25s ease;
 }
 
-
 .training-item:last-child {
     margin-bottom: 0;
 }
-
 
 .training-item:hover {
     transform: translateX(4px);
 
     border-color: #bfdbfe;
 
-    box-shadow: 0 8px 25px rgba(37,99,235,.08);
+    box-shadow:
+        0 8px 25px rgba(37,99,235,.08);
 }
-
 
 .training-title {
     display: flex;
@@ -607,7 +572,6 @@
     margin-bottom: 18px;
 }
 
-
 .training-title h3 {
     margin: 0 0 7px;
 
@@ -616,7 +580,6 @@
     font-size: 16px;
     font-weight: 800;
 }
-
 
 .training-status {
     display: inline-flex;
@@ -634,7 +597,6 @@
     text-transform: uppercase;
 }
 
-
 .training-details {
     display: grid;
 
@@ -643,7 +605,6 @@
     gap: 12px;
 }
 
-
 .training-details > div {
     padding: 11px 12px;
 
@@ -651,7 +612,6 @@
 
     background: #f8fafc;
 }
-
 
 .training-details span {
     display: block;
@@ -663,7 +623,6 @@
     font-size: 10px;
     font-weight: 700;
 }
-
 
 .training-details strong {
     display: block;
@@ -698,7 +657,6 @@
     border: 1px solid #bbf7d0;
 }
 
-
 .employment-status-box::after {
     content: "💼";
 
@@ -714,7 +672,6 @@
     opacity: .12;
 }
 
-
 .employment-status-box span {
     display: block;
 
@@ -729,7 +686,6 @@
     letter-spacing: .7px;
 }
 
-
 .employment-status-box h3 {
     margin: 0;
 
@@ -739,7 +695,6 @@
     font-weight: 850;
 }
 
-
 .employment-details {
     display: grid;
 
@@ -747,7 +702,6 @@
 
     margin-bottom: 18px;
 }
-
 
 .employment-detail {
     display: flex;
@@ -763,13 +717,11 @@
     background: #f8fafc;
 }
 
-
 .employment-detail span {
     color: var(--muted);
 
     font-size: 11px;
 }
-
 
 .employment-detail strong {
     color: var(--slate);
@@ -778,7 +730,6 @@
 
     text-align: right;
 }
-
 
 .card-action {
     display: inline-flex;
@@ -801,12 +752,239 @@
     transition: .25s ease;
 }
 
-
 .card-action:hover {
     background: var(--primary);
     color: white;
 
     transform: translateY(-2px);
+}
+
+
+/* =========================================================
+   ANALYTICS SECTION
+   ========================================================= */
+
+.analytics-grid {
+    display: grid;
+
+    grid-template-columns: .85fr 1.15fr;
+
+    gap: 18px;
+}
+
+.analytics-card {
+    padding: 20px;
+
+    border-radius: 18px;
+
+    border: 1px solid #e8edf5;
+
+    background:
+        linear-gradient(
+            135deg,
+            #ffffff,
+            #f8fbff
+        );
+}
+
+.analytics-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+
+    margin-bottom: 15px;
+}
+
+.analytics-header h3 {
+    margin: 0 0 4px;
+
+    color: var(--navy);
+
+    font-size: 15px;
+    font-weight: 850;
+}
+
+.analytics-header p {
+    margin: 0;
+
+    color: var(--muted);
+
+    font-size: 11px;
+}
+
+.chart-container {
+    position: relative;
+
+    height: 240px;
+}
+
+
+/* =========================================================
+   OVERALL CENTER LABEL
+   ========================================================= */
+
+.progress-center {
+    position: absolute;
+
+    left: 50%;
+    top: 50%;
+
+    transform: translate(-50%, -50%);
+
+    text-align: center;
+
+    pointer-events: none;
+}
+
+.progress-center strong {
+    display: block;
+
+    color: var(--navy);
+
+    font-size: 27px;
+    font-weight: 850;
+}
+
+.progress-center span {
+    color: var(--muted);
+
+    font-size: 10px;
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   PERFORMANCE
+   ========================================================= */
+
+.performance-grid {
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 15px;
+}
+
+.performance-item {
+    padding: 17px;
+
+    border: 1px solid #e8edf5;
+    border-radius: 15px;
+
+    background: #fafcff;
+}
+
+.performance-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    margin-bottom: 11px;
+}
+
+.performance-top span {
+    color: var(--slate);
+
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.performance-top strong {
+    color: var(--primary);
+
+    font-size: 16px;
+    font-weight: 850;
+}
+
+.progress-track {
+    width: 100%;
+    height: 9px;
+
+    overflow: hidden;
+
+    border-radius: 999px;
+
+    background: #e2e8f0;
+}
+
+.progress-fill {
+    height: 100%;
+
+    border-radius: inherit;
+
+    background:
+        linear-gradient(
+            90deg,
+            #2563eb,
+            #60a5fa
+        );
+
+    transition: width .7s ease;
+}
+
+.performance-overall {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    padding: 20px;
+
+    border-radius: 15px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #172554,
+            #2563eb
+        );
+
+    color: white;
+}
+
+.performance-overall span {
+    margin-bottom: 4px;
+
+    color: rgba(255,255,255,.7);
+
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.performance-overall strong {
+    font-size: 28px;
+    font-weight: 850;
+}
+
+.trainer-remarks {
+    margin-top: 18px;
+
+    padding: 17px;
+
+    border-left: 4px solid var(--primary);
+
+    border-radius: 12px;
+
+    background: #f8fafc;
+}
+
+.trainer-remarks > span {
+    display: block;
+
+    margin-bottom: 7px;
+
+    color: var(--primary);
+
+    font-size: 11px;
+    font-weight: 850;
+}
+
+.trainer-remarks p {
+    margin: 0;
+
+    color: var(--slate);
+
+    font-size: 12px;
+    line-height: 1.7;
 }
 
 
@@ -825,11 +1003,9 @@
     background: #fafcff;
 }
 
-
 .empty-state.compact {
     padding: 28px 20px;
 }
-
 
 .empty-icon {
     display: flex;
@@ -848,7 +1024,6 @@
     font-size: 27px;
 }
 
-
 .empty-state h3 {
     margin: 0 0 6px;
 
@@ -857,7 +1032,6 @@
     font-size: 15px;
     font-weight: 800;
 }
-
 
 .empty-state p {
     max-width: 500px;
@@ -894,7 +1068,6 @@
     border: 1px solid #fde68a;
 }
 
-
 .verification-icon {
     display: flex;
     align-items: center;
@@ -909,11 +1082,8 @@
 
     background: white;
 
-    box-shadow: 0 5px 15px rgba(245,158,11,.12);
-
     font-size: 25px;
 }
-
 
 .verification-box h3 {
     margin: 0 0 6px;
@@ -923,7 +1093,6 @@
     font-size: 16px;
     font-weight: 850;
 }
-
 
 .verification-box p {
     margin: 0;
@@ -946,6 +1115,8 @@
 
     padding: 18px;
 
+    margin-bottom: 10px;
+
     border-radius: 16px;
 
     background:
@@ -958,6 +1129,9 @@
     border: 1px solid #bfdbfe;
 }
 
+.assigned-training:last-child {
+    margin-bottom: 0;
+}
 
 .assigned-training-icon {
     display: flex;
@@ -978,11 +1152,9 @@
     font-size: 23px;
 }
 
-
 .assigned-training-info {
     flex: 1;
 }
-
 
 .assigned-training-info h3 {
     margin: 0 0 5px;
@@ -993,7 +1165,6 @@
     font-weight: 800;
 }
 
-
 .assigned-training-info p {
     margin: 0;
 
@@ -1002,7 +1173,6 @@
     font-size: 11px;
     line-height: 1.5;
 }
-
 
 .assigned-badge {
     padding: 7px 11px;
@@ -1020,155 +1190,6 @@
 
 
 /* =========================================================
-   PERFORMANCE
-   ========================================================= */
-
-.performance-grid {
-    display: grid;
-
-    grid-template-columns: 1fr 1fr;
-
-    gap: 15px;
-}
-
-
-.performance-item {
-    padding: 17px;
-
-    border: 1px solid #e8edf5;
-    border-radius: 15px;
-
-    background: #fafcff;
-}
-
-
-.performance-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-
-    margin-bottom: 11px;
-}
-
-
-.performance-top span {
-    color: var(--slate);
-
-    font-size: 12px;
-    font-weight: 700;
-}
-
-
-.performance-top strong {
-    color: var(--primary);
-
-    font-size: 16px;
-    font-weight: 850;
-}
-
-
-.progress-track {
-    width: 100%;
-    height: 9px;
-
-    overflow: hidden;
-
-    border-radius: 999px;
-
-    background: #e2e8f0;
-}
-
-
-.progress-fill {
-    height: 100%;
-
-    border-radius: inherit;
-
-    background:
-        linear-gradient(
-            90deg,
-            #2563eb,
-            #60a5fa
-        );
-
-    box-shadow: 0 0 12px rgba(37,99,235,.25);
-
-    transition: width .7s ease;
-}
-
-
-.performance-overall {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-
-    padding: 20px;
-
-    border-radius: 15px;
-
-    background:
-        linear-gradient(
-            135deg,
-            #172554,
-            #2563eb
-        );
-
-    color: white;
-}
-
-
-.performance-overall span {
-    margin-bottom: 4px;
-
-    color: rgba(255,255,255,.7);
-
-    font-size: 11px;
-    font-weight: 700;
-}
-
-
-.performance-overall strong {
-    font-size: 28px;
-    font-weight: 850;
-}
-
-
-.trainer-remarks {
-    margin-top: 18px;
-
-    padding: 17px;
-
-    border-left: 4px solid var(--primary);
-
-    border-radius: 12px;
-
-    background: #f8fafc;
-}
-
-
-.trainer-remarks > span {
-    display: block;
-
-    margin-bottom: 7px;
-
-    color: var(--primary);
-
-    font-size: 11px;
-    font-weight: 850;
-}
-
-
-.trainer-remarks p {
-    margin: 0;
-
-    color: var(--slate);
-
-    font-size: 12px;
-    line-height: 1.7;
-}
-
-
-/* =========================================================
    FOLLOW-UP TIMELINE
    ========================================================= */
 
@@ -1179,7 +1200,6 @@
 
     gap: 12px;
 }
-
 
 .followup-list::before {
     content: "";
@@ -1194,7 +1214,6 @@
 
     background: #dbeafe;
 }
-
 
 .followup-item {
     position: relative;
@@ -1214,7 +1233,6 @@
     transition: .25s ease;
 }
 
-
 .followup-item:hover {
     transform: translateX(4px);
 
@@ -1222,7 +1240,6 @@
 
     box-shadow: 0 8px 22px rgba(37,99,235,.07);
 }
-
 
 .followup-icon {
     display: flex;
@@ -1244,7 +1261,6 @@
     font-size: 18px;
 }
 
-
 .followup-item strong {
     display: block;
 
@@ -1255,110 +1271,10 @@
     font-size: 13px;
 }
 
-
 .followup-item span {
     color: var(--muted);
 
     font-size: 11px;
-}
-
-
-/* =========================================================
-   BADGE STATES
-   ========================================================= */
-
-.badge {
-    display: inline-flex;
-    align-items: center;
-
-    padding: 6px 11px;
-
-    border-radius: 999px;
-
-    font-size: 10px;
-    font-weight: 800;
-}
-
-
-.badge.Verified {
-    background: var(--green-light);
-    color: #166534;
-}
-
-
-.badge.Pending {
-    background: var(--orange-light);
-    color: #92400e;
-}
-
-
-.badge.Rejected {
-    background: var(--red-light);
-    color: #991b1b;
-}
-
-
-/* =========================================================
-   SCROLLBAR
-   ========================================================= */
-
-.trainee-dashboard ::-webkit-scrollbar {
-    width: 7px;
-}
-
-
-.trainee-dashboard ::-webkit-scrollbar-track {
-    background: #f1f5f9;
-}
-
-
-.trainee-dashboard ::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
-    border-radius: 999px;
-}
-
-
-/* =========================================================
-   ANIMATIONS
-   ========================================================= */
-
-@keyframes dashboardFade {
-
-    from {
-        opacity: 0;
-        transform: translateY(18px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-
-}
-
-
-.welcome-hero {
-    animation: dashboardFade .5s ease both;
-}
-
-
-.quick-stat-card {
-    animation: dashboardFade .5s ease both;
-}
-
-
-.quick-stat-card:nth-child(2) {
-    animation-delay: .06s;
-}
-
-
-.quick-stat-card:nth-child(3) {
-    animation-delay: .12s;
-}
-
-
-.dashboard-card {
-    animation: dashboardFade .5s ease both;
 }
 
 
@@ -1373,6 +1289,10 @@
     }
 
     .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .analytics-grid {
         grid-template-columns: 1fr;
     }
 
@@ -1508,8 +1428,10 @@
     *,
     *::before,
     *::after {
+
         animation-duration: .01ms !important;
         transition-duration: .01ms !important;
+
     }
 
 }
@@ -1518,6 +1440,7 @@
 
 
 <div class="trainee-dashboard">
+
 
     <!-- =====================================================
          HERO
@@ -1549,11 +1472,15 @@
                     </span>
 
                     <div>
-                        <small>Beneficiary ID</small>
+
+                        <small>
+                            Beneficiary ID
+                        </small>
 
                         <strong>
                             {{ trainee.beneficiary_id }}
                         </strong>
+
                     </div>
 
                 </div>
@@ -1566,11 +1493,15 @@
                     </span>
 
                     <div>
-                        <small>Account Status</small>
+
+                        <small>
+                            Account Status
+                        </small>
 
                         <strong>
                             {{ trainee.status }}
                         </strong>
+
                     </div>
 
                 </div>
@@ -1612,14 +1543,18 @@
 
             <div>
 
-                <span>Training</span>
+                <span>
+                    Training
+                </span>
 
                 <strong>
+
                     {% if batches %}
                         Assigned
                     {% else %}
                         Not Assigned
                     {% endif %}
+
                 </strong>
 
             </div>
@@ -1635,7 +1570,9 @@
 
             <div>
 
-                <span>Overall Progress</span>
+                <span>
+                    Overall Progress
+                </span>
 
                 <strong>
                     {{ overall_progress|default:"0" }}%
@@ -1654,14 +1591,18 @@
 
             <div>
 
-                <span>Employment</span>
+                <span>
+                    Employment
+                </span>
 
                 <strong>
+
                     {% if employment %}
                         {{ employment.status }}
                     {% else %}
                         Not Updated
                     {% endif %}
+
                 </strong>
 
             </div>
@@ -1729,33 +1670,56 @@
                     <div class="training-details">
 
                         <div>
-                            <span>📘 Course</span>
+
+                            <span>
+                                📘 Course
+                            </span>
+
                             <strong>
                                 {{ batch.course }}
                             </strong>
+
                         </div>
 
+
                         <div>
-                            <span>🏢 Provider</span>
+
+                            <span>
+                                🏢 Provider
+                            </span>
+
                             <strong>
                                 {{ batch.provider }}
                             </strong>
+
                         </div>
 
+
                         <div>
-                            <span>📍 District</span>
+
+                            <span>
+                                📍 District
+                            </span>
+
                             <strong>
                                 {{ batch.district }}
                             </strong>
+
                         </div>
 
+
                         <div>
-                            <span>📅 Duration</span>
+
+                            <span>
+                                📅 Duration
+                            </span>
+
                             <strong>
                                 {{ batch.start_date }}
                                 –
                                 {{ batch.end_date }}
                             </strong>
+
                         </div>
 
                     </div>
@@ -2048,7 +2012,95 @@
         </div>
 
 
-        <div class="performance-grid">
+        <!-- =================================================
+             ANALYTICS CHARTS
+        ================================================= -->
+
+        <div class="analytics-grid">
+
+
+            <!-- PROGRESS DOUGHNUT -->
+
+            <div class="analytics-card">
+
+                <div class="analytics-header">
+
+                    <div>
+
+                        <h3>
+                            Overall Progress
+                        </h3>
+
+                        <p>
+                            Your current training completion
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="chart-container">
+
+                    <canvas id="overallProgressChart"></canvas>
+
+                    <div class="progress-center">
+
+                        <strong>
+                            {{ overall_progress|default:"0" }}%
+                        </strong>
+
+                        <span>
+                            Overall
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- PERFORMANCE BAR -->
+
+            <div class="analytics-card">
+
+                <div class="analytics-header">
+
+                    <div>
+
+                        <h3>
+                            Performance Breakdown
+                        </h3>
+
+                        <p>
+                            Attendance, assignments and assessments
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="chart-container">
+
+                    <canvas id="performanceChart"></canvas>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             ORIGINAL PERFORMANCE BARS
+        ================================================= -->
+
+        <div
+            class="performance-grid"
+            style="margin-top:18px;"
+        >
 
 
             <!-- Attendance -->
@@ -2125,9 +2177,10 @@
 
                 <div class="progress-track">
 
-                    <div
-                        class="progress-fill"
+                    <div class="progress-fill"
+
                         style="width: {{ assessment_percentage|default:0 }}%;"
+
                     ></div>
 
                 </div>
@@ -2254,5 +2307,247 @@
 
 
 </div>
+
+
+<!-- =========================================================
+     CHART.JS
+     ========================================================= -->
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+
+    /* =====================================================
+       EXISTING DJANGO DATA
+       ===================================================== */
+
+    const overall =
+        Number("{{ overall_progress|default:0 }}") || 0;
+
+    const attendance =
+        Number("{{ attendance_percentage|default:0 }}") || 0;
+
+    const assignments =
+        Number("{{ assignment_percentage|default:0 }}") || 0;
+
+    const assessments =
+        Number("{{ assessment_percentage|default:0 }}") || 0;
+
+
+    /* =====================================================
+       OVERALL PROGRESS DOUGHNUT
+       ===================================================== */
+
+    const overallCanvas =
+        document.getElementById("overallProgressChart");
+
+
+    if (overallCanvas) {
+
+        new Chart(overallCanvas, {
+
+            type: "doughnut",
+
+            data: {
+
+                labels: [
+                    "Completed",
+                    "Remaining"
+                ],
+
+                datasets: [{
+
+                    data: [
+                        overall,
+                        Math.max(0, 100 - overall)
+                    ],
+
+                    borderWidth: 0,
+
+                    hoverOffset: 5
+
+                }]
+
+            },
+
+            options: {
+
+                responsive: true,
+
+                maintainAspectRatio: false,
+
+                cutout: "75%",
+
+                plugins: {
+
+                    legend: {
+
+                        position: "bottom",
+
+                        labels: {
+
+                            usePointStyle: true,
+
+                            padding: 16,
+
+                            font: {
+                                size: 10
+                            }
+
+                        }
+
+                    },
+
+                    tooltip: {
+
+                        callbacks: {
+
+                            label: function(context) {
+
+                                return " " +
+                                    context.label +
+                                    ": " +
+                                    context.raw +
+                                    "%";
+
+                            }
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        });
+
+    }
+
+
+    /* =====================================================
+       PERFORMANCE BAR CHART
+       ===================================================== */
+
+    const performanceCanvas =
+        document.getElementById("performanceChart");
+
+
+    if (performanceCanvas) {
+
+        new Chart(performanceCanvas, {
+
+            type: "bar",
+
+            data: {
+
+                labels: [
+                    "Attendance",
+                    "Assignments",
+                    "Assessments"
+                ],
+
+                datasets: [{
+
+                    label: "Performance",
+
+                    data: [
+                        attendance,
+                        assignments,
+                        assessments
+                    ],
+
+                    borderRadius: 8,
+
+                    borderSkipped: false
+
+                }]
+
+            },
+
+            options: {
+
+                responsive: true,
+
+                maintainAspectRatio: false,
+
+                scales: {
+
+                    y: {
+
+                        beginAtZero: true,
+
+                        max: 100,
+
+                        ticks: {
+
+                            callback: function(value) {
+
+                                return value + "%";
+
+                            },
+
+                            precision: 0
+
+                        },
+
+                        grid: {
+
+                            drawBorder: false
+
+                        }
+
+                    },
+
+                    x: {
+
+                        grid: {
+
+                            display: false
+
+                        }
+
+                    }
+
+                },
+
+                plugins: {
+
+                    legend: {
+
+                        display: false
+
+                    },
+
+                    tooltip: {
+
+                        callbacks: {
+
+                            label: function(context) {
+
+                                return " " +
+                                    context.raw +
+                                    "%";
+
+                            }
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        });
+
+    }
+
+});
+
+</script>
 
 {% endblock %}

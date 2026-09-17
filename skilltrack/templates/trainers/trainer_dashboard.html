@@ -1,8 +1,11 @@
-
 {% extends 'base.html' %}
 
 {% block title %}
 Trainer Dashboard | SkillTrack Maharashtra
+{% endblock %}
+
+{% block head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 {% endblock %}
 
 {% block page_header %}
@@ -15,27 +18,39 @@ Trainer Dashboard | SkillTrack Maharashtra
 {% block content %}
 
 <style>
+
 .trainer-page {
-    max-width: 1200px;
+    max-width: 1250px;
     margin: 0 auto;
 }
 
-/* Welcome */
+
+/* =========================
+   WELCOME
+========================= */
+
 .trainer-welcome {
-    background: linear-gradient(135deg, var(--navy), var(--navy-light));
+    background:
+        radial-gradient(circle at 85% 20%, rgba(255,255,255,.12), transparent 30%),
+        linear-gradient(135deg, var(--navy), var(--navy-light));
+
     color: white;
-    border-radius: 14px;
-    padding: 22px 26px;
+    border-radius: 16px;
+    padding: 24px 28px;
     margin-bottom: 20px;
+
     display: flex;
     justify-content: space-between;
     align-items: center;
+
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
 }
 
 .trainer-welcome h2 {
     margin: 0 0 5px;
     font-family: "Playfair Display", serif;
-    font-size: 25px;
+    font-size: 26px;
 }
 
 .trainer-welcome p {
@@ -47,12 +62,18 @@ Trainer Dashboard | SkillTrack Maharashtra
 .welcome-tag {
     background: rgba(255,255,255,.12);
     border: 1px solid rgba(255,255,255,.2);
-    padding: 7px 12px;
+    padding: 7px 13px;
     border-radius: 20px;
-    font-size: 12px;
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
 }
 
-/* Stats */
+
+/* =========================
+   STATS
+========================= */
+
 .trainer-stats {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -63,24 +84,45 @@ Trainer Dashboard | SkillTrack Maharashtra
 .trainer-stat {
     background: var(--white);
     border: 1px solid var(--line);
-    border-radius: 12px;
-    padding: 16px 18px;
+    border-radius: 13px;
+    padding: 17px 18px;
     box-shadow: var(--shadow);
+    position: relative;
+    overflow: hidden;
+}
+
+.trainer-stat::after {
+    content: "";
+    position: absolute;
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    right: -20px;
+    top: -20px;
+    background: var(--blue-light);
+    opacity: .7;
 }
 
 .trainer-stat .label {
     color: var(--muted);
-    font-size: 12px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .4px;
     margin-bottom: 6px;
 }
 
 .trainer-stat .number {
-    font-size: 25px;
+    font-size: 26px;
     font-weight: 800;
     color: var(--navy);
 }
 
-/* Actions */
+
+/* =========================
+   ACTIONS
+========================= */
+
 .trainer-actions {
     display: flex;
     gap: 10px;
@@ -92,11 +134,13 @@ Trainer Dashboard | SkillTrack Maharashtra
     text-decoration: none;
     padding: 9px 14px;
     border-radius: 8px;
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 700;
+
     border: 1px solid var(--line);
     background: white;
     color: var(--navy);
+
     transition: .2s;
 }
 
@@ -104,6 +148,7 @@ Trainer Dashboard | SkillTrack Maharashtra
     transform: translateY(-1px);
     border-color: var(--blue);
     color: var(--blue);
+    box-shadow: var(--shadow);
 }
 
 .trainer-actions a.primary {
@@ -112,7 +157,52 @@ Trainer Dashboard | SkillTrack Maharashtra
     border-color: var(--blue);
 }
 
-/* Section */
+
+/* =========================
+   ANALYTICS
+========================= */
+
+.analytics-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.45fr;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.chart-card {
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 18px;
+    box-shadow: var(--shadow);
+}
+
+.chart-header {
+    margin-bottom: 13px;
+}
+
+.chart-header h3 {
+    margin: 0;
+    color: var(--navy);
+    font-size: 16px;
+}
+
+.chart-header p {
+    margin: 4px 0 0;
+    color: var(--muted);
+    font-size: 11px;
+}
+
+.chart-box {
+    height: 235px;
+    position: relative;
+}
+
+
+/* =========================
+   SECTION TITLE
+========================= */
+
 .trainer-section-title {
     display: flex;
     justify-content: space-between;
@@ -126,7 +216,20 @@ Trainer Dashboard | SkillTrack Maharashtra
     color: var(--navy);
 }
 
-/* Batch grid */
+.batch-count {
+    background: var(--blue-light);
+    color: var(--blue);
+    padding: 5px 9px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 800;
+}
+
+
+/* =========================
+   BATCH GRID
+========================= */
+
 .batch-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -136,7 +239,7 @@ Trainer Dashboard | SkillTrack Maharashtra
 .batch-card {
     background: white;
     border: 1px solid var(--line);
-    border-radius: 12px;
+    border-radius: 13px;
     padding: 17px;
     box-shadow: var(--shadow);
     transition: .2s;
@@ -152,7 +255,7 @@ Trainer Dashboard | SkillTrack Maharashtra
     justify-content: space-between;
     align-items: flex-start;
     gap: 10px;
-    margin-bottom: 12px;
+    margin-bottom: 13px;
 }
 
 .batch-name {
@@ -191,6 +294,11 @@ Trainer Dashboard | SkillTrack Maharashtra
     color: var(--saffron);
 }
 
+
+/* =========================
+   BATCH INFO
+========================= */
+
 .batch-info {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -216,6 +324,11 @@ Trainer Dashboard | SkillTrack Maharashtra
     color: var(--ink);
 }
 
+
+/* =========================
+   CAPACITY
+========================= */
+
 .capacity-row {
     display: flex;
     justify-content: space-between;
@@ -225,7 +338,7 @@ Trainer Dashboard | SkillTrack Maharashtra
 }
 
 .capacity-bar {
-    height: 6px;
+    height: 7px;
     background: #edf1f5;
     border-radius: 10px;
     overflow: hidden;
@@ -233,14 +346,20 @@ Trainer Dashboard | SkillTrack Maharashtra
 
 .capacity-fill {
     height: 100%;
-    background: var(--blue);
+    background: linear-gradient(90deg, var(--blue), var(--green));
     border-radius: 10px;
 }
 
 .batch-footer {
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
+    align-items: center;
     margin-top: 14px;
+}
+
+.batch-trainee-label {
+    font-size: 11px;
+    color: var(--muted);
 }
 
 .manage-btn {
@@ -257,12 +376,16 @@ Trainer Dashboard | SkillTrack Maharashtra
     background: var(--blue);
 }
 
-/* Empty */
+
+/* =========================
+   EMPTY
+========================= */
+
 .empty-box {
     background: white;
     border: 1px dashed var(--line);
     border-radius: 12px;
-    padding: 35px 20px;
+    padding: 38px 20px;
     text-align: center;
     color: var(--muted);
 }
@@ -272,8 +395,21 @@ Trainer Dashboard | SkillTrack Maharashtra
     color: var(--navy);
 }
 
-/* Responsive */
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 950px) {
+
+    .analytics-grid {
+        grid-template-columns: 1fr;
+    }
+
+}
+
 @media (max-width: 800px) {
+
     .trainer-stats,
     .batch-grid {
         grid-template-columns: 1fr;
@@ -284,72 +420,135 @@ Trainer Dashboard | SkillTrack Maharashtra
         gap: 12px;
         flex-direction: column;
     }
+
 }
 
 @media (max-width: 500px) {
+
     .batch-info {
         grid-template-columns: 1fr;
     }
+
+    .trainer-welcome {
+        padding: 21px;
+    }
+
+    .trainer-actions a {
+        width: 100%;
+        text-align: center;
+    }
+
 }
+
 </style>
+
 
 <div class="trainer-page">
 
-    <!-- Compact Welcome -->
+
+    <!-- =========================
+         WELCOME
+    ========================== -->
+
     <div class="trainer-welcome">
+
         <div>
-            <h2>Welcome back, {{ request.user.get_full_name|default:request.user.username }}</h2>
-            <p>Manage your training batches and monitor trainee progress.</p>
+
+            <h2>
+                Welcome back,
+                {{ request.user.get_full_name|default:request.user.username }}
+            </h2>
+
+            <p>
+                Manage your training batches and monitor trainee progress.
+            </p>
+
         </div>
 
         <div class="welcome-tag">
             Training Management
         </div>
+
     </div>
 
-    <!-- Stats -->
+
+    <!-- =========================
+         STATS
+    ========================== -->
+
     <div class="trainer-stats">
 
         <div class="trainer-stat">
-            <div class="label">Assigned Batches</div>
-            <div class="number">{{ batches|length }}</div>
-        </div>
 
-        <div class="trainer-stat">
-            <div class="label">Active Batches</div>
-            <div class="number">
-                {% with active_count=0 %}
-                    {% for batch in batches %}
-                        {% if batch.status == "Active" %}
-                            {{ forloop.counter }}
-                        {% endif %}
-                    {% endfor %}
-                {% endwith %}
+            <div class="label">
+                Assigned Batches
             </div>
+
+            <div class="number">
+                {{ batches|length }}
+            </div>
+
         </div>
 
+
         <div class="trainer-stat">
-            <div class="label">Total Trainees</div>
+
+            <div class="label">
+                Active Batches
+            </div>
+
             <div class="number">
+
                 {% for batch in batches %}
-                    {{ batch.trainees.count }}{% if not forloop.last %}+{% endif %}
-                {% empty %}
-                    0
+
+                    {% if batch.status == "Active" %}
+                        <span class="active-counter"></span>
+                    {% endif %}
+
                 {% endfor %}
+
+                <span id="activeBatchCount">0</span>
+
             </div>
+
+        </div>
+
+
+        <div class="trainer-stat">
+
+            <div class="label">
+                Total Trainees
+            </div>
+
+            <div class="number">
+
+                <span id="totalTraineeCount">0</span>
+
+            </div>
+
         </div>
 
     </div>
 
-    <!-- Quick Actions -->
+
+    <!-- =========================
+         QUICK ACTIONS
+    ========================== -->
+
     <div class="trainer-actions">
 
-        <a href="{% url 'trainer_verify_trainees' %}" class="primary">
-            Verify Trainees
+        <a
+            href="{% url 'trainer_verify_trainees' %}"
+            class="primary">
+            ✓ Verify Trainees
         </a>
 
         <a href="{% url 'trainer_attendance' %}">
             Attendance
+        </a>
+
+        <a href="#analytics">
+            Analytics
         </a>
 
         <a href="#my-batches">
@@ -358,24 +557,101 @@ Trainer Dashboard | SkillTrack Maharashtra
 
     </div>
 
-    <!-- Batches -->
+
+    <!-- =========================
+         ANALYTICS
+    ========================== -->
+
+    <div id="analytics" class="analytics-grid">
+
+
+        <!-- BATCH STATUS -->
+
+        <div class="chart-card">
+
+            <div class="chart-header">
+
+                <h3>
+                    Batch Status
+                </h3>
+
+                <p>
+                    Overview of your assigned training batches.
+                </p>
+
+            </div>
+
+            <div class="chart-box">
+
+                <canvas id="batchStatusChart"></canvas>
+
+            </div>
+
+        </div>
+
+
+        <!-- TRAINEES -->
+
+        <div class="chart-card">
+
+            <div class="chart-header">
+
+                <h3>
+                    Trainees by Batch
+                </h3>
+
+                <p>
+                    Number of trainees assigned to each batch.
+                </p>
+
+            </div>
+
+            <div class="chart-box">
+
+                <canvas id="traineeBatchChart"></canvas>
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+    <!-- =========================
+         BATCHES
+    ========================== -->
+
     <div id="my-batches">
 
+
         <div class="trainer-section-title">
-            <h2>My Training Batches</h2>
+
+            <h2>
+                My Training Batches
+            </h2>
+
+            <span class="batch-count">
+                {{ batches|length }} Batches
+            </span>
+
         </div>
+
 
         {% if batches %}
 
         <div class="batch-grid">
 
+
             {% for batch in batches %}
 
             <div class="batch-card">
 
+
                 <div class="batch-top">
 
                     <div>
+
                         <h3 class="batch-name">
                             {{ batch.name }}
                         </h3>
@@ -383,90 +659,441 @@ Trainer Dashboard | SkillTrack Maharashtra
                         <div class="batch-course">
                             {{ batch.course.name }}
                         </div>
+
                     </div>
 
+
                     {% if batch.status == "Active" %}
+
                         <span class="batch-status status-active">
                             Active
                         </span>
+
                     {% elif batch.status == "Completed" %}
+
                         <span class="batch-status status-completed">
                             Completed
                         </span>
+
                     {% else %}
+
                         <span class="batch-status status-other">
                             {{ batch.status }}
                         </span>
+
                     {% endif %}
 
                 </div>
 
+
                 <div class="batch-info">
 
-                    <div class="info-item">
-                        <span>District</span>
-                        <strong>{{ batch.district }}</strong>
-                    </div>
 
                     <div class="info-item">
-                        <span>Trainees</span>
+
+                        <span>
+                            District
+                        </span>
+
+                        <strong>
+                            {{ batch.district }}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="info-item">
+
+                        <span>
+                            Trainees
+                        </span>
+
                         <strong>
                             {{ batch.trainees.count }} / {{ batch.capacity }}
                         </strong>
+
                     </div>
 
-                    <div class="info-item">
-                        <span>Start Date</span>
-                        <strong>{{ batch.start_date }}</strong>
-                    </div>
 
                     <div class="info-item">
-                        <span>End Date</span>
-                        <strong>{{ batch.end_date }}</strong>
+
+                        <span>
+                            Start Date
+                        </span>
+
+                        <strong>
+                            {{ batch.start_date }}
+                        </strong>
+
                     </div>
+
+
+                    <div class="info-item">
+
+                        <span>
+                            End Date
+                        </span>
+
+                        <strong>
+                            {{ batch.end_date }}
+                        </strong>
+
+                    </div>
+
 
                 </div>
 
+
+                <!-- CAPACITY -->
+
                 <div class="capacity-row">
-                    <span>Batch Capacity</span>
+
+                    <span>
+                        Batch Capacity
+                    </span>
+
                     <span>
                         {{ batch.trainees.count }}/{{ batch.capacity }}
                     </span>
+
                 </div>
 
+
                 <div class="capacity-bar">
+
                     <div
                         class="capacity-fill"
                         style="width:{% widthratio batch.trainees.count batch.capacity 100 %}%;">
                     </div>
+
                 </div>
 
+
                 <div class="batch-footer">
+
+                    <span class="batch-trainee-label">
+                        {{ batch.trainees.count }} trainees enrolled
+                    </span>
+
+
                     <a
                         href="{% url 'trainer_batch_detail' batch.id %}"
                         class="manage-btn">
+
                         Manage Batch →
+
                     </a>
+
                 </div>
+
 
             </div>
 
             {% endfor %}
 
+
         </div>
+
 
         {% else %}
 
+
         <div class="empty-box">
-            <h3>No Training Batches</h3>
-            <p>You currently have no batches assigned to you.</p>
+
+            <h3>
+                No Training Batches
+            </h3>
+
+            <p>
+                You currently have no batches assigned to you.
+            </p>
+
         </div>
 
+
         {% endif %}
+
 
     </div>
 
 </div>
 
-{% endblock %}
 
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+
+    /* =====================================
+       DATA FROM EXISTING DJANGO BATCHES
+    ===================================== */
+
+    const batchNames = [
+
+        {% for batch in batches %}
+
+            "{{ batch.name|escapejs }}"
+
+            {% if not forloop.last %},{% endif %}
+
+        {% endfor %}
+
+    ];
+
+
+    const traineeCounts = [
+
+        {% for batch in batches %}
+
+            {{ batch.trainees.count }}
+
+            {% if not forloop.last %},{% endif %}
+
+        {% endfor %}
+
+    ];
+
+
+    /* =====================================
+       CALCULATE EXISTING DATA
+       NO BACKEND CHANGES REQUIRED
+    ===================================== */
+
+    let active = 0;
+    let completed = 0;
+    let other = 0;
+    let totalTrainees = 0;
+
+
+    {% for batch in batches %}
+
+        totalTrainees += {{ batch.trainees.count }};
+
+
+        {% if batch.status == "Active" %}
+
+            active++;
+
+        {% elif batch.status == "Completed" %}
+
+            completed++;
+
+        {% else %}
+
+            other++;
+
+        {% endif %}
+
+    {% endfor %}
+
+
+    /* =====================================
+       UPDATE KPI CARDS
+    ===================================== */
+
+    document.getElementById("activeBatchCount").textContent = active;
+
+    document.getElementById("totalTraineeCount").textContent =
+        totalTrainees;
+
+
+    /* =====================================
+       BATCH STATUS CHART
+    ===================================== */
+
+    const statusCanvas =
+        document.getElementById("batchStatusChart");
+
+
+    if (statusCanvas) {
+
+        new Chart(statusCanvas, {
+
+            type: "doughnut",
+
+            data: {
+
+                labels: [
+                    "Active",
+                    "Completed",
+                    "Other"
+                ],
+
+                datasets: [{
+
+                    data: [
+                        active,
+                        completed,
+                        other
+                    ],
+
+                    borderWidth: 0,
+
+                    hoverOffset: 6
+
+                }]
+
+            },
+
+            options: {
+
+                responsive: true,
+
+                maintainAspectRatio: false,
+
+                cutout: "68%",
+
+                plugins: {
+
+                    legend: {
+
+                        position: "bottom",
+
+                        labels: {
+
+                            usePointStyle: true,
+
+                            padding: 18,
+
+                            font: {
+                                size: 11
+                            }
+
+                        }
+
+                    },
+
+                    tooltip: {
+
+                        callbacks: {
+
+                            label: function(context) {
+
+                                return " " +
+                                    context.label +
+                                    ": " +
+                                    context.raw +
+                                    " batches";
+
+                            }
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        });
+
+    }
+
+
+    /* =====================================
+       TRAINEES BY BATCH CHART
+    ===================================== */
+
+    const traineeCanvas =
+        document.getElementById("traineeBatchChart");
+
+
+    if (traineeCanvas) {
+
+        new Chart(traineeCanvas, {
+
+            type: "bar",
+
+            data: {
+
+                labels: batchNames,
+
+                datasets: [{
+
+                    label: "Trainees",
+
+                    data: traineeCounts,
+
+                    borderRadius: 7,
+
+                    borderSkipped: false
+
+                }]
+
+            },
+
+            options: {
+
+                responsive: true,
+
+                maintainAspectRatio: false,
+
+                scales: {
+
+                    y: {
+
+                        beginAtZero: true,
+
+                        ticks: {
+                            precision: 0
+                        },
+
+                        grid: {
+                            drawBorder: false
+                        }
+
+                    },
+
+                    x: {
+
+                        grid: {
+                            display: false
+                        },
+
+                        ticks: {
+
+                            font: {
+                                size: 10
+                            }
+
+                        }
+
+                    }
+
+                },
+
+                plugins: {
+
+                    legend: {
+                        display: false
+                    },
+
+                    tooltip: {
+
+                        callbacks: {
+
+                            label: function(context) {
+
+                                return " " +
+                                    context.raw +
+                                    " trainees";
+
+                            }
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        });
+
+    }
+
+});
+
+</script>
+
+{% endblock %}

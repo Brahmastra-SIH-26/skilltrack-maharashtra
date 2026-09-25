@@ -85,4 +85,11 @@ path(
     name="employment_detail",
 ),
     path("ok",views.ok),
+path(
+    "google-success/",
+    views.google_login_success,
+    name="google_login_success",
+),
+path("choose-role/", views.choose_role, name="choose_role"),
+ path("pending/", views.pending_page, name="pending_page"),
 ]
